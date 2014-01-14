@@ -18,13 +18,13 @@ import java.util.Map.Entry;
 import org.geoserver.xacml.geoxacml.XACMLConstants;
 import org.geoserver.xacml.role.XACMLRole;
 
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.DNSNameAttribute;
-import com.sun.xacml.attr.IPv4AddressAttribute;
-import com.sun.xacml.attr.IPv6AddressAttribute;
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.Subject;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.DNSNameAttribute;
+import org.wso2.balana.attr.IPv4AddressAttribute;
+import org.wso2.balana.attr.IPv6AddressAttribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.xacml2.Subject;
 
 /**
  * Builds a request for URL Matching against regular expressions Http parameters are encoded as

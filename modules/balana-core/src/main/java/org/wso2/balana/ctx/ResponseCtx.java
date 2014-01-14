@@ -168,6 +168,57 @@ public class ResponseCtx {
     }
 
     /**
+     * Encodes this context into its XML representation and writes this encoding to the given
+     * <code>OutputStream</code> with no indentation.
+     * 
+     * @param output
+     *            a stream into which the XML-encoded data is written
+     */
+    public void encode(OutputStream output) {
+        encode(output, new Indenter(0));
+    }
+
+    public void encode(OutputStream output, Indenter indenter) {
+        encode(output, indenter);
+    }
+    
+    /**Added this method to be equal as the GeoXACML file, but for now when this methos is called by the
+     * class "GeoXACMLPDPController" line 72 I passed only 1 parameter instead of 3 like in the GeoXACML original file
+     * 
+     * Encodes this context into its XML representation and writes this encoding to the given
+     * <code>OutputStream</code> with indentation.
+     * 
+     * @param output
+     *            a stream into which the XML-encoded data is written
+     * @param indenter
+     *            an object that creates indentation strings
+     
+    public void encode(OutputStream output, Indenter indenter, boolean header) {
+
+        // Make a PrintStream for a nicer printing interface
+        PrintStream out = new PrintStream(output);
+        if (header)
+            out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+        // Prepare the indentation string
+        String indent = indenter.makeString();
+
+        // Now write the XML...
+
+        out.println(indent + "<Response>");
+
+        // Go through all results
+        for (AbstractResult result : results)
+            result.encode(out, indenter);
+        
+        indenter.out();
+
+        // Finish the XML for a response
+        out.println(indent + "</Response>");
+
+    }*/
+    
+    /**
      * Encodes this <code>ResponseCtx</code> into its XML form and writes this out to the provided
      * <code>StringBuilder<code>
      *

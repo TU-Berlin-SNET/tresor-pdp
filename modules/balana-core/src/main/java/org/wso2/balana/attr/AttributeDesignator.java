@@ -111,6 +111,9 @@ public class AttributeDesignator extends AbstractDesignator {
     // This is used only for Subject in XACML2.
     // but adding it for all designators
     private URI category;
+    
+    // if we're a subject this is the category
+    private URI subjectCategory;
 
     // the logger we'll use for all messages
     private static Log logger = LogFactory.getLog(AttributeDesignator.class);
@@ -168,6 +171,17 @@ public class AttributeDesignator extends AbstractDesignator {
         this.category = category;
     }
 
+    /**(this method added to be equal as the GeoXACML file)
+     * Sets the category if this is a SubjectAttributeDesignatorType
+     * 
+     * @param category
+     *            the subject category
+     */
+    public void setSubjectCategory(URI category) {
+        if (target == SUBJECT_TARGET)
+            subjectCategory = category;
+    }
+    
     /**
      * Creates a new <code>AttributeDesignator</code> based on the DOM root of the XML data.
      *

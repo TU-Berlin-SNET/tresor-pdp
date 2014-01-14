@@ -20,13 +20,13 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xacml.geoxacml.attr.GMLVersion;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 import org.vfny.geoserver.Request;
-
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.Subject;
+        
+import org.wso2.balana.attr.AnyURIAttribute;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.StringAttribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.xacml2.Subject;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -66,7 +66,7 @@ public abstract class RequestCtxBuilder extends Object {
 
         AttributeValue roleAttributeValue = new AnyURIAttribute(roleURI);
         Attribute roleAttribute = new Attribute(XACMLConstants.RoleAttributeURI, null, null,
-                roleAttributeValue);
+                roleAttributeValue, 2);
         subjectAttributes.add(roleAttribute);
 
         for (Attribute attr : role.getAttributes()) {

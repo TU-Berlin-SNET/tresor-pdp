@@ -281,6 +281,36 @@ public class Status {
         }
         builder.append("</Status>");
     }
+    
+    /**
+     * Encodes this status data into its XML representation and writes this encoding to the given
+     * <code>OutputStream</code> with indentation.
+     * 
+     * @param output
+     *            a stream into which the XML-encoded data is written
+     * @param indenter
+     *            an object that creates indentation strings
+     
+    public void encode(OutputStream output, Indenter indenter) {
+        PrintStream out = new PrintStream(output);
+        String indent = indenter.makeString();
+
+        out.println(indent + "<Status>");
+
+        indenter.in();
+
+        encodeStatusCode(out, indenter, code.iterator());
+
+        if (message != null)
+            out.println(indenter.makeString() + "<StatusMessage>" + message + "</StatusMessage>");
+
+        if (detail != null)
+            out.println(detail.getEncoded());
+
+        indenter.out();
+
+        out.println(indent + "</Status>");
+    }*/
 
     /**
      * Encodes the object in XML

@@ -9,13 +9,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geoserver.security.AccessMode;
-import org.geoserver.security.DataAccessManager.CatalogMode;
+import org.geoserver.security.CatalogMode;
 import org.geoserver.xacml.geoxacml.XACMLConstants;
 import org.geoserver.xacml.role.XACMLRole;
 
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.Subject;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.xacml2.Subject;
 
 /**
  * Builds a request for testing access of geoserver to the catalog (always Permit) The idea here is

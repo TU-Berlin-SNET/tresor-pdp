@@ -164,8 +164,6 @@ public class Result extends AbstractResult {
         return list;
     }
 
-
-
     /**
      * Returns the resourceId to which this Result applies, or null if none is specified.
      * 

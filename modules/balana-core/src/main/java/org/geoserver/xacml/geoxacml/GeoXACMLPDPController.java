@@ -17,10 +17,12 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.w3c.dom.Document;
 
-import com.sun.xacml.Indenter;
-import com.sun.xacml.PDP;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.wso2.balana.Indenter;
+import org.wso2.balana.PDP;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
+//import com.sun.xacml.ctx.RequestCtx;
+//import com.sun.xacml.ctx.ResponseCtx;
 
 /**
  * Controller which acts as GeoXACML Policy Decision Point
@@ -66,7 +68,8 @@ public class GeoXACMLPDPController extends AbstractController {
         RequestCtx request = RequestCtx.getInstance(doc.getDocumentElement());
         ResponseCtx response = pdp.evaluate(request);
 
-        response.encode(resp.getOutputStream(), new Indenter(0), true);
+        //response.encode(resp.getOutputStream(), new Indenter(0), true);
+        response.encode(resp.getOutputStream());
         return null;
     }
 

@@ -86,6 +86,9 @@ public class Attribute {
      * issue instance of the attribute. this is not used in XACML3
      */
     private DateTimeAttribute issueInstant = null;
+    
+    // the single value associated with this attribute
+    private AttributeValue value;
 
     /**
      * a <code>List</code> of <code>AttributeValue</code>  
@@ -110,6 +113,53 @@ public class Attribute {
         this(id, value.getType(), issuer, issueInstant, Arrays.asList(value), includeInResult,version);
     }
 
+    /**
+     * Creates a new <code>Attribute</code> of the type specified in the given
+     * <code>AttributeValue</code>.
+     * 
+     * @param id
+     *            the id of the attribute
+     * @param issuer
+     *            the attribute's issuer or null if there is none
+     * @param issueInstant
+     *            the moment when the attribute was issued, or null if it's unspecified
+     * @param value
+     *            the actual value associated with the attribute meta-data
+     */
+    public Attribute(URI id, String issuer, DateTimeAttribute issueInstant, AttributeValue value) {
+        this(id, value.getType(), issuer, issueInstant, value);
+    }
+    
+    /**
+     * Creates a new <code>Attribute</code>
+     * 
+     * @deprecated As of version 1.1, replaced by
+     *             {@link #Attribute(URI,String,DateTimeAttribute,AttributeValue)}. This constructor
+     *             has some ambiguity in that it allows a specified datatype and a value that
+     *             already has some associated datatype. The new constructor clarifies this issue by
+     *             removing the datatype parameter and using the datatype specified by the given
+     *             value.
+     * 
+     * @param id
+     *            the id of the attribute
+     * @param type
+     *            the type of the attribute
+     * @param issuer
+     *            the attribute's issuer or null if there is none
+     * @param issueInstant
+     *            the moment when the attribute was issued, or null if it's unspecified
+     * @param value
+     *            the actual value associated with the attribute meta-data
+     */
+    public Attribute(URI id, URI type, String issuer, DateTimeAttribute issueInstant,
+            AttributeValue value) {
+        this.id = id;
+        this.type = type;
+        this.issuer = issuer;
+        this.issueInstant = issueInstant;
+        this.value = value;
+    }
+    
     /**
      * Creates a new <code>Attribute</code>  for XACML 2 and XACML 1.X with one <code>AttributeValue</code>
      *

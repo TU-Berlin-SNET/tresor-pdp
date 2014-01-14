@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.userdetails.UserDetails;
+//import org.springframework.security.Authentication;
+//import org.springframework.security.GrantedAuthority;
+//import org.springframework.security.context.SecurityContextHolder;
+//import org.springframework.security.userdetails.UserDetails;
 import org.geotools.xacml.geoxacml.attr.GML3Support;
 
-import com.sun.xacml.Indenter;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.wso2.balana.Indenter;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
+import org.wso2.balana.ctx.xacml2.Result;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -33,6 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.wso2.balana.ctx.AbstractResult;
 
 /**
  * Some utility methods
@@ -76,13 +77,14 @@ public class XACMLUtil {
     }
 
     public static int getDecisionFromResponseContext(ResponseCtx responseCtx) {
-        Set<Result> results = responseCtx.getResults();
+        Set<AbstractResult> results = responseCtx.getResults(); //instead of "Result" in balana project is "AbstractResult"
+        //Set<Result> results = responseCtx.getResults();
         // Set<Obligation> permitObligations = new HashSet<Obligation>();
         // Set<Obligation> denyObligations = new HashSet<Obligation>();
         Set<String> resources = new HashSet<String>();
 
         boolean hasPermit = false, hasDeny = false;
-        for (Result result : results) {
+        for (AbstractResult result : results) {
             int decision = result.getDecision();
             resources.add(result.getResource());
             if (decision == Result.DECISION_INDETERMINATE)
@@ -138,7 +140,8 @@ public class XACMLUtil {
         for (GrantedAuthority ga : auth.getAuthorities()) {
             buff.append(ga.getAuthority()).append(",");
         }
-        if (auth.getAuthorities().length > 0)
+        //if (auth.getAuthorities().length > 0)
+        if (auth.getAuthorities().size() > 0)
             buff.setLength(buff.length() - 1);
         buff.append(" ] ");
         return buff.toString();

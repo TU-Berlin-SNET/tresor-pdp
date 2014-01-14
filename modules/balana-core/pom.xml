@@ -83,6 +83,24 @@
             <version>2.7.0</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.restlet</groupId>
+            <artifactId>org.restlet</artifactId>
+            <version>1.0.8</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.noelios.restlet</groupId>
+            <artifactId>com.noelios.restlet.ext.servlet</artifactId>
+            <version>1.0.8</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <artifactId>spring-security-core</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <type>jar</type>
+            <version>3.1.0.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>

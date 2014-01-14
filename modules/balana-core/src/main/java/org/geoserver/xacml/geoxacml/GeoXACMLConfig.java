@@ -27,13 +27,13 @@ import org.geotools.xacml.transport.XACMLTransport;
 import org.geotools.xacml.transport.XACMLTransportFactory;
 import org.vfny.geoserver.global.GeoserverDataDirectory;
 
-import com.sun.xacml.PDP;
-import com.sun.xacml.PDPConfig;
-import com.sun.xacml.finder.AttributeFinder;
-import com.sun.xacml.finder.AttributeFinderModule;
-import com.sun.xacml.finder.PolicyFinder;
-import com.sun.xacml.finder.PolicyFinderModule;
-import com.sun.xacml.finder.impl.CurrentEnvModule;
+import org.wso2.balana.PDP;
+import org.wso2.balana.PDPConfig;
+import org.wso2.balana.finder.AttributeFinder;
+import org.wso2.balana.finder.AttributeFinderModule;
+import org.wso2.balana.finder.PolicyFinder;
+import org.wso2.balana.finder.PolicyFinderModule;
+import org.wso2.balana.finder.impl.CurrentEnvModule;
 
 /**
  * @author Christian Mueller

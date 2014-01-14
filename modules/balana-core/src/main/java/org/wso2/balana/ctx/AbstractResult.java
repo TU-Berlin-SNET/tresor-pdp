@@ -22,7 +22,7 @@ package org.wso2.balana.ctx;
 import org.wso2.balana.*;
 import org.wso2.balana.xacml3.Advice;
 
-import java.io.OutputStream;
+//import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +94,10 @@ public abstract class AbstractResult {
      * the status data
      */
     protected Status status = null;
+    
+    // the resource identifier or null if there is none
+    // this variable was "private" I changed to public to be accesed from "Result.java" file
+    public String resource = null;
 
     /**
      * XACML version
@@ -206,6 +210,15 @@ public abstract class AbstractResult {
     public int getDecision() {
         return decision;
     }
+        
+    /**
+     * Returns the resource to which this Result applies, or null if none is specified.
+     * 
+     * @return a resource identifier or null
+     */
+    public String getResource() {
+        return resource;
+    }
 
     /**
      * Returns the status data included in this <code>Result</code>. Typically this will be
@@ -244,5 +257,5 @@ public abstract class AbstractResult {
      * @param builder string stream into which the XML-encoded data is written
      */
     public abstract void encode(StringBuilder builder);
-
+    
 }
