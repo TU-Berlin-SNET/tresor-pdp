@@ -19,7 +19,7 @@ package org.geotools.xacml.geoxacml.cond;
 
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 
-import com.sun.xacml.attr.BooleanAttribute;
+import org.wso2.balana.attr.BooleanAttribute;
 
 /**
  * Abstract base class for geomtry topological functions

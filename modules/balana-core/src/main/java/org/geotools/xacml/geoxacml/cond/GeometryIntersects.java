@@ -18,12 +18,11 @@ package org.geotools.xacml.geoxacml.cond;
 
 import java.util.List;
 
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.cond.Evaluatable;
+import org.wso2.balana.cond.EvaluationResult;
+import org.wso2.balana.ctx.EvaluationCtx;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
-
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.cond.Expression;
 
 /**
  * Checks if 2 geometries intersect
@@ -40,7 +39,8 @@ public class GeometryIntersects extends GeometryTopologicalFunction {
 
     }
 
-    public EvaluationResult evaluate(List<? extends Expression> inputs, EvaluationCtx context) {
+//    public EvaluationResult evaluate(List<? extends Expression> inputs, EvaluationCtx context) {
+    public EvaluationResult evaluate(List<Evaluatable> inputs, EvaluationCtx context) {
 
         AttributeValue[] argValues = new AttributeValue[inputs.size()];
         EvaluationResult result = evalArgs(inputs, context, argValues);

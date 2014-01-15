@@ -20,12 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.xacml.EvaluationCtx;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.DoubleAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.cond.Expression;
+import org.wso2.balana.ctx.EvaluationCtx;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.DoubleAttribute;
+import org.wso2.balana.attr.StringAttribute;
+import org.wso2.balana.cond.Evaluatable;
+import org.wso2.balana.cond.EvaluationResult;
+import org.wso2.balana.cond.Expression;
 
 /**
  * Converts units to square metres
@@ -66,8 +67,9 @@ public class ConvertToSquareMetre extends ConvertFunction {
 
     }
 
-    public EvaluationResult evaluate(List<? extends Expression> inputs, EvaluationCtx context) {
-
+    //public EvaluationResult evaluate(List<? extends Expression> inputs, EvaluationCtx context) {
+    public EvaluationResult evaluate(List<Evaluatable> inputs, EvaluationCtx context) {
+        
         AttributeValue[] argValues = new AttributeValue[inputs.size()];
         EvaluationResult result = evalArgs(inputs, context, argValues);
         if (result != null)

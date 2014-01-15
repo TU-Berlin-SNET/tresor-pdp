@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sun.xacml.Indenter;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.wso2.balana.Indenter;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
 
 /**
  * Common base class for {@link XACMLTransport} implementations
@@ -46,7 +46,7 @@ public abstract class XACMLAbstractTransport implements XACMLTransport {
         if (logger.isLoggable(Level.FINE) == false)
             return;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ctx.encode(out, new Indenter(2), true);
+        ctx.encode(out, new Indenter(2));
         logger.fine(out.toString());
         try {
             out.close();
@@ -61,7 +61,7 @@ public abstract class XACMLAbstractTransport implements XACMLTransport {
         if (logger.isLoggable(Level.FINE) == false)
             return;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ctx.encode(out, new Indenter(2), true);
+        ctx.encode(out, new Indenter(2));
         logger.fine(out.toString());
         try {
             out.close();

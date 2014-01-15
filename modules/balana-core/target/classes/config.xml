@@ -17,5 +17,10 @@
     <!--condition>
         <function class="org.wso2.balana.cond.TimeInRangeFunction"/>
       </condition>
+      <string>/home/asela/Carbon/commons/commons/balana/src/test/resources/basic/3/policies/TestPolicy_0001.xml</string>
+      <string>/opt/NetBeans/TRESOR/WSO2-Balana/modules/balana-core/src/test/resources/basic/3/policies</string>
+      
+      line that work for us
+      <string>/opt/NetBeans/TRESOR/WSO2-Balana/modules/balana-core/src/test/resources/basic/3/policies/TestPolicy_0001.xml</string>
     </functionFactory-->
 </config>

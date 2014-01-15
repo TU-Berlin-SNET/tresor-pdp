@@ -25,8 +25,10 @@ import java.io.File;
  */
 public class TestConstants {
 
+    //public static final String RESOURCE_PATH =  "src" + File.separator + "test" + File.separator +"resources" + File.separator;
+    
     public static final String RESOURCE_PATH =  "src" + File.separator + "test" + File.separator +
-                                                "resources" + File.separator;
+                                                "resources";
 
     public static final String POLICY_DIRECTORY = "policies";
 

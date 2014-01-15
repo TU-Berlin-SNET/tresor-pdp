@@ -79,7 +79,7 @@ public abstract class AbstractResult {
      * List of obligations which may be empty
      */
     protected List<ObligationResult> obligations;
-
+    
     /**
      * List of advices which may be empty
      */
@@ -187,8 +187,7 @@ public abstract class AbstractResult {
         }
         return obligations;
     }
-
-
+    
     /**
      * Returns the set of advice that the PEP must fulfill, which may be empty.
      *

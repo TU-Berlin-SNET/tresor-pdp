@@ -17,28 +17,32 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.geoserver.xacml.geoxacml.GeoXACMLConfig;
 import org.geoserver.xacml.geoxacml.XACMLConstants;
 import org.geoserver.xacml.geoxacml.XACMLUtil;
 import org.geotools.xacml.geoxacml.attr.GMLVersion;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 
-import com.sun.xacml.Obligation;
-import com.sun.xacml.attr.AnyURIAttribute;
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BooleanAttribute;
-import com.sun.xacml.attr.DateTimeAttribute;
-import com.sun.xacml.attr.DoubleAttribute;
-import com.sun.xacml.attr.IntegerAttribute;
-import com.sun.xacml.attr.StringAttribute;
-import com.sun.xacml.ctx.Attribute;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
-import com.sun.xacml.ctx.Result;
+import org.wso2.balana.AbstractObligation;
+import org.wso2.balana.xacml2.Obligation;
+import org.wso2.balana.attr.AnyURIAttribute;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.BooleanAttribute;
+import org.wso2.balana.attr.DateTimeAttribute;
+import org.wso2.balana.attr.DoubleAttribute;
+import org.wso2.balana.attr.IntegerAttribute;
+import org.wso2.balana.attr.StringAttribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
+import org.wso2.balana.ctx.xacml2.Result;
 import com.vividsolutions.jts.geom.Geometry;
+import org.wso2.balana.ObligationResult;
+import org.wso2.balana.ctx.AbstractResult;
+//import org.wso2.balana.ctx.AbstractResult;
 
 /**
  * Spring Security implementation for {@link XACMLRoleAuthority}
@@ -52,8 +56,10 @@ public class XACMLDefaultRoleAuthority implements XACMLRoleAuthority {
     private static InheritableThreadLocal<Set<Authentication>> AlreadyPrepared = new InheritableThreadLocal<Set<Authentication>>();
 
     public <T extends UserDetails> void transformUserDetails(T details) {
-        for (int i = 0; i < details.getAuthorities().length; i++) {
-            details.getAuthorities()[i] = new XACMLRole(details.getAuthorities()[i].getAuthority());
+        //for (int i = 0; i < details.getAuthorities().length; i++) {
+        for (int i = 0; i < details.getAuthorities().size(); i++) {
+            //commented temporary to see if we need it
+            //details.getAuthorities()[i] = new XACMLRole(details.getAuthorities()[i].getAuthority());
         }
     }
 
@@ -67,7 +73,7 @@ public class XACMLDefaultRoleAuthority implements XACMLRoleAuthority {
         if (AlreadyPrepared.get().contains(auth)) {
             return; // nothing todo
         }
-        List<RequestCtx> requests = new ArrayList<RequestCtx>(auth.getAuthorities().length);
+        List<RequestCtx> requests = new ArrayList<RequestCtx>(auth.getAuthorities().size());
         String userName = null;
         if (auth.getPrincipal() instanceof UserDetails)
             userName = ((UserDetails) auth.getPrincipal()).getUsername();
@@ -85,8 +91,9 @@ public class XACMLDefaultRoleAuthority implements XACMLRoleAuthority {
 
         outer: for (int i = 0; i < responses.size(); i++) {
             ResponseCtx response = responses.get(i);
-            XACMLRole role = (XACMLRole) auth.getAuthorities()[i];
-            for (Result result : response.getResults()) {
+            //XACMLRole role = (XACMLRole) auth.getAuthorities()[i];
+            XACMLRole role = null;
+            for (AbstractResult result : response.getResults()) {
                 if (result.getDecision() != Result.DECISION_PERMIT) {
                     role.setEnabled(false);
                     continue outer;
@@ -99,7 +106,7 @@ public class XACMLDefaultRoleAuthority implements XACMLRoleAuthority {
         AlreadyPrepared.get().add(auth); // avoid further processing within one thread
     }
 
-    private void setUserProperties(Authentication auth, Result result, XACMLRole role) {
+    private void setUserProperties(Authentication auth, AbstractResult result, XACMLRole role) {
 
         if (role.isRoleAttributesProcessed())
             return; // already done
@@ -108,12 +115,16 @@ public class XACMLDefaultRoleAuthority implements XACMLRoleAuthority {
             role.setRoleAttributesProcessed(true);
             return;
         }
-
-        for (Obligation obligation : result.getObligations()) {
-            if (XACMLConstants.UserPropertyObligationId.equals(obligation.getId().toString()))
+        
+        //variable created to get the Id of the obligation and for getAssignments() method
+        AbstractObligation obligationId = null;
+        Obligation obligationGetAssigment = null;
+        
+        for (ObligationResult obligation : result.getObligations()) {
+            if (XACMLConstants.UserPropertyObligationId.equals(obligationId.getId().toString()))
                 setRoleParamsFromUserDetails(auth, obligation, role);
-            if (XACMLConstants.RoleConstantObligationId.equals(obligation.getId().toString()))
-                setRoleParamsFromConstants(obligation, role);
+            if (XACMLConstants.RoleConstantObligationId.equals(obligationId.getId().toString()))
+                setRoleParamsFromConstants(obligationGetAssigment, role);
 
         }
         role.setRoleAttributesProcessed(true);
@@ -125,17 +136,18 @@ public class XACMLDefaultRoleAuthority implements XACMLRoleAuthority {
         }
     }
 
-    private void setRoleParamsFromUserDetails(Authentication auth, Obligation obligation,
+    private void setRoleParamsFromUserDetails(Authentication auth, ObligationResult obligation,
             XACMLRole role) {
 
         BeanInfo bi = null;
+        Obligation obligationGetAssigment = null;
         try {
             bi = Introspector.getBeanInfo(auth.getPrincipal().getClass());
         } catch (IntrospectionException e) {
             throw new RuntimeException(e);
         }
 
-        for (Attribute attr : obligation.getAssignments()) {
+        for (Attribute attr : obligationGetAssigment.getAssignments()) {
             String propertyName = ((StringAttribute) attr.getValue()).getValue();
             for (PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 if (pd.getName().equals(propertyName)) {

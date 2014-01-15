@@ -17,8 +17,8 @@
 
 package org.geotools.xacml.geoxacml.cond;
 
-import com.sun.xacml.attr.DoubleAttribute;
-import com.sun.xacml.attr.StringAttribute;
+import org.wso2.balana.attr.DoubleAttribute;
+import org.wso2.balana.attr.StringAttribute;
 
 /**
  * Abstract base class for converter functions

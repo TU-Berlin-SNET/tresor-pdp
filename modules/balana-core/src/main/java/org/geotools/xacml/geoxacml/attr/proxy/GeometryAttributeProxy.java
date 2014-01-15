@@ -28,8 +28,8 @@ import org.wso2.balana.attr.AttributeValue;
  * 
  *         A proxy class, this is required by the SUN XACML implementation
  */
-//public class GeometryAttributeProxy implements AttributeProxy {
-public abstract class GeometryAttributeProxy implements AttributeProxy {
+public class GeometryAttributeProxy implements AttributeProxy {
+//public abstract class GeometryAttributeProxy implements AttributeProxy {
 
     public AttributeValue getInstance(Node root) throws Exception {
         return GeometryAttribute.getInstance(root);
@@ -38,5 +38,11 @@ public abstract class GeometryAttributeProxy implements AttributeProxy {
     public AttributeValue getInstance(String value) throws Exception {
         return GeometryAttribute.getInstance(value);
     }
+
+	public AttributeValue getInstance(String value, String[] params)
+			throws Exception {
+		// TODO corresponding getInstance in GeometryAttribute missing
+		return null;
+        }
 
 }

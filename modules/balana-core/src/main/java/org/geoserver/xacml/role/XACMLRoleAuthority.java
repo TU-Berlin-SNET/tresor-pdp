@@ -5,8 +5,8 @@
 
 package org.geoserver.xacml.role;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * A RoleAssignmentAuthority is NOT responsible for assignment from roles to subjects

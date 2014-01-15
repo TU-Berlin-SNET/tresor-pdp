@@ -160,10 +160,10 @@ public class PolicyMetaData {
         }
 
         if (xpathVersion != null) {
-            if (!xpathVersion.equals(XPATH_1_0_IDENTIFIER)){
+            /*if (!xpathVersion.equals(XPATH_1_0_IDENTIFIER)){
                 throw new IllegalArgumentException("Unsupported XPath " + " version: "
                         + xpathVersion);
-           }
+           }*/
             this.xpathVersion = XPATH_VERSION_1_0;
         } else {
             this.xpathVersion = XPATH_VERSION_UNSPECIFIED;

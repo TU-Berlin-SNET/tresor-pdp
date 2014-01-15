@@ -63,7 +63,7 @@ public class Result extends AbstractResult {
      * the resourceId identifier or null if there is none
      */
     private String resourceId = null;
-
+    
     public Result(int decision, Status status){
         // version can be XACML 2.0,  1.1 or 1.0 But here we assume as XACML 2.0 as a common
         super(decision, status, XACMLConstants.XACML_VERSION_2_0);
@@ -224,4 +224,5 @@ public class Result extends AbstractResult {
         // finish it off
         builder.append("</Result>");
     }
+    
 }

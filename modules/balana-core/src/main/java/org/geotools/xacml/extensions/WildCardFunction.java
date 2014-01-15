@@ -31,6 +31,7 @@ import org.wso2.balana.attr.IPAddressAttribute;
 import org.wso2.balana.attr.RFC822NameAttribute;
 import org.wso2.balana.attr.StringAttribute;
 import org.wso2.balana.attr.X500NameAttribute;
+import org.wso2.balana.cond.Evaluatable;
 import org.wso2.balana.cond.EvaluationResult;
 import org.wso2.balana.cond.Expression;
 import org.wso2.balana.cond.FunctionBase;
@@ -204,7 +205,7 @@ public class WildCardFunction extends FunctionBase {
      * @return an <code>EvaluationResult</code> representing the function's result
      */
 
-    public EvaluationResult evaluate(List<? extends Expression> inputs, EvaluationCtx context) {
+    public EvaluationResult evaluate(List<Evaluatable> inputs, EvaluationCtx context) {
 
         // Evaluate the arguments
         AttributeValue[] argValues = new AttributeValue[inputs.size()];

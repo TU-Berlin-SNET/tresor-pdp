@@ -16,9 +16,8 @@
  */
 package org.geotools.xacml.geoxacml.cond;
 
+import org.wso2.balana.attr.BooleanAttribute;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
-
-import com.sun.xacml.attr.BooleanAttribute;
 
 /**
  * Abstract base class for geomtry check functions

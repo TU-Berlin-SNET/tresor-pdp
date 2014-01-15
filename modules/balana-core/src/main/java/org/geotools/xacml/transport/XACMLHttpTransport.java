@@ -30,10 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.w3c.dom.Node;
 
-import com.sun.xacml.Indenter;
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.wso2.balana.Indenter;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
 
 /**
  * Transport Object for a remote PDP reachable by an http POST request. Since XACML requests are
@@ -162,7 +163,7 @@ public class XACMLHttpTransport extends XACMLAbstractTransport {
 
     private ResponseCtx sendHttpPost(RequestCtx requestCtx) {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        requestCtx.encode(bout, new Indenter(0), true);
+        requestCtx.encode(bout, new Indenter(0));
         byte[] byteArray = bout.toByteArray();
         byte[] msgDigest = getDigestBytes(byteArray);
 
@@ -182,7 +183,8 @@ public class XACMLHttpTransport extends XACMLAbstractTransport {
             out.write(byteArray);
             out.close();
             InputStream in = conn.getInputStream();
-            ResponseCtx result = ResponseCtx.getInstance(in);
+            //ResponseCtx result = ResponseCtx.getInstance(in);
+            ResponseCtx result = ResponseCtx.getInstance((Node) in);
             in.close();
             if (msgDigest != null)
                 DigestMap.get().put(new String(msgDigest), result);

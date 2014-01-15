@@ -32,9 +32,9 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
-import com.sun.xacml.cond.EvaluationResult;
-import com.sun.xacml.cond.FunctionBase;
-import com.sun.xacml.ctx.Status;
+import org.wso2.balana.cond.EvaluationResult;
+import org.wso2.balana.cond.FunctionBase;
+import org.wso2.balana.ctx.Status;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**

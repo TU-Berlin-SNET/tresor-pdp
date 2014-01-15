@@ -313,7 +313,7 @@ public abstract class FunctionBase implements Function {
      *         <code>EvaluationResult</code> representing the error
      */
     //original function
-    /*
+    
     protected EvaluationResult evalArgs(List<Evaluatable> params, EvaluationCtx context, AttributeValue[] args) {
         Iterator it = params.iterator();
         int index = 0;
@@ -333,7 +333,8 @@ public abstract class FunctionBase implements Function {
 
         // if no error occurred then we got here, so we return no errors
         return null;
-    }*/
+    }
+    /*
     //function from the GeoXACML code
     protected EvaluationResult evalArgs(List<? extends Expression> params, EvaluationCtx context,
             AttributeValue[] args) {
@@ -355,7 +356,7 @@ public abstract class FunctionBase implements Function {
 
         // if no error occurred then we got here, so we return no errors
         return null;
-    }
+    }*/
     
     /**
      * Default handling of input checking. This does some simple checking based on the type of

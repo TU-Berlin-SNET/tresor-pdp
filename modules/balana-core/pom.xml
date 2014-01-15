@@ -84,6 +84,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <artifactId>spring-security-core</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <type>jar</type>
+            <version>3.1.0.RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>org.restlet</groupId>
             <artifactId>org.restlet</artifactId>
             <version>1.0.8</version>
@@ -96,10 +102,28 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <artifactId>spring-security-core</artifactId>
-            <groupId>org.springframework.security</groupId>
+            <groupId>org.restlet</groupId>
+            <artifactId>org.restlet.ext.freemarker</artifactId>
+            <version>1.0.8</version>
             <type>jar</type>
-            <version>3.1.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <artifactId>platform</artifactId>
+            <groupId>org.geoserver</groupId>
+            <type>jar</type>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-context</artifactId>
+            <groupId>org.springframework</groupId>
+            <type>jar</type>
+            <version>3.1.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>3.1.4.RELEASE</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
@@ -133,8 +157,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
- 			<Bundle-Name>${pom.artifactId}</Bundle-Name>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+ 			<Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
                             org.wso2.balana.*,
                         </Export-Package>
@@ -150,6 +174,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <!--<version>2.0</version>-->
                 <configuration>
                     <includes>
                         <include>**/*BaseTestCase.java</include>

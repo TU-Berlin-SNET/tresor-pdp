@@ -23,9 +23,9 @@ import java.util.Set;
 
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 
-import com.sun.xacml.attr.AttributeValue;
-import com.sun.xacml.attr.BagAttribute;
-import com.sun.xacml.cond.EvaluationResult;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.BagAttribute;
+import org.wso2.balana.cond.EvaluationResult;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**

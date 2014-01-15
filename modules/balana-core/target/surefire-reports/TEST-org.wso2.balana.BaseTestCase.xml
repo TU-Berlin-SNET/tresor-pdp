@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="org.wso2.balana.BaseTestCase" time="4.945" tests="24" errors="0" skipped="0" failures="0">
+<testsuite name="org.wso2.balana.BaseTestCase" time="3.323" tests="24" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-7-oracle/jre/lib/amd64"/>
@@ -30,9 +30,9 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="51.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="os.version" value="3.8.0-31-generic"/>
+    <property name="os.version" value="3.11.0-15-generic"/>
     <property name="user.home" value="/home/zequeira"/>
-    <property name="user.timezone" value="Europe/Madrid"/>
+    <property name="user.timezone" value="Europe/Berlin"/>
     <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.specification.version" value="1.7"/>
@@ -59,28 +59,28 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="testConformanceTestB" classname="org.wso2.balana.conformance.ConformanceTestV2" time="1.147"/>
-  <testcase name="testConformanceTestA" classname="org.wso2.balana.conformance.ConformanceTestV2" time="0.291"/>
-  <testcase name="testConformanceTestC" classname="org.wso2.balana.conformance.ConformanceTestV2" time="2.378"/>
-  <testcase name="testConformanceTestD" classname="org.wso2.balana.conformance.ConformanceTestV2" time="0.224"/>
-  <testcase name="testConformanceTestA" classname="org.wso2.balana.conformance.ConformanceTestV3" time="0.274"/>
-  <testcase name="testBasicTest0003" classname="org.wso2.balana.basic.BasicTestV3" time="0.035"/>
-  <testcase name="testBasicTest0004" classname="org.wso2.balana.basic.BasicTestV3" time="0.036"/>
-  <testcase name="testBasicTest0005" classname="org.wso2.balana.basic.BasicTestV3" time="0.024"/>
-  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.BasicTestV3" time="0.046"/>
-  <testcase name="testBasicTest0002" classname="org.wso2.balana.basic.BasicTestV3" time="0.013"/>
-  <testcase name="testBasicTest0003" classname="org.wso2.balana.basic.TestFunctionV3" time="0.011"/>
-  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.TestFunctionV3" time="0.012"/>
-  <testcase name="testBasicTest0002" classname="org.wso2.balana.basic.TestFunctionV3" time="0.011"/>
-  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.TestMultipleRequestV3" time="0.009"/>
-  <testcase name="testBasicTest0003" classname="org.wso2.balana.basic.TestXPathV3" time="0.047"/>
-  <testcase name="testBasicTest0004" classname="org.wso2.balana.basic.TestXPathV3" time="0.022"/>
-  <testcase name="testBasicTest0005" classname="org.wso2.balana.basic.TestXPathV3" time="0.026"/>
-  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.TestXPathV3" time="0.024"/>
-  <testcase name="testBasicTest0002" classname="org.wso2.balana.basic.TestXPathV3" time="0.019"/>
-  <testcase name="testConformanceTestA" classname="org.wso2.balana.conformance.ConformanceTestV3" time="0.233"/>
-  <testcase name="testAdvanceTest0001" classname="org.wso2.balana.advance.AdvanceTestV3" time="0.005"/>
-  <testcase name="testAdvanceTest0003" classname="org.wso2.balana.advance.AdvanceTestV3" time="0.037"/>
-  <testcase name="testBasics2" classname="org.wso2.balana.finder.impl.TestInMemoryPolicyFinderModule" time="0.013"/>
-  <testcase name="testBasics1" classname="org.wso2.balana.finder.impl.TestInMemoryPolicyFinderModule" time="0.008"/>
+  <testcase name="testConformanceTestA" classname="org.wso2.balana.conformance.ConformanceTestV2" time="0.523"/>
+  <testcase name="testConformanceTestB" classname="org.wso2.balana.conformance.ConformanceTestV2" time="0.49"/>
+  <testcase name="testConformanceTestC" classname="org.wso2.balana.conformance.ConformanceTestV2" time="1.407"/>
+  <testcase name="testConformanceTestD" classname="org.wso2.balana.conformance.ConformanceTestV2" time="0.104"/>
+  <testcase name="testConformanceTestA" classname="org.wso2.balana.conformance.ConformanceTestV3" time="0.191"/>
+  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.BasicTestV3" time="0.044"/>
+  <testcase name="testBasicTest0002" classname="org.wso2.balana.basic.BasicTestV3" time="0.012"/>
+  <testcase name="testBasicTest0003" classname="org.wso2.balana.basic.BasicTestV3" time="0.013"/>
+  <testcase name="testBasicTest0004" classname="org.wso2.balana.basic.BasicTestV3" time="0.018"/>
+  <testcase name="testBasicTest0005" classname="org.wso2.balana.basic.BasicTestV3" time="0.017"/>
+  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.TestFunctionV3" time="0.013"/>
+  <testcase name="testBasicTest0002" classname="org.wso2.balana.basic.TestFunctionV3" time="0.01"/>
+  <testcase name="testBasicTest0003" classname="org.wso2.balana.basic.TestFunctionV3" time="0.01"/>
+  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.TestMultipleRequestV3" time="0.012"/>
+  <testcase name="testBasicTest0001" classname="org.wso2.balana.basic.TestXPathV3" time="0.142"/>
+  <testcase name="testBasicTest0002" classname="org.wso2.balana.basic.TestXPathV3" time="0.016"/>
+  <testcase name="testBasicTest0003" classname="org.wso2.balana.basic.TestXPathV3" time="0.024"/>
+  <testcase name="testBasicTest0004" classname="org.wso2.balana.basic.TestXPathV3" time="0.02"/>
+  <testcase name="testBasicTest0005" classname="org.wso2.balana.basic.TestXPathV3" time="0.021"/>
+  <testcase name="testConformanceTestA" classname="org.wso2.balana.conformance.ConformanceTestV3" time="0.166"/>
+  <testcase name="testAdvanceTest0001" classname="org.wso2.balana.advance.AdvanceTestV3" time="0.006"/>
+  <testcase name="testAdvanceTest0003" classname="org.wso2.balana.advance.AdvanceTestV3" time="0.051"/>
+  <testcase name="testBasics1" classname="org.wso2.balana.finder.impl.TestInMemoryPolicyFinderModule" time="0.007"/>
+  <testcase name="testBasics2" classname="org.wso2.balana.finder.impl.TestInMemoryPolicyFinderModule" time="0.006"/>
 </testsuite>

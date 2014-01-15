@@ -19,8 +19,8 @@ package org.geotools.xacml.transport;
 
 import java.util.List;
 
-import com.sun.xacml.ctx.RequestCtx;
-import com.sun.xacml.ctx.ResponseCtx;
+import org.wso2.balana.ctx.xacml2.RequestCtx;
+import org.wso2.balana.ctx.ResponseCtx;
 
 /**
  * Since XACML says nothing about the communication between PEP and PDP, this interface offers the
