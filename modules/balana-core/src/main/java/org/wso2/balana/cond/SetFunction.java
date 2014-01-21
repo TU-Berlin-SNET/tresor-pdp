@@ -51,6 +51,7 @@ import org.wso2.balana.attr.StringAttribute;
 import org.wso2.balana.attr.TimeAttribute;
 import org.wso2.balana.attr.X500NameAttribute;
 import org.wso2.balana.attr.YearMonthDurationAttribute;
+import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -98,6 +99,12 @@ public abstract class SetFunction extends FunctionBase {
      * <code>string</code>) + </code>NAME_BASE_SET_EQUALS</code>.
      */
     public static final String NAME_BASE_SET_EQUALS = "-set-equals";
+    
+    /**
+     * Rafael Zequeira
+     * Variable added to be able to call "ConditionSetFunction" with one more parameter, so use an especific construct for GeoXACML
+     */
+    public static boolean geo = false;
 
     /**
      * A complete list of all the XACML datatypes supported by the Set functions in XACML 1.x
@@ -162,6 +169,13 @@ public abstract class SetFunction extends FunctionBase {
         return new ConditionSetFunction(functionName, argumentType,
                 NAME_BASE_AT_LEAST_ONE_MEMBER_OF);
     }
+    /* Rafael Zequeira
+     * Temporary solution to support some function from GeoXACML
+     */
+    public static SetFunction getAtLeastOneInstanceGeo(String functionName, String argumentType) {
+        return new ConditionSetFunction(functionName, argumentType,
+                NAME_BASE_AT_LEAST_ONE_MEMBER_OF, geo);
+    }
 
     /**
      * Creates a new instance of the union set function. This should be used to create support for
@@ -190,6 +204,12 @@ public abstract class SetFunction extends FunctionBase {
     public static SetFunction getSubsetInstance(String functionName, String argumentType) {
         return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SUBSET);
     }
+    /* Rafael Zequeira
+     * Temporary solution to support some function from GeoXACML
+     */
+    public static SetFunction getSubsetInstanceGeo(String functionName, String argumentType) {
+        return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SUBSET, geo);
+    }
 
     /**
      * Creates a new instance of the equals set function. This should be used to create support for
@@ -203,6 +223,12 @@ public abstract class SetFunction extends FunctionBase {
      */
     public static SetFunction getSetEqualsInstance(String functionName, String argumentType) {
         return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SET_EQUALS);
+    }
+     /* Rafael Zequeira
+      * Temporary solution to support some function from GeoXACML
+      */
+    public static SetFunction getSetEqualsInstanceGeo(String functionName, String argumentType) {
+        return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SET_EQUALS, geo);
     }
 
     /**

@@ -125,6 +125,9 @@ public class IntegerAttribute extends AttributeValue {
      * @throws NumberFormatException if the string isn't a number
      */
     public static IntegerAttribute getInstance(String value) throws NumberFormatException {
+        // added to fix the spacs on integer Atributes Values
+        // Ömer
+        value = value.trim();
         // Leading '+' is allowed per XML schema and not
         // by Long.parseLong. Strip it, if present.
         if ((value.length() >= 1) && (value.charAt(0) == '+'))

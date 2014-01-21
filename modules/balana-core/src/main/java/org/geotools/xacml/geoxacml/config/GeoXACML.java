@@ -139,7 +139,7 @@ public class GeoXACML {
         FunctionFactoryProxy factoryProxy = StandardFunctionFactory.getNewFactoryProxy();
         FunctionFactory factory = factoryProxy.getTargetFactory();
 
-        // FunctionFactory factory = FunctionFactory.getTargetInstance();
+        //FunctionFactory factory = FunctionFactory.getTargetInstance();
 
         // add wildcard functions
         for (Function wildCardFunction : new WildCardFunctionCluster().getSupportedFunctions()) {
@@ -196,25 +196,36 @@ public class GeoXACML {
         factory.addFunction(BagFunction.getBagInstance(functionName, GeometryAttribute.identifier));
 
         String setPrefix = "urn:ogc:def:function:geoxacml:1.0:geometry";
-
+        
         functionName = setPrefix + SetFunction.NAME_BASE_AT_LEAST_ONE_MEMBER_OF;
-        factory.addFunction(SetFunction.getAtLeastOneInstance(functionName,
+        /** 
+         * Rafael Zequeira
+         * line commented to call the same function for example: "getAtLeastOneInstanceGeo" but
+         * with an additional parameter to be able to call a different constructior with the right parameters
+         */
+        /*factory.addFunction(SetFunction.getAtLeastOneInstance(functionName,
+                GeometryAttribute.identifier));*/
+        factory.addFunction(SetFunction.getAtLeastOneInstanceGeo(functionName,
                 GeometryAttribute.identifier));
-
+        
         functionName = setPrefix + SetFunction.NAME_BASE_SET_EQUALS;
-        factory.addFunction(SetFunction.getSetEqualsInstance(functionName,
+        /*factory.addFunction(SetFunction.getSetEqualsInstance(functionName,
+                GeometryAttribute.identifier));*/
+        factory.addFunction(SetFunction.getSetEqualsInstanceGeo(functionName,
                 GeometryAttribute.identifier));
-
+        
         setPrefix = "urn:ogc:def:function:geoxacml:1.0:geometry-bag";
 
         functionName = setPrefix + SetFunction.NAME_BASE_INTERSECTION;
         factory.addFunction(SetFunction.getIntersectionInstance(functionName,
                 GeometryAttribute.identifier));
-
+        
         functionName = setPrefix + SetFunction.NAME_BASE_SUBSET;
-        factory.addFunction(SetFunction.getSubsetInstance(functionName,
+        /*factory.addFunction(SetFunction.getSubsetInstance(functionName,
+                GeometryAttribute.identifier));*/
+        factory.addFunction(SetFunction.getSubsetInstanceGeo(functionName,
                 GeometryAttribute.identifier));
-
+        
         functionName = setPrefix + SetFunction.NAME_BASE_UNION;
         factory.addFunction(SetFunction
                 .getUnionInstance(functionName, GeometryAttribute.identifier));

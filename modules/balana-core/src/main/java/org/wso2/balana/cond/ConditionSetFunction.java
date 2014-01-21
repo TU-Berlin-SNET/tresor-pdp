@@ -36,6 +36,7 @@
 package org.wso2.balana.cond;
 
 import org.wso2.balana.ctx.EvaluationCtx;
+import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.BagAttribute;
@@ -68,7 +69,7 @@ public class ConditionSetFunction extends SetFunction {
 
 	// the actual supported ids
 	private static Set<String> supportedIds;
-
+        
 	/**
 	 * Static initializer that sets up the paramater info for all the supported functions.
 	 */
@@ -103,7 +104,24 @@ public class ConditionSetFunction extends SetFunction {
 			typeMap.put(baseName + NAME_BASE_SUBSET, baseType);
 			typeMap.put(baseName + NAME_BASE_SET_EQUALS, baseType);
 		}
+/*
+		/** Temporarily added content begins
+		 *  Ömer 
+		 */
+/*		String baseName = "urn:ogc:def:function:geoxacml:1.0:geometry";
+		String baseType = GeometryAttribute.identifier;
+		idMap.put(baseName + NAME_BASE_AT_LEAST_ONE_MEMBER_OF,
+		Integer.valueOf(ID_BASE_AT_LEAST_ONE_MEMBER_OF));
+		idMap.put(baseName + NAME_BASE_SUBSET, Integer.valueOf(ID_BASE_SUBSET));
+		idMap.put(baseName + NAME_BASE_SET_EQUALS, Integer.valueOf(ID_BASE_SET_EQUALS));
 
+		typeMap.put(baseName + NAME_BASE_AT_LEAST_ONE_MEMBER_OF, baseType);
+		typeMap.put(baseName + NAME_BASE_SUBSET, baseType);
+		typeMap.put(baseName + NAME_BASE_SET_EQUALS, baseType);				
+		/** Temporarily added content ends
+		 *  Ömer
+		 */
+		
 		supportedIds = Collections.unmodifiableSet(new HashSet<String>(idMap.keySet()));
 
 		idMap.put(NAME_BASE_AT_LEAST_ONE_MEMBER_OF, Integer.valueOf(ID_BASE_AT_LEAST_ONE_MEMBER_OF));
@@ -135,10 +153,24 @@ public class ConditionSetFunction extends SetFunction {
 	 * @param datatype the full identifier for the supported datatype
 	 * @param functionType which kind of Set function, based on the <code>NAME_BASE_*</code> fields
 	 */
+        /* Rafael Zequeira
+         * Original code
+         */
 	public ConditionSetFunction(String functionName, String datatype, String functionType) {
+                //original code
 		super(functionName, getId(functionName), datatype, BooleanAttribute.identifier, false);
+                
+                //temporary code
+                //super(functionName, getId(functionType), datatype, BooleanAttribute.identifier, false);
 	}
-
+        /* Rafael Zequeira
+         * Temporary solution to support some new function from GeoXACML, the same constructor with one more parameter
+         * to be able to call "getId(functionType)" and no "getId(functionName)"
+         */ 
+        public ConditionSetFunction(String functionName, String datatype, String functionType, Boolean geo) {
+		super(functionName, getId(functionType), datatype, BooleanAttribute.identifier, false);
+	}
+        
 	/**
 	 * Private helper that returns the internal identifier used for the given standard function.
 	 */
@@ -147,7 +179,7 @@ public class ConditionSetFunction extends SetFunction {
 
 		if (id == null)
 			throw new IllegalArgumentException("unknown set function " + functionName);
-
+                
 		return id.intValue();
 	}
 

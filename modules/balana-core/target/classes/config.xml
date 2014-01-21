@@ -5,7 +5,7 @@
         <attributeFinderModule class="org.wso2.balana.finder.impl.SelectorModule"/>
         <policyFinderModule class="org.wso2.balana.finder.impl.FileBasedPolicyFinderModule">
             <set>
-                <string>/home/asela/Carbon/commons/commons/balana/src/test/resources/basic/3/policies/TestPolicy_0001.xml</string>
+                <string>/opt/NetBeans/TRESOR/policies-request/org.wso2.balana/geoxacml_testPolicies/test_geopolicy_area_designator.xml</string>
             </set>
         </policyFinderModule>
     </pdp>
@@ -20,7 +20,13 @@
       <string>/home/asela/Carbon/commons/commons/balana/src/test/resources/basic/3/policies/TestPolicy_0001.xml</string>
       <string>/opt/NetBeans/TRESOR/WSO2-Balana/modules/balana-core/src/test/resources/basic/3/policies</string>
       
+      <string>/opt/NetBeans/TRESOR/policies-request/geoxacml-policies/policy-1-time-stamp.xml</string>
+      
       line that work for us
       <string>/opt/NetBeans/TRESOR/WSO2-Balana/modules/balana-core/src/test/resources/basic/3/policies/TestPolicy_0001.xml</string>
+      
+      <string>/opt/NetBeans/TRESOR/policies-request/org.wso2.balana/geoxacml_testRequests/TestPolicy_0017.xml</string>
+      <string>/opt/NetBeans/TRESOR/policies-request/geoxacml-policies/policy-1-time-stamp.xml</string>
+      
     </functionFactory-->
 </config>

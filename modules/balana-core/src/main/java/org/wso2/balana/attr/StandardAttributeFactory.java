@@ -43,6 +43,8 @@ import org.wso2.balana.XACMLConstants;
 import org.wso2.balana.attr.proxy.*;
 import org.wso2.balana.attr.proxy.xacml3.XPathAttributeProxy;
 import org.wso2.balana.attr.xacml3.XPathAttribute;
+import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
+import org.geotools.xacml.geoxacml.attr.proxy.GeometryAttributeProxy;
 
 import java.util.Collections;
 import java.util.HashMap;
