@@ -82,8 +82,10 @@ public class AppGeo2
     	//getPDPNewInstance();
         PDP pdp = new PDP(balana.getPdpConfig());
         
-        String request = new Scanner(new File("/opt/NetBeans/TRESOR/policies-request/org.wso2.balana/geoxacml_testRequests/test_georequest_designator.xml")).useDelimiter("\\A").next();
+        //Policy for this request
+        //<string>/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/org.wso2.balana/geoxacml_testRequests/TestPolicy_0017.xml</string>
         
+        String request = new Scanner(new File("/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/org.wso2.balana/geoxacml_testRequests/test_georequest_designator.xml")).useDelimiter("\\A").next();
         
         String req = 
         		" <Request xmlns='urn:oasis:names:tc:xacml:2.0:context:schema:os'"

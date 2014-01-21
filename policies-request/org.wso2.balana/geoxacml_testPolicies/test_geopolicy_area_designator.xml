@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy
+xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os
+http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd"
+PolicyId="urn:oasis:names:tc:example:SimplePolicy1"
+RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides">
+
+<PolicyDefaults>
+<XPathVersion>http://www.w3.org/TR/1999/Rec-xpath-19991116</XPathVersion>
+</PolicyDefaults>
+
+  <!-- This Policy only applies to requests on the SampleServer -->
+  <Target>    
+    <Resources>
+    <Resource>
+      <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SampleServer</AttributeValue>
+        <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string"
+                                     AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"/>
+       </ResourceMatch>
+      </Resource>
+    </Resources>    
+  </Target>
+
+    
+  <Rule RuleId="LoginRule2" Effect="Permit">
+
+    <!-- Only use this Rule if the action is login -->
+    <Target>            
+      <Actions>
+        <Action>
+          <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">login</AttributeValue>
+            <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string"
+                                       AttributeId="ServerAction"/>
+          </ActionMatch>
+        </Action>
+      </Actions>
+    </Target>    
+
+    
+    <Condition>
+        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:double-equal">
+
+            <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-area">
+                 <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+                    <ResourceAttributeDesignator
+                     DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry"
+                     AttributeId="RequestBoundingBox" />
+                  </Apply>
+            </Apply>
+
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#double">20000</AttributeValue>
+        </Apply>
+    </Condition>
+
+  </Rule>  
+</Policy>

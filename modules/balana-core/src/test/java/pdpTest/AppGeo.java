@@ -7,8 +7,10 @@
 package pdpTest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 import org.wso2.balana.Balana;
 import org.wso2.balana.PDP;
@@ -67,7 +69,7 @@ public class AppGeo
         
     }	
 	
-    public static void main( String[] args )
+    public static void main( String[] args ) throws FileNotFoundException
     {
     	initBalana();
         // create default instance of Balana
@@ -80,6 +82,10 @@ public class AppGeo
     	//getPDPNewInstance();
         PDP pdp = new PDP(balana.getPdpConfig());
         
+        //Policy for this request
+        //<string>/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/geoxacml-policies/policy-2-coordinates.xml</string>
+        
+        String request = new Scanner(new File("/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/geoxacml-policies/geoxacml-2-request-coordinates-indeterminate.xml")).useDelimiter("\\A").next();
         
         String req = 
         		"<Request xmlns='urn:oasis:names:tc:xacml:2.0:context:schema:os' "
@@ -124,7 +130,7 @@ public class AppGeo
         				+ "</Request>";
         
         //pdp.evaluate(req);
-        result = pdp.evaluate(req);
+        result = pdp.evaluate(request);
         System.out.println("La respuesta es: "+result);
     }
 }

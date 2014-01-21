@@ -82,9 +82,10 @@ public class AppGeo3
     	//getPDPNewInstance();
         PDP pdp = new PDP(balana.getPdpConfig());
         
-        //String req_geoxacml3_2 = new Scanner(new File("/opt/NetBeans/TRESOR/policies-request/org.wso2.balana/geoxacmlRequest_XACML3_2")).useDelimiter("\\A").next();
+        //Policy for this request
+        //<string>/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/org.wso2.balana/geoxacml_testRequests/TestPolicy_0017.xml</string>
         
-        String req_geoxacml3_2 = new Scanner(new File("/opt/NetBeans/TRESOR/policies-request/geoxacml-policies/geoxacml-3-request-actions-within-campus-permit.xml")).useDelimiter("\\A").next();
+        String request = new Scanner(new File("/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/geoxacml-policies/geoxacml-1-request-time-stamp-deny.xml")).useDelimiter("\\A").next();
         
         
         String req = 
@@ -125,7 +126,7 @@ public class AppGeo3
                    +" </Request>";
         
         //pdp.evaluate(req);
-        result = pdp.evaluate(req_geoxacml3_2);
+        result = pdp.evaluate(request);
         System.out.println("La respuesta es: "+result);
     }
 }

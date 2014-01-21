@@ -78,6 +78,9 @@ public class App
     	initBalana();
     	getPDPNewInstance();
        
+        //Policy for this request
+        //<string>/opt/NetBeans/TRESOR/WSO2-Balana/modules/balana-core/src/test/resources/basic/3/policies/TestPolicy_0001.xml</string>
+        
         String req =
                 
   "<Request xmlns='urn:oasis:names:tc:xacml:3.0:core:schema:wd-17' ReturnPolicyIdList='false' CombinedDecision='false'>"

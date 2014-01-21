@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Request
+      xmlns="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="urn:oasis:names:tc:xacml:1.0:context
+        cs-xacml-schema-context-01.xsd">
+    <Subject/>
+    <Resource>
+        <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+               DataType="http://www.w3.org/2001/XMLSchema#string">
+            <AttributeValue>SampleServer</AttributeValue>
+        </Attribute>
+    </Resource>
+    <Action>
+        <Attribute AttributeId="ServerAction"
+               DataType="http://www.w3.org/2001/XMLSchema#string">
+            <AttributeValue>login</AttributeValue>
+        </Attribute>
+    </Action>
+    <Environment/>
+</Request>
+
+

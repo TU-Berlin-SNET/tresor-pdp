@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy
+xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+xmlns:eig="http://www.environmatics.net"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os
+http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd"
+PolicyId="urn:oasis:names:tc:example:SimplePolicy1"
+RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides">
+
+<PolicyDefaults>
+<XPathVersion>http://www.w3.org/TR/1999/Rec-xpath-19991116</XPathVersion>
+</PolicyDefaults>
+
+  <!-- This Policy only applies to requests on the SampleServer -->
+  <Target>    
+    <Resources>
+    <Resource>
+      <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SampleServer</AttributeValue>
+        <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string"
+                                     AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"/>
+       </ResourceMatch>
+      </Resource>
+    </Resources>    
+  </Target>
+
+    
+  <Rule RuleId="LoginRule2" Effect="Permit">
+
+    <!-- Only use this Rule if the action is login -->
+    <Target>            
+      <Actions>
+        <Action>
+          <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">login</AttributeValue>
+            <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string"
+                                       AttributeId="ServerAction"/>
+          </ActionMatch>
+        </Action>
+      </Actions>
+    </Target>    
+
+    
+    <Condition>
+        <Apply  FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-bag-subset">
+
+        <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-bag">
+            <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+            <AttributeSelector
+               RequestContextPath="//eig:bbox"
+               DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry"/> 
+            </Apply>
+            <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                <Box xmlns="http://www.opengis.net/gml" srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                    <coord>
+                        <X>-200.0</X>
+                        <Y>0.0  </Y>
+                    </coord>
+                    <coord>
+                        <X>200.0 </X>
+                        <Y>200.0</Y>
+                    </coord>
+                </Box>
+            </AttributeValue>
+         </Apply>
+
+        <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-bag">
+            <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                <Box xmlns="http://www.opengis.net/gml" srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                    <coord>
+                        <X>-100.0</X>
+                        <Y>0.0  </Y>
+                    </coord>
+                    <coord>
+                        <X>100.0 </X>
+                        <Y>100.0</Y>
+                    </coord>
+                </Box>
+            </AttributeValue>
+            <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                <Box xmlns="http://www.opengis.net/gml" srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                    <coord>
+                        <X>-200.0</X>
+                        <Y>0.0  </Y>
+                    </coord>
+                    <coord>
+                        <X>200.0 </X>
+                        <Y>200.0</Y>
+                    </coord>
+                </Box>
+            </AttributeValue>
+            <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                <Box xmlns="http://www.opengis.net/gml" srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                    <coord>
+                        <X>-300.0</X>
+                        <Y>0.0  </Y>
+                    </coord>
+                    <coord>
+                        <X>300.0 </X>
+                        <Y>300.0</Y>
+                    </coord>
+                </Box>
+            </AttributeValue>
+         </Apply>
+
+       </Apply>
+        
+      
+    </Condition>
+
+  </Rule>  
+</Policy>

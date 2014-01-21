@@ -5,7 +5,7 @@
         <attributeFinderModule class="org.wso2.balana.finder.impl.SelectorModule"/>
         <policyFinderModule class="org.wso2.balana.finder.impl.FileBasedPolicyFinderModule">
             <set>
-                <string>/opt/NetBeans/TRESOR/policies-request/org.wso2.balana/geoxacml_testPolicies/test_geopolicy_area_designator.xml</string>
+                <string>/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/geoxacml-policies/policy-1-time-stamp.xml</string>
             </set>
         </policyFinderModule>
     </pdp>

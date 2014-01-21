@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy
+xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os
+http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd"
+PolicyId="urn:oasis:names:tc:example:SimplePolicy1"
+RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides">
+
+    <PolicyDefaults>
+        <XPathVersion>http://www.w3.org/TR/1999/Rec-xpath-19991116</XPathVersion>
+    </PolicyDefaults>
+
+  <!-- This Policy only applies to requests on the SampleServer -->
+    <Target>
+        <Resources>
+            <Resource>
+                <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SampleServer</AttributeValue>
+                    <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string"
+                                     AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"/>
+                </ResourceMatch>
+            </Resource>
+        </Resources>
+    </Target>
+
+    
+    <Rule RuleId="LoginRule2" Effect="Permit">
+
+    <!-- Only use this Rule if the action is login -->
+        <Target>
+            <Actions>
+                <Action>
+                    <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">login</AttributeValue>
+                        <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string"
+                                       AttributeId="ServerAction"/>
+                    </ActionMatch>
+                </Action>
+            </Actions>
+        </Target>
+
+        <Condition>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+                    <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                        <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+                            <ResourceAttributeDesignator
+                                 DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry"
+                                 AttributeId="RequestBoundingBox" />
+                        </Apply>
+                    </Apply>
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">false</AttributeValue>
+                </Apply>
+
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry"/>
+                </Apply>
+
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                    </AttributeValue>
+                </Apply>
+  
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <LineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                            <coord>
+                                <X>0.0</X>
+                                <Y>0.0</Y>
+                            </coord>
+                            <coord>
+                                <X>1.0</X>
+                                <Y>1.0</Y>
+                            </coord>
+                            <coord>
+                                <X>1.5</X>
+                                <Y>2.0</Y>
+                            </coord>
+                            <coord>
+                                <X>0.0</X>
+                                <Y>0.0</Y>
+                            </coord>
+                        </LineString>
+                    </AttributeValue>
+                </Apply>
+
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <Point gid="123">
+                            <coord>
+                                <X>12.0</X>
+                                <Y>34.0</Y>
+                            </coord>
+                        </Point>
+                    </AttributeValue>
+                </Apply>
+
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <gml:MultiPoint xmlns:gml="http://www.opengis.net/gml"
+                                        srsName="urn:EPSG:geographicCRS:4326">
+                            <geometryMember>
+                                <gml:Point gid="P1" xmlns:gml="http://www.opengis.net/gml"
+                                           srsName="urn:EPSG:geographicCRS:4326">
+                                    <gml:coord>
+                                        <gml:X>0.0</gml:X>
+                                        <gml:Y>0.0</gml:Y>
+                                    </gml:coord>
+                                </gml:Point>
+                            </geometryMember>
+                            <geometryMember>
+                                <gml:Point gid="P2" xmlns:gml="http://www.opengis.net/gml"
+                                    srsName="urn:EPSG:geographicCRS:4326">
+                                    <gml:coord>
+                                        <gml:X>1.0</gml:X>
+                                        <gml:Y>1.0</gml:Y>
+                                    </gml:coord>
+                                </gml:Point>
+                            </geometryMember>
+                        </gml:MultiPoint>
+                    </AttributeValue>
+                </Apply>
+
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-is-closed">
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+
+                        <MultiLineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                            <geometryMember>
+                                <LineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                                    <coord>
+                                        <X>0.0</X>
+                                        <Y>0.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>1.0</X>
+                                        <Y>1.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>1.5</X>
+                                        <Y>2.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>0.0</X>
+                                        <Y>0.0</Y>
+                                    </coord>
+                                </LineString>
+                            </geometryMember>
+                            <geometryMember>
+                                <LineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                                    <coord>
+                                        <X>0.0</X>
+                                        <Y>0.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>4.0</X>
+                                        <Y>1.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>1.5</X>
+                                        <Y>2.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>0.0</X>
+                                        <Y>0.0</Y>
+                                    </coord>
+                                </LineString>
+                            </geometryMember>
+                            <geometryMember>
+                                <LineString srsName="http://www.opengis.net/gml/srs/epsg.xml#4326">
+                                    <coord>
+                                        <X>0.0</X>
+                                        <Y>0.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>3.0</X>
+                                        <Y>1.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>1.5</X>
+                                        <Y>2.0</Y>
+                                    </coord>
+                                    <coord>
+                                        <X>0.0</X>
+                                        <Y>0.0</Y>
+                                    </coord>
+                                </LineString>
+                            </geometryMember>
+                        </MultiLineString>
+                    </AttributeValue>
+                </Apply>
+
+
+            </Apply>
+        </Condition>
+
+    </Rule>
+</Policy>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os  http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"
+        PolicyId="policy-5-room" 
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides">
+    <Description>
+        Check the requested action from the user. From the saved polygon, representing a room groundfloor, every action is possible only if the relative 
+		distance to sea level is between to given values defined in rule:2 and rule:3. 
+        From outside this area, defined by the polygon and the relative distance to sea level, only the HTTP GET method will be allowed.
+    </Description>
+    <Target />
+    <Rule Effect="Permit" RuleId="policy-5-room:rule:1">
+        <Target/>
+        <Condition>
+            <!--
+            The user will get full access from a certain place (polygone).
+            All conditions must be meet! Author Dirk // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                <!-- only one action must match // -->
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                        <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" />
+                    </Apply>
+                    <!-- Set of allowed actions IDs // -->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">GET
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">POST
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">PUT
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">DELETE
+                        </AttributeValue>
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-within">
+                    <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+                        <!-- This is the recent gps position// -->
+                        <EnvironmentAttributeDesignator DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry" AttributeId="position" />
+                    </Apply>
+                    <!-- This is the defined gps polygon // -->
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <gml:Polygon xmlns:gml="http://www.opengis.net/gml" srsName="EPSG:4326">
+                            <gml:outerBoundaryIs>
+                                <gml:LinearRing>
+                                    <!-- Room in a hospital // -->
+                                    <gml:coordinates>52.51264289,13.32010746 52.51541127,13.31984997 52.51909348,13.32401276 52.51862343,13.3263731 52.51674317,13.32482815 52.51614252,13.32620144 52.51423604,13.3286047 52.51342641,13.33036423 52.51230335,13.33693027 52.5109452,13.33650112 52.51133698,13.33469868 52.50969149,13.33126545 52.50812429,13.32864761 52.50807205,13.32710266 52.51264289,13.32010746</gml:coordinates>
+                                </gml:LinearRing>
+                            </gml:outerBoundaryIs>
+                        </gml:Polygon>
+                    </AttributeValue>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>	
+	    <Rule Effect="Permit" RuleId="policy-5-room:rule:2">
+    <Description>
+        Check the age of the last position update (timestamp within the location provider database).
+    </Description>
+        <Target/>
+        <Condition>            
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than-or-equal">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-subtract">                    
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">                        
+                        <EnvironmentAttributeDesignator MustBePresent="true" DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="myAltitude" />
+                    </Apply>
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">
+                    <!-- minimal height in meters from sea level - groundfloor room // -->
+                    82
+                </AttributeValue>
+            </Apply>
+        </Condition>
+    </Rule>
+<Rule Effect="Permit" RuleId="policy-5-room:rule:3">
+    <Description>
+        Check the age of the last position update (timestamp within the location provider database).
+    </Description>
+        <Target/>
+        <Condition>            
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-subtract">                    
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">                        
+                        <EnvironmentAttributeDesignator MustBePresent="true" DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="myAltitude" />
+                    </Apply>
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">
+                    <!-- maximal height in meters from sea level - room ceiling // -->
+                    86
+                </AttributeValue>
+            </Apply>
+        </Condition>
+    </Rule>    
+    <Rule Effect="Deny" RuleId="DenyAll"/>
+</Policy>
+
