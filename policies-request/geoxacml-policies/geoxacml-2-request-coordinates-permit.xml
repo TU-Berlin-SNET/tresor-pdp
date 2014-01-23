@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Request xmlns="urn:oasis:names:tc:xacml:2.0:context:schema:os" 
+         xmlns:gml="http://www.opengis.net/gml" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:context:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-context-schema-os.xsd">
+    <Subject />
+    <Resource>
+        <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" DataType="http://www.w3.org/2001/XMLSchema#anyURI">
+            <AttributeValue>https://path/to/resource/maybe/with/complete/resource</AttributeValue>
+        </Attribute>
+    </Resource>
+    <Action>
+        <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" DataType="http://www.w3.org/2001/XMLSchema#string">
+            <AttributeValue>GET</AttributeValue>
+        </Attribute>
+    </Action>
+    <Environment>
+        <Attribute DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="wifiSSID">
+            <!-- defines the recent wifi ssid // -->
+            <AttributeValue>eduroam</AttributeValue>
+        </Attribute>
+        <!-- defines the recent position // -->
+        <Attribute AttributeId="position" DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+            <AttributeValue>
+                <gml:Point srsName="EPSG:4326">
+                    <!-- position Campus Charottenburg //-->
+                    <gml:coordinates>52.51246006,13.32714558</gml:coordinates>
+                    <!-- position Campus Dovestr. 
+                        <gml:coordinates>52.51995523,13.32195282</gml:coordinates>
+                    //-->
+                    <!-- position Campus Ackerstr.
+                        <gml:coordinates>52.53885723,13.38465214</gml:coordinates>
+                    //-->
+                    <!-- position Hackescher Markt    
+                        <gml:coordinates>52.522645,13.402234</gml:coordinates>
+                    //-->
+ 
+                </gml:Point>
+            </AttributeValue>
+        </Attribute>
+    </Environment>
+</Request>

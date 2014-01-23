@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"
+        PolicyId="policy-2-coordinates" 
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+    <Description>
+        Check the gps and wifi position of the user
+    </Description>
+    <Target />
+    <Rule Effect="Permit" RuleId="policy-2-coordinates:rule:1">
+        <Target/>
+        <Condition>
+            <!-- All conditions must be meet! // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                            <!-- This is the recent wifi ID // --> 
+                            <EnvironmentAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="wifiSSID" MustBePresent="true" />
+                    </Apply>
+                    <!-- Set of allowed wifi IDs // -->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">eduroam</AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">endlichwlan</AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">telekom</AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">t-spot</AttributeValue>
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-within">
+                    <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+                        <!-- This is the recent gps position// -->
+                        <EnvironmentAttributeDesignator DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry" MustBePresent="true" AttributeId="position" />
+                    </Apply>
+                    <!-- This is the defined gps polygon // -->
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <gml:Polygon xmlns:gml="http://www.opengis.net/gml" srsName="EPSG:4326">
+                            <gml:outerBoundaryIs>
+                                <gml:LinearRing>
+                                    <!-- Central Campus TU Charlottenburg // -->
+                                    <gml:coordinates>52.51264289,13.32010746 52.51541127,13.31984997 52.51909348,13.32401276 52.51862343,13.3263731 52.51674317,13.32482815 52.51614252,13.32620144 52.51423604,13.3286047 52.51342641,13.33036423 52.51230335,13.33693027 52.5109452,13.33650112 52.51133698,13.33469868 52.50969149,13.33126545 52.50812429,13.32864761 52.50807205,13.32710266 52.51264289,13.32010746</gml:coordinates>
+                                </gml:LinearRing>
+                            </gml:outerBoundaryIs>
+                            <gml:outerBoundaryIs>
+                                <gml:LinearRing>
+                                    <!-- Campus Ackerstr. Wedding // -->
+                                    <gml:coordinates>52.53880502,13.38365436 52.53993393,13.38487744 52.53888333,13.38581085 52.53814594,13.38499546</gml:coordinates>
+                                </gml:LinearRing>
+                            </gml:outerBoundaryIs>
+                        </gml:Polygon>
+                    </AttributeValue>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+    <Rule Effect="Deny" RuleId="DenyAll"/>
+</Policy>
+

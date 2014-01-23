@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"
+        PolicyId="policy-2-coordinates" 
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+    <Description>
+        Check the gps position, requested URL and action of the user arzt
+    </Description>
+    <Target/>
+    <Rule RuleId="policy-4-tresor:1" Effect="Permit">
+        <Description>This is for the anonymous access until the user is able to authenticate.</Description>
+        <Target />
+        <Condition>
+            <!-- All conditions must be meet! // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                    <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" MustBePresent="true" />
+                </Apply>
+                <!-- Set of allowed actions IDs // -->
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#string">GET
+                    </AttributeValue>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+    <Rule RuleId="policy-4-tresor:2" Effect="Permit">
+        <Description>This is for the the authentication process.</Description>
+        <Target />
+        <Condition>
+            <!-- All conditions must be meet! // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                <!-- Checks for the allows actions //-->
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                        <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" MustBePresent="true" />
+                    </Apply>
+                    <!-- Set of allowed actions IDs // -->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">POST
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">GET
+                        </AttributeValue>
+                    </Apply>
+                </Apply>
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-equal"/>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-one-and-only">
+                        <ResourceAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#anyURI" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" MustBePresent="true" />
+                    </Apply>
+                    <!-- Set of allowed actions IDs // -->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:anyURI-bag">
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://xacml.snet.tu-berlin.de:3000/users/sign_in?locale=de
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://xacml.snet.tu-berlin.de:3000/users/sign_in?locale=en
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://xacml.snet.tu-berlin.de:3000/users/sign_out?locale=de
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#anyURI">http://xacml.snet.tu-berlin.de:3000/users/sign_out?locale=en
+                        </AttributeValue>
+                    </Apply>
+                </Apply>
+            </Apply>
+        </Condition>
+    </Rule>
+    <Rule RuleId="policy-4-tresor:rule:3" Effect="Permit">
+        <Target />
+<!--
+             The whole regex match patterns are not implemented in SUN-XACML :(
+         
+        <Resources>
+            <Resource>
+                <ResourceMatch
+                    MatchId="urn:oasis:names:tc:xacml:1.0:function:anyuri-regexp-match">
+                    <AttributeValue
+                        DataType="http://www.w3.org/2001/XMLSchema#string">
+                        http://xacml.snet.tu-berlin.de:3000/.*
+                    </AttributeValue>
+                    <ResourceAttributeDesignator
+                        AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                        DataType="urn:oasis:names:tc:xacml:1.0:data-type:anyURI" />
+                </ResourceMatch>
+            </Resource>
+        </Resources> // -->
+        <Condition>
+            <!-- All conditions must be meet! // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                        <ActionAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" MustBePresent="true" />
+                    </Apply>
+                    <!-- Set of allowed actions IDs // -->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">GET
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">POST
+                        </AttributeValue>
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">PUT
+                        </AttributeValue>
+                    </Apply>
+                </Apply>
+                <!-- checks the recent time // -->
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-subtract">
+                        <!-- checks that there is only one integer in bag //-->
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+                            <!-- takes the recent time as timestamp, where 1 number represents 1 second //--> 
+                            <EnvironmentAttributeDesignator MustBePresent="true" DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="now" />
+                        </Apply>
+                        <!-- checks that there is only one integer in bag //-->
+                        <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+                            <!-- takes the timestamp from the last update, where 1 number represents 1 second //--> 
+                            <EnvironmentAttributeDesignator MustBePresent="true" DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="lastupdate" />
+                        </Apply>
+                    </Apply>
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">
+                        <!-- maximum time difference in s // -->
+                        300
+                    </AttributeValue>
+                </Apply>
+                <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-within">
+                    <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+                        <!-- This is the recent gps position// -->
+                        <EnvironmentAttributeDesignator DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry" MustBePresent="true" AttributeId="position" />
+                    </Apply>
+                    <!-- This is the defined gps polygon // -->
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <gml:Polygon xmlns:gml="http://www.opengis.net/gml" srsName="EPSG:4326">
+                            <gml:outerBoundaryIs>
+                                <gml:LinearRing>
+                                    <!-- Central Campus TU Charlottenburg // -->
+                                    <gml:coordinates>52.51264289,13.32010746 52.51541127,13.31984997 52.51909348,13.32401276 52.51862343,13.3263731 52.51674317,13.32482815 52.51614252,13.32620144 52.51423604,13.3286047 52.51342641,13.33036423 52.51230335,13.33693027 52.5109452,13.33650112 52.51133698,13.33469868 52.50969149,13.33126545 52.50812429,13.32864761 52.50807205,13.32710266 52.51264289,13.32010746</gml:coordinates>
+                                </gml:LinearRing>
+                            </gml:outerBoundaryIs>
+                        </gml:Polygon>
+                    </AttributeValue>
+                </Apply>  
+                <!-- Allowed user names //-->
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+                        <SubjectAttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#string" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" />
+                    </Apply>
+                    <!-- Set of allowed actions IDs // -->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
+                        <AttributeValue
+                            DataType="http://www.w3.org/2001/XMLSchema#string">arzt
+                        </AttributeValue>
+                    </Apply>
+                </Apply>            
+            </Apply>
+            
+        </Condition>
+    </Rule>
+    <Rule Effect="Deny" RuleId="DenyAll"/> 
+</Policy>
+

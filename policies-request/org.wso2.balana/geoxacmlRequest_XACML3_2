@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Request xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd" ReturnPolicyIdList="false" CombinedDecision="false" xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" />
+
+	<Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+		<Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SampleServer</AttributeValue>
+		</Attribute>
+		<Attribute IncludeInResult="false" AttributeId="RequestBoundingBox">
+			<AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+				<Box srsName="http://www.opengis.net/gml" xmlns="http://www.opengis.net/gml">
+					<coord><X>-100.0</X><Y>0.0</Y></coord>
+	                <coord><X>100.0</X><Y>100.0</Y></coord>
+				</Box>
+			</AttributeValue>
+		</Attribute>
+	</Attributes>
+
+	<Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+		<Attribute IncludeInResult="false" AttributeId="ServerAction">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">login</AttributeValue>
+		</Attribute>
+	</Attributes>
+		
+	<Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment" />
+
+</Request>
