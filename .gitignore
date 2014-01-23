@@ -52,6 +52,9 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.classpath
+.project
+MANIFEST.MF
 
 # External tool builders
 .externalToolBuilders/
@@ -80,3 +83,7 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
+
+#### ignores specific to maven ####
+log/
+target/
