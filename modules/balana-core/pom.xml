@@ -31,7 +31,7 @@
     <groupId>org.wso2.balana</groupId>
     <artifactId>org.wso2.balana</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Balana Core _ Basic _ OK</name>
+    <name>WSO2 Balana Core_Basic_OK</name>
     <version>1.0.0-SNAPSHOT</version>
     <description>
     This is the pom file that defines the build process for the WSO2 Balana Core. Balana is XACML

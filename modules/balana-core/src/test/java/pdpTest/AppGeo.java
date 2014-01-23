@@ -63,9 +63,9 @@ public class AppGeo
         PDP pdp = new PDP(balana.getPdpConfig());
         
         //Policy for this request
-        //<string>/opt/NetBeans/TRESOR/WSO2-Balana-Basic_OK/policies-request/geoxacml-policies/policy-2-coordinates.xml</string>
+        //<string>/opt/NetBeans/TRESOR/balana/policies-request/geoxacml-policies/policy-2-coordinates.xml</string>
         
-        String request = new Scanner(new File("/opt/NetBeans/TRESOR/WSO2-Balana-Basic_OK/policies-request/geoxacml-policies/geoxacml-2-request-coordinates-indeterminate.xml")).useDelimiter("\\A").next();
+        String request = new Scanner(new File("/opt/NetBeans/TRESOR/balana/policies-request/geoxacml-policies/geoxacml-2-request-coordinates-indeterminate.xml")).useDelimiter("\\A").next();
         
         result = pdp.evaluate(request);
         System.out.println("La respuesta es: "+result);
