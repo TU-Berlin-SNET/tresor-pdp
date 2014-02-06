@@ -1,4 +1,4 @@
-package org.snet.server.servlet;
+package org.snet.rest;
 
 import java.io.IOException;
 

@@ -15,7 +15,6 @@ import org.wso2.balana.PDP;
 /**
  * Class used for on the fly testing during development, WILL be changed very frequently 
  * @author malik
- *
  */
 public class TestClass {
 
