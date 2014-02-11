@@ -1,11 +1,12 @@
 package org.snet.rest;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.snet.contexthandler.ContextHandler;
 
 /**
  * A simple Servlet which responds to POST-requests as is specified in
@@ -13,14 +14,28 @@ import javax.servlet.http.HttpServletResponse;
  * @author malik
  */
 public class PostServlet extends HttpServlet {
-
+	
+	ContextHandler contextHandler;
+	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO handle incoming requests
-		response.getWriter().println("Dummy sample xacml/saml response");
+		String s = "";
+		
+		s = this.contextHandler.handle(request.getReader());
+		
+		if (s != null && !s.isEmpty()) {
+			response.setStatus(200);
+			response.setContentType("application/xml");
+			response.setContentLength(s.length());
+			response.getWriter().print(s);
+			response.getWriter().flush();
+		} else {
+			response.setStatus(400);
+		}		
 	}	
 	
-	public PostServlet() throws ServletException {
+	public PostServlet(ContextHandler contextHandler) throws ServletException {
+		this.contextHandler = contextHandler;
 		this.init();
 	}
 

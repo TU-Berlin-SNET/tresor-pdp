@@ -3,6 +3,7 @@ package org.snet.rest;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.snet.contexthandler.ContextHandler;
 
 /**
  * Very simple Jetty REST Server implementation
@@ -11,8 +12,11 @@ import org.eclipse.jetty.servlet.ServletHolder;
 public class RestServer {
 
 	Server server;
+	ContextHandler contextHandler;
 	
-	public RestServer() { }
+	public RestServer(ContextHandler contextHandler) {
+		this.contextHandler = contextHandler;
+	}
 	
 	/**
 	 * Sets up and starts server bound to given port
@@ -22,7 +26,7 @@ public class RestServer {
 	public void init(int port) throws Exception {
 		// init servletholders
 		ServletHolder getHolder = new ServletHolder(new GetServlet());
-		ServletHolder postHolder = new ServletHolder(new PostServlet());
+		ServletHolder postHolder = new ServletHolder(new PostServlet(this.contextHandler));
 		
 		// init servletcontexthandler with paths for REST
 		ServletContextHandler servletContextHandler = new ServletContextHandler();
