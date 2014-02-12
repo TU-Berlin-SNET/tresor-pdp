@@ -32,8 +32,9 @@ public class ContextHandler {
 		
 		if (elem != null) {
 			// if elem == xacml
-			if (elem.getNamespaceURI() == XACMLConstants.XACML_3_0_IDENTIFIER) {
-				// response = this.pdp.evaluate(elem converted to String)
+			if (elem.getNamespaceURI() == XACMLConstants.XACML_2_0_IDENTIFIER ||
+					elem.getNamespaceURI() == XACMLConstants.XACML_3_0_IDENTIFIER) {
+				response = XACMLHandler.handle(elem, pdp);
 			}
 			// if elem == xacml-saml 2 OR 3 (xacmlauthzdecisionquery)
 			if (elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML20P_NS ||
