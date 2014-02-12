@@ -5,6 +5,7 @@ import java.io.Reader;
 import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
 import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.parse.XMLParserException;
+import org.snet.saml.SAMLHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.PDP;
@@ -20,8 +21,9 @@ public class ContextHandler {
 		this.pdp = pdp;
 	}
 	
-	public String handle(Reader reader) {
+	public String handle(Reader reader) throws Exception {
 		String response = null;
+                String request = null;
 		Document doc = null;
 		Element elem = null;
 
@@ -38,7 +40,13 @@ public class ContextHandler {
 			// if elem == xacml-saml 2 OR 3 (xacmlauthzdecisionquery)
 			if (elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML20P_NS ||
 					elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML30P_NS) {
-				// response = samlhandler.handle(elem)
+                            
+                            SAMLHandler samlHandler = new SAMLHandler();
+                            
+                            request = samlHandler.handleRequest(elem);
+                            // response = this.pdp.evaluate(elem converted to String)
+                            
+                            response = samlHandler.handleResponse(response);
 			}
 		}
 		

@@ -1,9 +1,6 @@
-package org.snet.test;
-import org.snet.saml.*;
+package org.snet.saml;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.Key;
@@ -11,10 +8,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.SignatureException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -37,31 +31,32 @@ import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionStatementType;
 import org.opensaml.xacml.profile.saml.impl.XACMLAuthzDecisionQueryTypeImpl;
 import org.opensaml.xacml.profile.saml.impl.XACMLAuthzDecisionQueryTypeImplBuilder;
 import org.opensaml.xml.Configuration;
+import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
 import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.security.credential.BasicCredential;
-import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.security.credential.UsageType;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.signature.Signer;
 import org.opensaml.xml.validation.ValidationException;
-import org.snet.saml.SAMLConfig;
-import org.snet.saml.xacml3.XACML3RequestType;
-import org.snet.saml.xacml3.XACML3ResponseType;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Class used for on the fly testing during development, WILL be changed very frequently 
- * @author malik
+ * 
+ * 
  */
-public class OpenSAMLutility {
+public class SAMLUtility {
     
     private static BasicCredential signingCredential = null;
+    private BasicParserPool parserPool = null;
+    
+        public SAMLUtility() throws ConfigurationException {
+            this.parserPool = new BasicParserPool();
+                 parserPool.setNamespaceAware(true);
+	}
     
         public static Signature getSignature() throws NoSuchAlgorithmException, NoSuchProviderException{
             
@@ -109,24 +104,13 @@ public class OpenSAMLutility {
         /**
          * Creates a new SAML-XACML Response Signed from a common XACML .xml file or String Response
          * 
-         * @return The String SAML-XACML Response
+         * @param xacmlResponseString - the xml response from the pdp in String format
+         * @return The String SAML-XACML Response Signed
          * @throws Exception
          */
-        public static String makeSAMLxacmlResponse() throws Exception{
-        
-                BasicParserPool parserPool = new BasicParserPool();
-		parserPool.setNamespaceAware(true);
-		/*
-                String xacmlResponseString = "<Response xmlns='urn:oasis:names:tc:xacml:3.0:core:schema:wd-17'>"
-				+ "<Result><Decision>Deny</Decision><Status><StatusCode Value='urn:oasis:names:tc:xacml:1.0:status:ok'/>"
-				+ "</Status></Result></Response>";				
+        public String makeSAMLxacmlResponse(String xacmlResponseString) throws Exception{
+						
 		Element xacmlResponseXML = parserPool.parse(new StringReader(xacmlResponseString)).getDocumentElement();
-                */
-                // load xacml Response
-		Element xacmlResponseXML = parserPool.parse(new FileInputStream(
-				new File("/opt/Netbeans/TRESOR/saml20-xacml20-Response.xml"))
-				).getDocumentElement();
-                
                 QName qName= new QName(xacmlResponseXML.getNamespaceURI(), xacmlResponseXML.getLocalName(), XACMLConstants.XACMLCONTEXT_PREFIX);
                                 
 		ResponseType xacmlResponse = (ResponseType) Configuration.getUnmarshallerFactory()
@@ -166,19 +150,19 @@ public class OpenSAMLutility {
 		StringWriter buffer = new StringWriter();
 		TransformerFactory.newInstance().newTransformer()
 			.transform(new DOMSource(assertionXML), new StreamResult(buffer));
-
-		System.out.println(buffer.toString());
+		
                 return buffer.toString();
         }
 	
-	private static String XACMLRequest2XACMLAuthzDecisionQuery() throws Exception {
+	public static String XACMLRequest2XACMLAuthzDecisionQuery(Element xacmlRequestXML) throws Exception {
                 BasicParserPool parserPool = new BasicParserPool();
 		parserPool.setNamespaceAware(true);
                 
 		// load xacml Request
+                /*
 		Element xacmlRequestXML = parserPool.parse(new FileInputStream(
 				new File("/opt/Netbeans/TRESOR/OpenSAML/geoxacml-request-coordinate.xml"))
-				).getDocumentElement();
+				).getDocumentElement();*/
                 
                 QName qName= new QName(xacmlRequestXML.getNamespaceURI(), xacmlRequestXML.getLocalName(), XACMLConstants.XACMLCONTEXT_PREFIX);
                 
@@ -219,20 +203,16 @@ public class OpenSAMLutility {
 		StringWriter buffer = new StringWriter();
 		TransformerFactory.newInstance().newTransformer()
 			.transform(new DOMSource(xacmlDecisionQueryXML), new StreamResult(buffer));
-                
-		System.out.println("Request: "+buffer.toString());
+		
                 return buffer.toString();
 	}
 	
-	private static void XACMLAuthzDecisionQuery2XACMLRequestTest(String SAMLxacmlRequest) throws Exception {
-                BasicParserPool parserPool = new BasicParserPool();
-		parserPool.setNamespaceAware(true);
+	public String XACMLAuthzDecisionQuery2XACMLRequest(Element SAMLxacmlRequestXML) throws Exception {
                 
-                Element SAMLxacmlRequestXML = parserPool.parse(new StringReader(SAMLxacmlRequest)).getDocumentElement();
+                //Element SAMLxacmlRequestXML = parserPool.parse(new StringReader(SAMLxacmlRequest)).getDocumentElement();
 		
 		UnmarshallerFactory fac = Configuration.getUnmarshallerFactory();
 		Unmarshaller unmarshaller = fac.getUnmarshaller(SAMLxacmlRequestXML);
-		System.out.println("got unmarshaller");
 		
 		XACMLAuthzDecisionQueryTypeImpl xacmlQuery = (XACMLAuthzDecisionQueryTypeImpl) unmarshaller.unmarshall(SAMLxacmlRequestXML);
                 
@@ -246,21 +226,7 @@ public class OpenSAMLutility {
 		StringWriter buffer = new StringWriter();
 		trans.transform(new DOMSource(xacmlElem), new StreamResult(buffer));
 		
-		System.out.println(buffer.toString());
-	}
-        
-        public static void main(String[] args) throws Exception {
-		// prepare opensaml
-		SAMLConfig.InitSAML();
-                
-                String SAMLxacmlResponse = makeSAMLxacmlResponse();
-		
-		
-		String SAMLxacmlRequest = XACMLRequest2XACMLAuthzDecisionQuery();
-                //XACMLAuthzDecisionQueryType SAMLxacmlRequest = XACMLRequest2XACMLAuthzDecisionQuery();
-                
-                XACMLAuthzDecisionQuery2XACMLRequestTest(SAMLxacmlRequest);
-                //checkSignature(SAMLxacmlRequest);
+                return buffer.toString();
 	}
 
 }
