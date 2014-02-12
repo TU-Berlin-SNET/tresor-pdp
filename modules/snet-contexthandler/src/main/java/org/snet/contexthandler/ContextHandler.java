@@ -21,19 +21,19 @@ public class ContextHandler {
 		this.pdp = pdp;
 	}
 	
-	public String handle(Reader reader) throws Exception {
+	public String handle(Reader reader) {
 		String response = null;
-                String request = null;
 		Document doc = null;
 		Element elem = null;
 
-		try { doc = this.parserPool.parse(reader);	}
-		catch (XMLParserException e) { }
-		
-		elem = doc.getDocumentElement();
+		try { 
+			doc = this.parserPool.parse(reader);
+			elem = doc.getDocumentElement();
+		}
+		catch (Exception e) { }
 		
 		if (elem != null) {
-			// if elem == xacml
+			// if elem == xacml 2 OR 3
 			if (elem.getNamespaceURI() == XACMLConstants.XACML_2_0_IDENTIFIER ||
 					elem.getNamespaceURI() == XACMLConstants.XACML_3_0_IDENTIFIER) {
 				response = XACMLHandler.handle(elem, pdp);
@@ -42,12 +42,14 @@ public class ContextHandler {
 			if (elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML20P_NS ||
 					elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML30P_NS) {
                             
-                            SAMLHandler samlHandler = new SAMLHandler();
-                            
-                            request = samlHandler.handleRequest(elem);
-                            // response = this.pdp.evaluate(elem converted to String)
-                            
-                            response = samlHandler.handleResponse(response);
+				try {
+					SAMLHandler samlHandler = new SAMLHandler();
+					String request, s;
+                    request = samlHandler.handleRequest(elem);
+                    s = XACMLHandler.handle(request, this.pdp);
+                    response = samlHandler.handleResponse(s);
+				} catch (Exception e) { e.printStackTrace(); }
+				
 			}
 		}
 		

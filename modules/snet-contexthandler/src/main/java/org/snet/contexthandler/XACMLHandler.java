@@ -13,6 +13,7 @@ public class XACMLHandler {
 
 	public static String handle(Element elem, PDP pdp) {
 		String s = null;
+		
 		try {
 			StringWriter buffer = new StringWriter();
 			TransformerFactory.newInstance().newTransformer()
@@ -21,6 +22,10 @@ public class XACMLHandler {
 		} catch (Exception e) {	e.printStackTrace(); }
 
 		return s;
+	}
+	
+	public static String handle(String req, PDP pdp) {
+		return pdp.evaluate(req);
 	}
 
 }
