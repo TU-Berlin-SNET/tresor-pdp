@@ -5,7 +5,7 @@
         <attributeFinderModule class="org.wso2.balana.finder.impl.SelectorModule"/>
         <policyFinderModule class="org.wso2.balana.finder.impl.FileBasedPolicyFinderModule">
             <set>
-                <string>/home/malik/Downloads/TRESOR/Test/policies/TestPolicy_0001.xml</string>
+                <string>/home/malik/Downloads/TRESOR/Test/policies/policy-1-time-stamp.xml</string>
             </set>
         </policyFinderModule>
     </pdp>

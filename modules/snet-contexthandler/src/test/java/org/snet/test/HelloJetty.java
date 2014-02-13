@@ -1,4 +1,6 @@
 package org.snet.test;
+import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
+import org.geotools.xacml.geoxacml.attr.proxy.GeometryAttributeProxy;
 import org.geotools.xacml.geoxacml.config.GeoXACML;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.snet.contexthandler.ContextHandler;
@@ -18,6 +20,8 @@ public class HelloJetty {
 		GeoXACML.initialize();
 		SAMLConfig.InitSAML();
 		
+		balana.getAttributeFactory().addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());		
+		
 		PDP pdp = new PDP(balana.getPdpConfig());
 		BasicParserPool pp = new BasicParserPool();
 		
@@ -25,7 +29,6 @@ public class HelloJetty {
 		
 		RestServer server = new RestServer(cx);
 		server.init(8080);
-
 	}
 
 }
