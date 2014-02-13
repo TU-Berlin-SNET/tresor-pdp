@@ -30,7 +30,7 @@ public class ContextHandler {
 			doc = this.parserPool.parse(reader);
 			elem = doc.getDocumentElement();
 		}
-		catch (Exception e) { }
+		catch (Exception e) { e.printStackTrace(); }
 		
 		if (elem != null) {
 			// if elem == xacml 2 OR 3
