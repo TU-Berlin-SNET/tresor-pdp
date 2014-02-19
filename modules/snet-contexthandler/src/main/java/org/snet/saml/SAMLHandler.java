@@ -1,7 +1,11 @@
 package org.snet.saml;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.parse.ParserPool;
 import org.w3c.dom.Element;
 
 /**
@@ -12,9 +16,8 @@ public class SAMLHandler {
     
     SAMLUtility samlUtility = null;
     
-        public SAMLHandler() throws ConfigurationException {
-                //SAMLConfig.InitSAML();
-                this.samlUtility = new SAMLUtility();
+        public SAMLHandler() throws ConfigurationException, NoSuchAlgorithmException, NoSuchProviderException, IOException, FileNotFoundException, InvalidKeySpecException {
+                samlUtility = new SAMLUtility();
         }
 
         public String handleRequest(Element element) throws ConfigurationException, Exception {

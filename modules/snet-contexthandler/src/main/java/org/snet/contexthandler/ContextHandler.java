@@ -1,5 +1,6 @@
 package org.snet.contexthandler;
 
+import java.io.InputStream;
 import java.io.Reader;
 
 import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
@@ -22,6 +23,7 @@ public class ContextHandler {
 	}
 	
 	public String handle(Reader reader) {
+        //public String handle(InputStream reader) {
 		String response = null;
 		Document doc = null;
 		Element elem = null;
@@ -38,21 +40,19 @@ public class ContextHandler {
 					elem.getNamespaceURI() == XACMLConstants.XACML_3_0_IDENTIFIER) {
 				response = XACMLHandler.handle(elem, pdp);
 			}
-			// if elem == xacml-saml 2 OR 3 (xacmlauthzdecisionquery)
 			if (elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML20P_NS ||
 					elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML30P_NS) {
                             
 				try {
 					SAMLHandler samlHandler = new SAMLHandler();
 					String request, s;
-                    request = samlHandler.handleRequest(elem);
-                    s = XACMLHandler.handle(request, this.pdp);
-                    response = samlHandler.handleResponse(s);
+                                        request = samlHandler.handleRequest(elem);
+                                        s = XACMLHandler.handle(request, this.pdp);
+                                        response = samlHandler.handleResponse(s);
 				} catch (Exception e) { e.printStackTrace(); }
 				
 			}
 		}
-		
 		return response;
 	}
 
