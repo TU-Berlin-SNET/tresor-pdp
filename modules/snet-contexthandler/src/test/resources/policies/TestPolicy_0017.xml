@@ -1,0 +1,34 @@
+<Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"
+        PolicyId="policy-1-time-stamp" 
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+    <Target />
+    <Rule Effect="Permit" RuleId="policy-1-time-stamp:rule:1">
+    <Description>
+        Check the age of the last position update (timestamp within the location provider database).
+    </Description>
+        <Target/>
+        <Condition>
+            <!-- checks the recent time // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-subtract">
+                    <!-- checks that there is only one integer in bag //-->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+                        <!-- takes the recent time as timestamp, where 1 number represents 1 second //--> 
+                        <EnvironmentAttributeDesignator MustBePresent="true" DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="now" />
+                    </Apply>
+                    <!-- checks that there is only one integer in bag //-->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+                        <!-- takes the timestamp from the last update, where 1 number represents 1 second //--> 
+                        <EnvironmentAttributeDesignator MustBePresent="true" DataType="http://www.w3.org/2001/XMLSchema#integer" AttributeId="lastupdate" />
+                    </Apply>
+                </Apply>
+                <!-- maximum time difference in s // -->
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">300</AttributeValue>
+            </Apply>
+        </Condition>
+    </Rule>
+    <Rule Effect="Deny" RuleId="DenyAll"/>
+</Policy>
+

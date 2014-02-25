@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.transform.TransformerFactory;
@@ -17,67 +19,25 @@ import org.snet.saml.SAMLConfig;
 import org.snet.saml.SAMLUtility;
 import org.w3c.dom.Element;
 import org.wso2.balana.Balana;
+import org.wso2.balana.ObligationResult;
 import org.wso2.balana.PDP;
 import org.wso2.balana.PDPConfig;
 import org.wso2.balana.TestConstants;
+import org.wso2.balana.TestUtil;
+import org.wso2.balana.ctx.AbstractResult;
+import org.wso2.balana.ctx.ResponseCtx;
+import org.wso2.balana.ctx.xacml3.Result;
 import org.wso2.balana.finder.PolicyFinder;
 import org.wso2.balana.finder.PolicyFinderModule;
 import org.wso2.balana.finder.impl.FileBasedPolicyFinderModule;
+import org.wso2.balana.xacml3.Advice;
+import org.wso2.balana.xacml3.Attributes;
 
 /**
  * Class used for on the fly testing during development, WILL be changed very frequently 
  * @author malik
  */
 public class TestUtils {
-
-	public TestUtils() { }
-	
-	public static void main(String[] args) throws Exception {
-		SAMLConfig.InitSAML();
-		String path = "/home/malik/Downloads/TRESOR/Test/requests/";
-//		String path = "/home/malik/Downloads/TRESOR/Test/responses/xacml";
-		File file = new File(path);
-		
-		for (File f : file.listFiles()) {
-			if (f.isFile()) {
-				convert2XACMLSAML(f);
-//				convert2XACMLSAMLResponse(f);
-			}				
-		}
-		
-		System.out.println("finished");
-	}
-
-	public static void convert2XACMLSAML(File file) throws Exception {
-		BasicParserPool pp = new BasicParserPool();
-		Element elem = pp.parse(new FileInputStream(file)).getDocumentElement();
-		String xAuthz = SAMLUtility.XACMLRequest2XACMLAuthzDecisionQuery(elem);
-		
-		File out = new File(file.getAbsolutePath() + "xacmlAuthz");
-		out.createNewFile();
-		PrintWriter writer = new PrintWriter(out);
-		writer.write(xAuthz);
-		writer.flush();
-		writer.close();		
-	}
-	
-	private static void convert2XACMLSAMLResponse(File file) throws Exception {
-		BasicParserPool pp = new BasicParserPool();
-		Element elem = pp.parse(new FileInputStream(file)).getDocumentElement();
-		
-		StringWriter buffer = new StringWriter();
-		TransformerFactory.newInstance().newTransformer().transform(new DOMSource(elem), new StreamResult(buffer));
-		
-		SAMLUtility samlUtil = new SAMLUtility();
-		String samlResp = samlUtil.makeSAMLxacmlResponse(buffer.toString());
-		
-		File out = new File(file.getAbsolutePath() + "xacmlAuthz");
-		out.createNewFile();
-		PrintWriter writer = new PrintWriter(out);
-		writer.write(samlResp);
-		writer.flush();
-		writer.close();
-	}
 	
     /**
      * Returns a new PDP instance with new XACML policies
@@ -119,6 +79,196 @@ public class TestUtils {
     	}
     	
     	return policies;
+    }
+    
+    /**
+     * Checks matching of result that got from PDP and expected response from a file.
+     * (taken from org.wso2.balana), (only XACML)
+     *
+     * @param resultResponse  result that got from PDP
+     * @param expectedResponse  expected response from a file
+     * @return True/False
+     */
+    public static boolean isMatchingXACML(ResponseCtx resultResponse, ResponseCtx expectedResponse) {
+
+        Set<AbstractResult> results = resultResponse.getResults();
+        Set<AbstractResult> expectedResults = expectedResponse.getResults();
+
+        boolean finalResult = false;
+
+        for(AbstractResult result : results){
+
+            boolean match = false;
+
+            int decision = result.getDecision();
+
+            String status =  result.getStatus().encode();
+
+            List<String> advices = new ArrayList <String>();
+            if( result.getAdvices() != null){
+                for(Advice advice : result.getAdvices()){
+                    advices.add(advice.encode());
+                }
+            }
+
+            List<String> obligations = new ArrayList <String>();
+            if(result.getObligations() != null){
+                for(ObligationResult obligationResult : result.getObligations()){
+                    obligations.add(obligationResult.encode());
+                }
+            }
+
+            List<String> attributesList = new ArrayList <String>();
+
+            if(result instanceof Result){
+                Result xacml3Result = (Result) result;
+                if(xacml3Result.getAttributes() != null){
+                    for(Attributes attributesElement : xacml3Result.getAttributes()){
+                        attributesList.add(attributesElement.encode());
+                    }
+                }
+            }
+
+            for(AbstractResult expectedResult : expectedResults){
+
+                int decisionExpected = expectedResult.getDecision();
+                if(decision == 4 || decision == 5 || decision == 6){
+                    decision = 2;
+                }
+                if(decision != decisionExpected){
+                    continue;
+                }
+
+                String statusExpected = expectedResult.getStatus().encode();
+
+                if(!processResult(statusExpected).equals(processResult(status))){
+                    continue;
+                }
+
+                List<String> advicesExpected = new ArrayList <String>();
+                if(expectedResult.getAdvices() != null){
+                    for(Advice advice : expectedResult.getAdvices()){
+                        advicesExpected.add(advice.encode());
+                    }
+                }
+
+                if(advices.size() != advicesExpected.size()){
+                    continue;
+                }
+
+                if(advices.size() > 0){
+                    boolean adviceContains = false;
+                    for(String advice : advices){
+                        if(!advicesExpected.contains(advice)){
+                            adviceContains = false;
+                            break;
+                        } else {
+                            adviceContains = true;
+                        }
+                    }
+
+                    if(!adviceContains){
+                        continue;
+                    }
+                }
+
+                List<String> obligationsExpected = new ArrayList <String>();
+                if(expectedResult.getObligations() != null){
+                    for(ObligationResult obligationResult : expectedResult.getObligations()){
+                        obligationsExpected.add(obligationResult.encode());
+                    }
+                }
+
+                if(obligations.size() != obligationsExpected.size()){
+                    continue;
+                }
+
+                if(obligations.size() > 0){
+                    boolean obligationContains = false;
+                    for(String obligation : obligations){
+                        if(!obligationsExpected.contains(obligation)){
+                            obligationContains = false;
+                            break;
+                        } else {
+                            obligationContains = true;
+                        }
+                    }
+
+                    if(!obligationContains){
+                        continue;
+                    }
+                }
+
+                // if only XACML 3.0. result
+                if(expectedResult instanceof Result){
+
+                    Result xacml3Result = (Result) expectedResult;
+                    List<String> attributesExpected = new ArrayList <String>();
+
+                    if(xacml3Result.getAttributes() != null){
+                        for(Attributes  attributes : xacml3Result.getAttributes()){
+                            attributesExpected.add(attributes.encode());
+                        }
+                    }
+
+                    if(attributesList.size() != attributesExpected.size()){
+                        continue;
+                    }
+
+                    if(attributesList.size() > 0){
+                        boolean attributeContains = false;
+                        for(String attribute : attributesList){
+                            if(!attributesExpected.contains(attribute)){
+                                attributeContains = false;
+                                break;
+                            } else {
+                                attributeContains = true;
+                            }
+                        }
+
+                        if(!attributeContains){
+                            continue;
+                        }
+                    }
+                }
+                match = true;
+                break;
+            }
+
+            if(match){
+                finalResult = true;
+            } else {
+                finalResult = false;
+                break;
+            }
+        }
+
+//        if(finalResult){
+//            log.info("Test is Passed........!!!   " +
+//                    "Result received from the PDP is matched with expected result");
+//        } else {
+//            log.info("Test is Failed........!!!     " +
+//                    "Result received from the PDP is NOT match with expected result");
+//        }
+        return finalResult;
+    }
+    
+    /**
+     * This would remove the StatusMessage from the response. Because StatusMessage depends
+     * on the how you have defined it with the PDP, Therefore we can not compare it with
+     * conformance tests. (taken from org.wso2.balana)
+     *
+     * @param response  XACML response String
+     * @return XACML response String with out StatusMessage
+     */
+    private static String processResult(String response){
+
+        if(response.contains("StatusMessage")){
+            response = response.substring(0, response.indexOf("<StatusMessage>")) +
+                    response.substring(response.indexOf("</Status>"));
+        }
+
+        return response;
     }
 
 }
