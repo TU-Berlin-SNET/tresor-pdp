@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.snet.saml.SAMLConfig;
 import org.snet.saml.SAMLUtility;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.Balana;
 import org.wso2.balana.ObligationResult;
@@ -30,11 +32,12 @@ import org.wso2.balana.ctx.xacml3.Result;
 import org.wso2.balana.finder.PolicyFinder;
 import org.wso2.balana.finder.PolicyFinderModule;
 import org.wso2.balana.finder.impl.FileBasedPolicyFinderModule;
+import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
 import org.wso2.balana.xacml3.Advice;
 import org.wso2.balana.xacml3.Attributes;
 
 /**
- * Class used for on the fly testing during development, WILL be changed very frequently 
+ * Class which provides several methods used in testing
  * @author malik
  */
 public class TestUtils {
@@ -61,7 +64,28 @@ public class TestUtils {
         pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), finder,
                                                             pdpConfig.getResourceFinder(), true);
         return new PDP(pdpConfig);
+    }
+    
+    /**
+     * Returns a new PDP instance with new XACML policies
+     * 
+     * @param policies, a list of policies
+     * @return a PDP instance
+     */
+    public static PDP getPDPNewInstance(List<Document> policies) {
 
+        PolicyFinder finder= new PolicyFinder();        
+        
+        InMemoryPolicyFinderModule testPolicyFinderModule = new InMemoryPolicyFinderModule(policies);
+        Set<PolicyFinderModule> policyModules = new HashSet<PolicyFinderModule>();
+        policyModules.add(testPolicyFinderModule);
+        finder.setModules(policyModules);
+        
+        Balana balana = Balana.getInstance();
+        PDPConfig pdpConfig = balana.getPdpConfig();
+        pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), finder,
+                                                            pdpConfig.getResourceFinder(), true);
+        return new PDP(pdpConfig);
     }
     
     private static Set<String> getPolicies(String policyPath) {

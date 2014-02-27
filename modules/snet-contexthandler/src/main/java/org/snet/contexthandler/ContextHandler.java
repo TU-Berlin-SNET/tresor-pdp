@@ -40,8 +40,7 @@ public class ContextHandler {
 		try { 
 			doc = this.parserPool.parse(reader);
 			elem = doc.getDocumentElement();
-		}
-		catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { e.printStackTrace(); }
 		
 		if (elem != null) {
 			// if elem == xacml 2 OR 3
@@ -49,20 +48,25 @@ public class ContextHandler {
 					elem.getNamespaceURI() == XACMLConstants.REQUEST_CONTEXT_3_0_IDENTIFIER) {
 				response = XACMLHandler.handle(elem, pdp);
 			}
+			// if elem == xacml-samlp
 			if (elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML20P_NS ||
 					elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML30P_NS) {
-                            
+				
 				try {
 					SAMLHandler samlHandler = new SAMLHandler();
 					String request, s;
-                                        request = samlHandler.handleRequest(elem);
-                                        s = XACMLHandler.handle(request, this.pdp);
-                                        response = samlHandler.handleResponse(s);
+                    request = samlHandler.handleRequest(elem);
+                    s = XACMLHandler.handle(request, this.pdp);
+                    response = samlHandler.handleResponse(s);
 				} catch (Exception e) { e.printStackTrace(); }
 				
 			}
 		}
 		return response;
+	}
+	
+	public void setPDP(PDP pdp) {
+		this.pdp = pdp;
 	}
 
 }
