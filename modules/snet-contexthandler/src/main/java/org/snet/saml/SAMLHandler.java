@@ -8,7 +8,8 @@ import java.security.spec.InvalidKeySpecException;
 import org.opensaml.xml.ConfigurationException;
 import org.w3c.dom.Element;
 
-/**
+/** Class to order the conversion from XACMLAuthzDecisionQuery to a normal XACML Request
+ *  and to order the conformation of the XACMl Response into the SAML format.
  *
  * @author zequeira
  */

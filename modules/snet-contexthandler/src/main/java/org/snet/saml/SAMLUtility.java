@@ -62,7 +62,7 @@ import org.w3c.dom.Element;
 
 /**
  * 
- * 
+ * @author zequeira
  */
 public class SAMLUtility {
     
