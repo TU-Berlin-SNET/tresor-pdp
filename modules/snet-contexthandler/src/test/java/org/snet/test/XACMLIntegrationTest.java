@@ -17,9 +17,9 @@ import org.snet.contexthandler.ContextHandler;
 import org.snet.saml.SAMLConfig;
 import org.wso2.balana.Balana;
 import org.wso2.balana.PDP;
-import org.wso2.balana.TestUtil;
+import org.wso2.balana.attr.AttributeFactory;
+import org.wso2.balana.attr.StandardAttributeFactory;
 import org.wso2.balana.ctx.ResponseCtx;
-import org.wso2.balana.ctx.xacml2.RequestCtx;
 
 public class XACMLIntegrationTest {
 	
@@ -34,8 +34,10 @@ public class XACMLIntegrationTest {
 	public static void setUpBeforeClass() throws Exception {
 		SAMLConfig.InitSAML();
 		GeoXACML.initialize();
-		Balana.getInstance().getAttributeFactory()
-			.addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());		
+
+		AttributeFactory sattr = StandardAttributeFactory.getNewFactory();
+		sattr.addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());
+		Balana.getInstance().setAttributeFactory(sattr);
 	}
 
 	@Test
@@ -51,8 +53,9 @@ public class XACMLIntegrationTest {
 	
 	private void doTestLoop(String reqRoot, String respRoot) {
 		String policyNr, reqRespNr, policy;
-		ContextHandler cx;
-		PDP pdp;				
+		PDP pdp = null;
+		
+		ContextHandler cx = new ContextHandler(new BasicParserPool(), pdp);
 		
 		String reqRespType = (reqRoot.contains("saml")) ? TestConstants.ReqRespTypeSAML : TestConstants.ReqRespTypeXACML;
 		String req, expectedResponse, actualResponse;
@@ -64,7 +67,7 @@ public class XACMLIntegrationTest {
 
 			if (new File(policy).isFile()) {
 				pdp = TestUtils.getPDPNewInstance(TestConstants.PolicyRoot + "/TestPolicy_" + policyNr + ".xml");
-				cx = new ContextHandler(new BasicParserPool(), pdp);
+				cx.setPDP(pdp);
 			} else {
 				continue;
 			}
