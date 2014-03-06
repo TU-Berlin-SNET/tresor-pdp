@@ -33,8 +33,7 @@ public class Helper {
 		if (!initialized) {
 			initEngine();
 		}
-		return Helper.getPDP(new LinkedList<Document>());
-//		return new PDP(Balana.getInstance().getPdpConfig());		
+		return Helper.getPDP(new LinkedList<Document>());		
 	}
 	
     /**

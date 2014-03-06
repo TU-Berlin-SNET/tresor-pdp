@@ -2,9 +2,9 @@ package org.snet.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;

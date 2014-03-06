@@ -1,9 +1,6 @@
 package org.snet.test;
-import org.snet.saml.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.Key;
@@ -11,10 +8,8 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.SignatureException;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -40,9 +35,7 @@ import org.opensaml.xml.Configuration;
 import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
 import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.security.credential.BasicCredential;
-import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.security.credential.UsageType;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
@@ -50,9 +43,6 @@ import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.signature.Signer;
 import org.opensaml.xml.validation.ValidationException;
 import org.snet.saml.SAMLConfig;
-import org.snet.saml.xacml3.XACML3RequestType;
-import org.snet.saml.xacml3.XACML3ResponseType;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**

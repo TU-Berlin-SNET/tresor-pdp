@@ -2,20 +2,15 @@ package org.snet.contexthandler;
 
 import java.io.Reader;
 import java.io.StringWriter;
-import java.nio.CharBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
-import org.snet.test.TestUtils;
 import org.w3c.dom.Document;
 
 public class PolicyHandler {
