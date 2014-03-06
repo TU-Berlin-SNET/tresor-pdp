@@ -55,7 +55,7 @@ public class XACMLIntegrationTest {
 		String policyNr, reqRespNr, policy;
 		PDP pdp = null;
 		
-		ContextHandler cx = new ContextHandler(new BasicParserPool(), pdp);
+		ContextHandler cx = ContextHandler.getInstance();		
 		
 		String reqRespType = (reqRoot.contains("saml")) ? TestConstants.ReqRespTypeSAML : TestConstants.ReqRespTypeXACML;
 		String req, expectedResponse, actualResponse;

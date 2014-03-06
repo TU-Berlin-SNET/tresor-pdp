@@ -66,28 +66,6 @@ public class TestUtils {
         return new PDP(pdpConfig);
     }
     
-    /**
-     * Returns a new PDP instance with new XACML policies
-     * 
-     * @param policies, a list of policies
-     * @return a PDP instance
-     */
-    public static PDP getPDPNewInstance(List<Document> policies) {
-
-        PolicyFinder finder= new PolicyFinder();        
-        
-        InMemoryPolicyFinderModule testPolicyFinderModule = new InMemoryPolicyFinderModule(policies);
-        Set<PolicyFinderModule> policyModules = new HashSet<PolicyFinderModule>();
-        policyModules.add(testPolicyFinderModule);
-        finder.setModules(policyModules);
-        
-        Balana balana = Balana.getInstance();
-        PDPConfig pdpConfig = balana.getPdpConfig();
-        pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), finder,
-                                                            pdpConfig.getResourceFinder(), true);
-        return new PDP(pdpConfig);
-    }
-    
     private static Set<String> getPolicies(String policyPath) {
     	File file = new File(policyPath);
     	Set<String> policies = new HashSet<String>();

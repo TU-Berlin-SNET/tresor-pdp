@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
+import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.parse.XMLParserException;
 import org.snet.saml.SAMLHandler;
@@ -17,10 +18,17 @@ import org.wso2.balana.XACMLConstants;
  */
 public class ContextHandler {	
 	
+	static ContextHandler contextHandler;
 	ParserPool parserPool;
 	PDP pdp;
 	
-	public ContextHandler(ParserPool parserPool, PDP pdp) {
+	public static ContextHandler getInstance() {
+		if (contextHandler == null)
+			contextHandler = new ContextHandler(new BasicParserPool(), Helper.getPDP());
+		return contextHandler;
+	}
+	
+	private ContextHandler(ParserPool parserPool, PDP pdp) {
 		this.parserPool = parserPool;
 		this.pdp = pdp;
 	}

@@ -1,4 +1,4 @@
-package org.snet.test.server;
+package org.snet.contexthandler;
 
 import java.io.Reader;
 import java.io.StringWriter;
@@ -15,18 +15,25 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
-import org.snet.contexthandler.ContextHandler;
 import org.snet.test.TestUtils;
 import org.w3c.dom.Document;
 
 public class PolicyHandler {
 
+	static PolicyHandler policyHandler;
+	
 	ContextHandler contextHandler;	
 	List<Document> policies;
 	ParserPool parserPool;
 	
-	public PolicyHandler(ContextHandler cx) {
-		this.contextHandler = cx;
+	public static PolicyHandler getInstance() {
+		if (policyHandler == null)
+			policyHandler = new PolicyHandler();
+		return policyHandler;
+	}
+	
+	private PolicyHandler() {
+		this.contextHandler = ContextHandler.getInstance();
 		this.policies = new LinkedList<Document>();
 		this.parserPool = new BasicParserPool();
 	}
@@ -82,7 +89,7 @@ public class PolicyHandler {
 	}
 	
 	private void updatePDP() {
-		this.contextHandler.setPDP(TestUtils.getPDPNewInstance(this.policies));
+		this.contextHandler.setPDP(Helper.getPDP(this.policies));
 	}
 
 }
