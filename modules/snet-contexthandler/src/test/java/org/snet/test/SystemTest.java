@@ -66,9 +66,9 @@ public class SystemTest {
         
         InputStream requestStream = new ByteArrayInputStream(request.getBytes("UTF-8"));
         
-        String response = contextHandler.handle(requestStream); 
+        //String response = contextHandler.handle(requestStream); 
        
-        System.out.println("La respuesta es: "+response);
+        //System.out.println("La respuesta es: "+response);
     }
     
 }
