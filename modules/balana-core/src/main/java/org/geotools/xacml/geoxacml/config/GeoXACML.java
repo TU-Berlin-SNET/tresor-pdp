@@ -51,7 +51,7 @@ import org.geotools.xacml.geoxacml.cond.GeometryTouches;
 import org.geotools.xacml.geoxacml.cond.GeometryUnion;
 import org.geotools.xacml.geoxacml.cond.GeometryWithin;
 import org.xml.sax.SAXException;
-
+import org.wso2.balana.Balana;
 import org.wso2.balana.attr.AttributeFactory;
 import org.wso2.balana.attr.AttributeFactoryProxy;
 import org.wso2.balana.attr.StandardAttributeFactory;
@@ -229,15 +229,9 @@ public class GeoXACML {
 
     private static void registerGeoXACMLAttributes() {
 
-        final AttributeFactory fac = StandardAttributeFactory.getNewFactory();
-
-        fac.addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());
-
-        AttributeFactory.setDefaultFactory(new AttributeFactoryProxy() {
-            public AttributeFactory getFactory() {
-                return fac;
-            }
-        });
+		AttributeFactory sattr = StandardAttributeFactory.getNewFactory();
+		sattr.addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());
+		Balana.getInstance().setAttributeFactory(sattr);
 
     }
 

@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
  * the "REST Profile of XACML v3.0" specification
  * @author malik
  */
-public class GetServlet extends HttpServlet {
+public class HomeServlet extends HttpServlet {
 
 	private String resourcesXML = "<resources xmlns='http://ietf.org/ns/home-documents'	xmlns:atom='http://www.w3.org/2005/Atom'>"
 			+ "<resource rel='http://docs.oasis-open.org/ns/xacml/relation/pdp'>"
@@ -28,7 +28,7 @@ public class GetServlet extends HttpServlet {
 		response.getWriter().flush();
 	}
 	
-	public GetServlet() throws ServletException {
+	public HomeServlet() throws ServletException {
 		this.init();
 	}	
 	

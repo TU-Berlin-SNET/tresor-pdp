@@ -1,8 +1,10 @@
-package org.snet.test.server;
+package org.snet.rest;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.snet.contexthandler.PolicyHandler;
 
 public class PolicyHandlerServlet extends HttpServlet {
 
@@ -45,8 +47,8 @@ public class PolicyHandlerServlet extends HttpServlet {
 		}
 	}
 	
-	public PolicyHandlerServlet(PolicyHandler policyHandler) {
-		this.policyHandler = policyHandler;
+	public PolicyHandlerServlet() {
+		this.policyHandler = PolicyHandler.getInstance();
 	}
 
 }

@@ -13,7 +13,7 @@ import org.snet.contexthandler.ContextHandler;
  * the "REST Profile of XACML v3.0" specification
  * @author malik
  */
-public class PostServlet extends HttpServlet {
+public class PDPServlet extends HttpServlet {
 	
 	ContextHandler contextHandler;
 	
@@ -34,8 +34,8 @@ public class PostServlet extends HttpServlet {
 		}		
 	}	
 	
-	public PostServlet(ContextHandler contextHandler) throws ServletException {
-		this.contextHandler = contextHandler;
+	public PDPServlet() throws ServletException {
+		this.contextHandler = ContextHandler.getInstance();
 		this.init();
 	}
 

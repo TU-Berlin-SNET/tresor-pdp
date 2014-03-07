@@ -1,38 +1,21 @@
 package org.snet.test;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.opensaml.xml.parse.BasicParserPool;
-import org.snet.saml.SAMLConfig;
-import org.snet.saml.SAMLUtility;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.wso2.balana.Balana;
 import org.wso2.balana.ObligationResult;
 import org.wso2.balana.PDP;
 import org.wso2.balana.PDPConfig;
-import org.wso2.balana.TestConstants;
-import org.wso2.balana.TestUtil;
 import org.wso2.balana.ctx.AbstractResult;
 import org.wso2.balana.ctx.ResponseCtx;
 import org.wso2.balana.ctx.xacml3.Result;
 import org.wso2.balana.finder.PolicyFinder;
 import org.wso2.balana.finder.PolicyFinderModule;
 import org.wso2.balana.finder.impl.FileBasedPolicyFinderModule;
-import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
 import org.wso2.balana.xacml3.Advice;
 import org.wso2.balana.xacml3.Attributes;
 
@@ -59,28 +42,6 @@ public class TestUtils {
         policyModules.add(testPolicyFinderModule);
         finder.setModules(policyModules);
 
-        Balana balana = Balana.getInstance();
-        PDPConfig pdpConfig = balana.getPdpConfig();
-        pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), finder,
-                                                            pdpConfig.getResourceFinder(), true);
-        return new PDP(pdpConfig);
-    }
-    
-    /**
-     * Returns a new PDP instance with new XACML policies
-     * 
-     * @param policies, a list of policies
-     * @return a PDP instance
-     */
-    public static PDP getPDPNewInstance(List<Document> policies) {
-
-        PolicyFinder finder= new PolicyFinder();        
-        
-        InMemoryPolicyFinderModule testPolicyFinderModule = new InMemoryPolicyFinderModule(policies);
-        Set<PolicyFinderModule> policyModules = new HashSet<PolicyFinderModule>();
-        policyModules.add(testPolicyFinderModule);
-        finder.setModules(policyModules);
-        
         Balana balana = Balana.getInstance();
         PDPConfig pdpConfig = balana.getPdpConfig();
         pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), finder,
