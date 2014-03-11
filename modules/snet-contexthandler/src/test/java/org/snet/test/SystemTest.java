@@ -62,7 +62,7 @@ public class SystemTest {
         //<string>/opt/NetBeans/TRESOR/WSO2-Balana/policies-request/geoxacml-policies/policy-2-coordinates.xml</string>
         String request = new Scanner(new File("/opt/Netbeans/TRESOR/Signed_Request_OK.xml")).useDelimiter("\\A").next();
         
-        ContextHandler contextHandler = new ContextHandler(new BasicParserPool(), pdp);
+        //ContextHandler contextHandler = new ContextHandler(new BasicParserPool(), pdp);
         
         InputStream requestStream = new ByteArrayInputStream(request.getBytes("UTF-8"));
         
