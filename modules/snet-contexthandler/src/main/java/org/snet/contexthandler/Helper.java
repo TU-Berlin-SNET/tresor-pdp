@@ -1,7 +1,6 @@
 package org.snet.contexthandler;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,51 +16,51 @@ import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
 
 public class Helper {
 
-	static boolean initialized = false;
+	private static boolean initialized = false;
 	
-	public static void initEngine() {
-		try {
-			GeoXACML.initialize();
-			SAMLConfig.InitSAML();
-			initialized = true;
-		} catch (Exception e) {
-			initialized = false;
-		}
-	}
-	
+	/**
+	 * @return a PDP instance with base pdp configuration (see PDPConfiguration.java)
+	 */
 	public static PDP getPDP() {
-		if (!initialized) {
+		if (!initialized)
 			initEngine();
-		}
-		return Helper.getPDP(new LinkedList<Document>());		
+		
+		return new PDP(Balana.getInstance().getPdpConfig());
 	}
 	
     /**
-     * Returns a new PDP instance with new XACML policies
-     * 
-     * @param policies, a list of policies
-     * @return a PDP instance
+     * @param policyDocuments, a list of policy documents
+     * @return a PDP instance with given policies
      */
-    public static PDP getPDP(List<Document> policies) {
+    public static PDP getPDP(List<Document> policyDocuments) {
 
-    	if (!initialized) {
+    	if (!initialized)
     		initEngine();
-    	}
-    	
-        PolicyFinder finder= new PolicyFinder();        
-        
-        InMemoryPolicyFinderModule testPolicyFinderModule = new InMemoryPolicyFinderModule(policies);
+    	    	
+    	InMemoryPolicyFinderModule policyFinderModule = new InMemoryPolicyFinderModule(policyDocuments);    	    	
         Set<PolicyFinderModule> policyModules = new HashSet<PolicyFinderModule>();
-        policyModules.add(testPolicyFinderModule);
-        finder.setModules(policyModules);
+        policyModules.add(policyFinderModule);
         
-        Balana balana = Balana.getInstance();
-        PDPConfig pdpConfig = balana.getPdpConfig();
-        pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), finder,
-                                                            pdpConfig.getResourceFinder(), true);
+        PolicyFinder policyFinder = new PolicyFinder();
+        policyFinder.setModules(policyModules);        
+        
+        PDPConfig pdpConfig = Balana.getInstance().getPdpConfig();
+        pdpConfig = new PDPConfig(pdpConfig.getAttributeFinder(), policyFinder, pdpConfig.getResourceFinder(), true);
+        
         return new PDP(pdpConfig);
+    }    
+        
+    private static void initEngine() {
+    	if (!initialized) {
+        	try {
+        		GeoXACML.initialize();
+        		SAMLConfig.InitSAML();
+        		Balana.getInstance().setPdpConfig(PDPConfiguration.getPDPConfig());
+        		initialized = true;
+        	} catch (Exception e) {
+        		initialized = false;
+        	}    		
+    	}
     }
-	
-	
-
+    
 }

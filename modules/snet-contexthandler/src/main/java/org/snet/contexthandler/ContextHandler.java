@@ -12,7 +12,7 @@ import org.wso2.balana.PDP;
 import org.wso2.balana.XACMLConstants;
 
 /**
- * Simple Class for handling incoming requests and providing them to the appropiate handler
+ * Simple Class for handling incoming requests and providing them to the appropriate handler
  */
 public class ContextHandler {	
 	
@@ -28,6 +28,10 @@ public class ContextHandler {
 	
 	private ContextHandler(ParserPool parserPool, PDP pdp) {
 		this.parserPool = parserPool;
+		this.pdp = pdp;
+	}
+		
+	public void setPDP(PDP pdp) {
 		this.pdp = pdp;
 	}
 	
@@ -69,10 +73,6 @@ public class ContextHandler {
 			}
 		}
 		return response;
-	}
-	
-	public void setPDP(PDP pdp) {
-		this.pdp = pdp;
 	}
 
 }
