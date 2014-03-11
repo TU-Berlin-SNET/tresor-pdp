@@ -1,7 +1,22 @@
 package org.snet.tresor.finder.impl;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -23,6 +38,16 @@ import org.wso2.balana.finder.AttributeFinderModule;
  * @author Zequeira
  */
 public class GeoAttributeFinderModule extends AttributeFinderModule {
+    
+    /**
+     * Attribute Id suported by this Attribute Finder Module
+     */
+    public static final String suportedAttributeId = "http://wso2.org/claims/emailaddress";
+    
+    /**
+     * Server's url to make the request
+     */
+    public static final String url = "http://localhost:9090/coordinates";
     
     private EvaluationResult createProcessingError(String msg) {
         ArrayList<String> code = new ArrayList<String>();
@@ -184,7 +209,90 @@ public class GeoAttributeFinderModule extends AttributeFinderModule {
     @Override
     public EvaluationResult findAttribute(URI attributeType, URI attributeId, String issuer,
             URI category, EvaluationCtx context) {
-        return new EvaluationResult(BagAttribute.createEmptyBag(attributeType));
+        
+        // check if the AttributeId is supported by this Attribute Finder, otherwise go for the next AttributeFinder
+        if (!suportedAttributeId.equals(attributeId.toString()))
+            return new EvaluationResult(BagAttribute.createEmptyBag(attributeType));
+        
+        ArrayList<AttributeValue> list = new ArrayList<AttributeValue>();
+        
+        Map<String, String> data = new HashMap<String, String>();
+        /*data.put("AttributeId", "http://wso2.org/claims/emailaddress");
+        data.put("DataType", "http://www.w3.org/2001/XMLSchema#string");
+        data.put("Category", "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");*/
+        
+        data.put("AttributeId", attributeId.toString());
+        data.put("DataType", attributeType.toString());
+        data.put("Category", category.toString());
+        
+        //String url = "http://localhost:9090/coordinates";
+        String USER_AGENT = "Mozilla/5.0";
+        URL  obj;
+        //HttpsURLConnection conection;
+        try {
+            obj = new URL(url);
+            HttpURLConnection conection = (HttpURLConnection) obj.openConnection();
+            
+            //adding request headers
+            conection.setRequestMethod("POST");
+            conection.setDoOutput(true);
+            conection.setDoInput(true);
+            conection.setRequestProperty("User-Agent", USER_AGENT);
+            conection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            
+            
+            DataOutputStream out = new DataOutputStream(conection.getOutputStream());
+		
+            Set keys = data.keySet();
+            Iterator keyIter = keys.iterator();
+            String content = "";
+            for(int i=0; keyIter.hasNext(); i++) {
+                    Object key = keyIter.next();
+                    if(i!=0) {
+                            content += "&";
+                    }
+                    content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
+            }
+            System.out.println(content);
+            out.writeBytes(content);
+            out.flush();
+            out.close();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conection. getInputStream()));
+            String line = "";
+            String answer[] = null;
+            
+            StringBuffer response = new StringBuffer();
+            
+            while((line=in.readLine())!=null) {
+                    System.out.println(line);
+                    answer = line.split(" ");
+            }
+            in.close();
+            
+            
+            AttributeFactory attrFactory = AttributeFactory.getInstance();
+            
+            AttributeValue attrValue = null;
+            attrValue = attrFactory.createValue(attributeType, answer[7]);
+            
+            list.add(attrValue);
+            
+            
+            //print result
+            //System.out.println(response.toString());
+            
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(GeoAttributeFinderModule.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GeoAttributeFinderModule.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnknownIdentifierException ex) {
+            Logger.getLogger(GeoAttributeFinderModule.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParsingException ex) {
+            Logger.getLogger(GeoAttributeFinderModule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
+        return new EvaluationResult(new BagAttribute(attributeType, list));
+        //return new EvaluationResult(BagAttribute.createEmptyBag(attributeType));
     }
     
     @Override
