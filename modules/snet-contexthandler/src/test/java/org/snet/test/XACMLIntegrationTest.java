@@ -29,16 +29,6 @@ public class XACMLIntegrationTest {
 	String samlRespRoot = TestConstants.ResponseRoot + "/xacmlsaml";
 	
 	BasicParserPool pp = new BasicParserPool();
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		SAMLConfig.InitSAML();
-		GeoXACML.initialize();
-
-		AttributeFactory sattr = StandardAttributeFactory.getNewFactory();
-		sattr.addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());
-		Balana.getInstance().setAttributeFactory(sattr);
-	}
 
 	@Test
 	public void testXACML() {
@@ -55,7 +45,7 @@ public class XACMLIntegrationTest {
 		String policyNr, reqRespNr, policy;
 		PDP pdp = null;
 		
-		ContextHandler cx = ContextHandler.getInstance();		
+		ContextHandler cx = ContextHandler.getInstance();
 		
 		String reqRespType = (reqRoot.contains("saml")) ? TestConstants.ReqRespTypeSAML : TestConstants.ReqRespTypeXACML;
 		String req, expectedResponse, actualResponse;

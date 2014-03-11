@@ -61,10 +61,13 @@ public class PolicyHandler {
 		char[] buffer = new char[contentlength];
 		request.read(buffer);
 		int index = Integer.parseInt(String.valueOf(buffer));
-
+		
+		String removedPolicy = transformToString(this.deletePolicy(index));		
+		this.updatePDP();
+		
 		// TODO error handling and stuff
 
-		return transformToString(this.deletePolicy(index));
+		return removedPolicy;
 	}
 	
 	private boolean addPolicy(Document policy) {
