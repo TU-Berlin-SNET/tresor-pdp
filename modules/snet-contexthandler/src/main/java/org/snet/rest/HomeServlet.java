@@ -26,10 +26,6 @@ public class HomeServlet extends HttpServlet {
 		response.setContentLength(resourcesXML.length());
 		response.getWriter().println(resourcesXML);
 		response.getWriter().flush();
-	}
-	
-	public HomeServlet() throws ServletException {
-		this.init();
 	}	
 	
 }

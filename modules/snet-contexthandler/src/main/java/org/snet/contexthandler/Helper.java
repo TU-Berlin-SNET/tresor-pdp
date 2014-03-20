@@ -14,6 +14,10 @@ import org.wso2.balana.finder.PolicyFinder;
 import org.wso2.balana.finder.PolicyFinderModule;
 import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
 
+/**
+ * Helper-Class for interfacing with Balana and PDP
+ * @author malik
+ */
 public class Helper {
 
 	private static boolean initialized = false;
@@ -50,6 +54,9 @@ public class Helper {
         return new PDP(pdpConfig);
     }    
         
+    /**
+     * Initializes the engine with additional geoxacml and saml support, also sets new pdpconfiguration
+     */
     private static void initEngine() {
     	if (!initialized) {
         	try {
@@ -58,6 +65,7 @@ public class Helper {
         		Balana.getInstance().setPdpConfig(PDPConfiguration.getPDPConfig());
         		initialized = true;
         	} catch (Exception e) {
+        		e.printStackTrace();
         		initialized = false;
         	}    		
     	}

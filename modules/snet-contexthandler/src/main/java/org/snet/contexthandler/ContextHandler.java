@@ -14,16 +14,16 @@ import org.wso2.balana.XACMLConstants;
 /**
  * Simple Class for handling incoming requests and providing them to the appropriate handler
  */
-public class ContextHandler {	
+public class ContextHandler {
+	static ContextHandler CONTEXTHANDLER;
 	
-	static ContextHandler contextHandler;
 	ParserPool parserPool;
 	PDP pdp;
 	
 	public static ContextHandler getInstance() {
-		if (contextHandler == null)
-			contextHandler = new ContextHandler(new BasicParserPool(), Helper.getPDP());
-		return contextHandler;
+		if (CONTEXTHANDLER == null)
+			CONTEXTHANDLER = new ContextHandler(new BasicParserPool(), Helper.getPDP());
+		return CONTEXTHANDLER;
 	}
 	
 	private ContextHandler(ParserPool parserPool, PDP pdp) {
@@ -42,7 +42,6 @@ public class ContextHandler {
 	 * @return the response from the handler or null if an error happened
 	 */
 	public String handle(Reader reader) {
-        //public String handle(InputStream reader) {
 		String response = null;
 		Document doc = null;
 		Element elem = null;

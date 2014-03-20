@@ -1,11 +1,16 @@
 package org.snet.rest;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.snet.contexthandler.PolicyHandler;
 
+/**
+ * A simple Servlet which provides a restful interface for getting, adding and removing of policies.
+ * @author malik
+ */
 public class PolicyHandlerServlet extends HttpServlet {
 
 	PolicyHandler policyHandler;
@@ -47,8 +52,9 @@ public class PolicyHandlerServlet extends HttpServlet {
 		}
 	}
 	
-	public PolicyHandlerServlet() {
+	public void init() throws ServletException {
 		this.policyHandler = PolicyHandler.getInstance();
+		super.init();
 	}
 
 }

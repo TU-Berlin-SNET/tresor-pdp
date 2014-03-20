@@ -13,6 +13,10 @@ import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
 import org.w3c.dom.Document;
 
+/**
+ * Handler-class which handles getting, adding and removing of policies.
+ * @author malik
+ */
 public class PolicyHandler {
 
 	static PolicyHandler policyHandler;

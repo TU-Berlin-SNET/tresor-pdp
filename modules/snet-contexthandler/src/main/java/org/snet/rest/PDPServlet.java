@@ -1,6 +1,7 @@
 package org.snet.rest;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,12 +33,11 @@ public class PDPServlet extends HttpServlet {
 		} else {
 			response.setStatus(400);
 		}		
-	}	
-	
-	public PDPServlet() throws ServletException {
-		this.contextHandler = ContextHandler.getInstance();
-		this.init();
 	}
-
-
+	
+	public void init() throws ServletException {
+		this.contextHandler = ContextHandler.getInstance();
+		super.init();		
+	}
+	
 }
