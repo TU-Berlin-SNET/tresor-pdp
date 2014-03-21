@@ -62,7 +62,9 @@ public class AppGeo3
         //Policy for this request
         //<string>/opt/NetBeans/TRESOR/WSO2-Balana-Basic_OK/policies-request/geoxacml-policies/policy-3-actions.xml</string>
         
-        String request = new Scanner(new File("/opt/Netbeans/TRESOR/Test_Request.xml")).useDelimiter("\\A").next();
+        String request = new Scanner(new File("/opt/Netbeans/TRESOR/z_time-policy-request/2-RequestTime.xml")).useDelimiter("\\A").next();
+        //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Test_Request.xml")).useDelimiter("\\A").next();
+        //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Request_Date_3.0.xml")).useDelimiter("\\A").next();
         
         result = pdp.evaluate(request);
         System.out.println("La respuesta es: "+result);
