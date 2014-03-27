@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.snet.tresor.finder.impl.LocationAttributeFinderModule;
+import org.snet.finder.impl.LocationAttributeFinderModule;
 import org.wso2.balana.PDPConfig;
 import org.wso2.balana.finder.AttributeFinder;
 import org.wso2.balana.finder.AttributeFinderModule;
@@ -38,6 +38,7 @@ public class PDPConfiguration {
 		Map<String, String> m = new HashMap<String, String>();
 		
 		m.put("wifiSSID", "http://localhost:8080/wifiPIP");
+		m.put("timestamp-wifi", "http://localhost:8080/wifiPIP");
 		
 		PIPURLMAP = m;
 	}
