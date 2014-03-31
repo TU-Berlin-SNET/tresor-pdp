@@ -71,6 +71,8 @@ public class ContextHandler {
 				
 			}
 		}
+		
+		Helper.clearCaches();		
 		return response;
 	}
 
