@@ -47,7 +47,7 @@ public class AppGeo3
         // create default instance of Balana
         balana = Balana.getInstance();
         
-        balana.getAttributeFactory().addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());
+        //balana.getAttributeFactory().addDatatype(GeometryAttribute.identifier, new GeometryAttributeProxy());
     }	
 	
     public static void main( String[] args ) throws FileNotFoundException
@@ -62,7 +62,7 @@ public class AppGeo3
         //Policy for this request
         //<string>/opt/NetBeans/TRESOR/WSO2-Balana-Basic_OK/policies-request/geoxacml-policies/policy-3-actions.xml</string>
         
-        String request = new Scanner(new File("/opt/Netbeans/TRESOR/z_time-policy-request/2-RequestTime.xml")).useDelimiter("\\A").next();
+        String request = new Scanner(new File("/opt/Netbeans/TRESOR/z_sql-policy-request/Test_Request.xml")).useDelimiter("\\A").next();
         //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Test_Request.xml")).useDelimiter("\\A").next();
         //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Request_Date_3.0.xml")).useDelimiter("\\A").next();
         
