@@ -26,21 +26,26 @@ public class PDPConfiguration {
 	private static PDPConfig PDPCONFIG = null;
 	
 	private static AttributeFinderModule[] ATTRIBUTEFINDERMODULES = { new CurrentEnvModule(), 
-															  		  new SelectorModule()															  		  
+															  		  new SelectorModule(),
+															  		  getLocationAttributeFinderModule()
 																	};
 		
 	private static PolicyFinderModule[] POLICYFINDERMODULES = { };
 	
 	private static ResourceFinderModule[] RESOURCEFINDERMODULES = {	};
 	
-	private static Map<String, String> PIPURLMAP;
-	static {
-		Map<String, String> m = new HashMap<String, String>();
+	private static LocationAttributeFinderModule locModule;
+	private static LocationAttributeFinderModule getLocationAttributeFinderModule() {
+		if (locModule == null) {
+			locModule = new LocationAttributeFinderModule();
+			
+			locModule.addPIP("wifiSSID", "http://localhost:8080/wifiPIP");
+			locModule.addPIP("position", "http://localhost:8080/wifiPIP");
+			locModule.addPIP("timestamp-wifi", "http://localhost:8080/wifiPIP");
+			locModule.addPIP("timestamp-geo", "http://localhost:8080/wifiPIP");			
+		}
 		
-		m.put("wifiSSID", "http://localhost:8080/wifiPIP");
-		m.put("timestamp-wifi", "http://localhost:8080/wifiPIP");
-		
-		PIPURLMAP = m;
+		return locModule;
 	}
 	
 	/**
@@ -56,18 +61,11 @@ public class PDPConfiguration {
 	 * Initializes and sets the PDPConfig
 	 */
 	private static void initConfig() {
-		LocationAttributeFinderModule locModule = new LocationAttributeFinderModule();
-		for (String key : PIPURLMAP.keySet())
-			locModule.addPIP(key, PIPURLMAP.get(key));
 		
 		// prepare attributefinder
 		AttributeFinder attributeFinder = new AttributeFinder();
-//		attributeFinder.setModules(new ArrayList<AttributeFinderModule>(
-//				Arrays.asList(ATTRIBUTEFINDERMODULES)));
-		List<AttributeFinderModule> attrModules = new ArrayList<AttributeFinderModule>();
-		attrModules.addAll(Arrays.asList(ATTRIBUTEFINDERMODULES));
-		attrModules.add(locModule);
-		attributeFinder.setModules(attrModules);
+		attributeFinder.setModules(new ArrayList<AttributeFinderModule>(
+				Arrays.asList(ATTRIBUTEFINDERMODULES)));
 		
 		// prepare policyfinder
 		PolicyFinder policyFinder = new PolicyFinder();
