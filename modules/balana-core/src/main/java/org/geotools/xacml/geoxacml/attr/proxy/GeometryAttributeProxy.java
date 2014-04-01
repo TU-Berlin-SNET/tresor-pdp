@@ -39,10 +39,12 @@ public class GeometryAttributeProxy implements AttributeProxy {
         return GeometryAttribute.getInstance(value);
     }
 
-	public AttributeValue getInstance(String value, String[] params)
-			throws Exception {
+	public AttributeValue getInstance(String value, String[] params) throws Exception {
 		// TODO corresponding getInstance in GeometryAttribute missing
-		return null;
+			if (params == null || params.length < 1)
+				return getInstance(value);
+			else 
+				throw new Exception("Invalid method call");		
         }
 
 }
