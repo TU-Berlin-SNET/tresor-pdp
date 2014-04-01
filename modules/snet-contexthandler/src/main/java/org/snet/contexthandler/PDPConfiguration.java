@@ -2,11 +2,7 @@ package org.snet.contexthandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import org.snet.finder.impl.LocationAttributeFinderModule;
 import org.wso2.balana.PDPConfig;
 import org.wso2.balana.finder.AttributeFinder;
