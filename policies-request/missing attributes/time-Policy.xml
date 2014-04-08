@@ -1,0 +1,57 @@
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" 
+		PolicyId="2-PolicyTime" 
+		RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" 
+		Version="1.0">
+   <Target/>
+   <Rule Effect="Permit" RuleId="Rule-1">
+	   <Description>
+			The resource "foo" is accesible for "read" for user "bob" only on 21/03/2014 or any day before.
+		</Description>
+      <Target>
+         <AnyOf>
+            <AllOf>
+               <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">foo</AttributeValue>
+                  <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" 
+										Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" 
+										DataType="http://www.w3.org/2001/XMLSchema#string" 
+										MustBePresent="true"/>
+               </Match>
+            </AllOf>
+         </AnyOf>
+         <AnyOf>
+            <AllOf>
+               <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+                  <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+										Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" 
+										DataType="http://www.w3.org/2001/XMLSchema#string" 
+										MustBePresent="false"/>
+               </Match>
+            </AllOf>
+         </AnyOf>
+      </Target>
+      <Condition>
+         <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-less-than-or-equal">
+               <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-one-and-only">
+                  <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date" 
+										Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment" 
+										DataType="http://www.w3.org/2001/XMLSchema#date" 
+										MustBePresent="true"/>
+               </Apply>
+               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#date">2014-03-21</AttributeValue>
+            </Apply>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+               <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bob</AttributeValue>
+               <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" 
+									Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" 
+									DataType="http://www.w3.org/2001/XMLSchema#string" 
+									MustBePresent="true"/>
+            </Apply>
+         </Apply>
+      </Condition>
+   </Rule>
+   <Rule Effect="Deny" RuleId="Deny-Rule" />
+</Policy>       
