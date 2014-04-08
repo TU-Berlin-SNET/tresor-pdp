@@ -13,7 +13,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.json.JSONException;
+import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.wso2.balana.Balana;
@@ -27,11 +27,15 @@ import org.wso2.balana.finder.AttributeFinderModule;
 
 /**
  * AttributeFinderModule which interfaces with the LocationServer-PIP to provide location data.
+ * GeometryAttributes only work with gml:Point coordinates for now
  * @author Zequeira, malik
  */
 public class LocationAttributeFinderModule extends AttributeFinderModule {
 	private static RuntimeException earlyException;
 
+	static String GEOMETRY_POINT_PRE = "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"EPSG:4326\"><gml:coordinates>";
+	static String GEOMETRY_POINT_POST = "</gml:coordinates></gml:Point>";
+	
 	private static URI SUBJECT_CATEGORY;
 	private static URI STRING_DATATYPE;
 	private static URI SUBJECT_ID;
@@ -105,13 +109,8 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 			URI category, EvaluationCtx context) {    	
 		String pipUrl = this.pipUrlMap.get(attributeId.toString());
 
-		// TODO remove
-		System.out.println("Looking for attribute: " + attributeId.toString());
-
 		// if we have a url for a pip which can provide attribute values for given attributeid...
 		if (pipUrl != null) {
-			// TODO remove
-			System.out.println("Have a pip");
 			try {
 				// ...we query the pip and get the response body as json,...
 				JSONObject jsonResponse = this.queryPIP(pipUrl, attributeId, issuer, context); 
@@ -141,62 +140,58 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 	 */
 	private JSONObject queryPIP(String pipUrl, URI attributeId, String issuer,	EvaluationCtx context) throws Exception {
 		JSONObject response = null;
-		
-		String subjectID = getAttributeAsString(STRING_DATATYPE, SUBJECT_ID, issuer, SUBJECT_CATEGORY, context);
-		String deviceID = getAttributeAsString(STRING_DATATYPE, DEVICE_ID, issuer, SUBJECT_CATEGORY, context);
 
 		// try to get the value from cache
 		String cachedValue = THREADCACHE.get().get(attributeId.toString());
-		// TODO remove
-		System.out.println("Cached Value is: " + cachedValue);
-		if (cachedValue != null)
-			response = new JSONObject().put(attributeId.toString(), cachedValue);		
-		else {
-			
-			// TODO remove
-			System.out.println("No cached value, asking pip");
-			
-			// if that fails, try getting the value from the pip
-			PostMethod query = new PostMethod(pipUrl);
-			
-			try {
-				// create json data and set in query
-				JSONObject jsonData = new JSONObject();
-				jsonData.put("subject-id", subjectID);
-				jsonData.put("device-id", deviceID);
-				jsonData.put("attribute-id", attributeId.toString());
-				jsonData.putOpt("issuer", issuer);
-				query.setRequestEntity(new StringRequestEntity(jsonData.toString(), "application/json", "UTF-8"));
 
-				// fire query
-				this.httpClient.executeMethod(query);
+		if (cachedValue != null) {
+			response = new JSONObject().put(attributeId.toString(), cachedValue);
+		} else {
+			// else get the value from pip
 
-				// if query was successful...
-				if (query.getStatusCode() == 200) {
-					// ...parse the response Body...
-					JSONTokener tokener = new JSONTokener(new InputStreamReader(query.getResponseBodyAsStream()));
-					response = new JSONObject(tokener);
-					
-					// TODO remove
-					System.out.println("Adding to cache");
-					
-					// ...cache all values the pip sent...
-					Iterator iter = response.keys();
-					Map<String, String> threadCacheMap = THREADCACHE.get();
-					while (iter.hasNext()) {
-						String key = (String) iter.next();
-						threadCacheMap.put(key, response.getString(key));
-					}				
+			String subjectID = getAttributeAsString(STRING_DATATYPE, SUBJECT_ID, issuer, SUBJECT_CATEGORY, context);
+			String deviceID = getAttributeAsString(STRING_DATATYPE, DEVICE_ID, issuer, SUBJECT_CATEGORY, context);			
+
+			if (subjectID != null && deviceID != null) {				
+				PostMethod query = new PostMethod(pipUrl);
+
+				try {
+					// create json data and set in query
+					JSONObject jsonData = new JSONObject();
+					jsonData.put("subject-id", subjectID);
+					jsonData.put("device-id", deviceID);
+					jsonData.put("attribute-id", attributeId.toString());
+					jsonData.putOpt("issuer", issuer);
+					query.setRequestEntity(new StringRequestEntity(jsonData.toString(), "application/json", "UTF-8"));
+
+					// fire query
+					this.httpClient.executeMethod(query);
+
+					// if query was successful...
+					if (query.getStatusCode() == 200) {
+						// ...parse the response Body...
+						JSONTokener tokener = new JSONTokener(new InputStreamReader(query.getResponseBodyAsStream()));
+						response = new JSONObject(tokener);
+
+						// ...and cache all values the pip sent
+						Iterator iter = response.keys();
+						Map<String, String> threadCacheMap = THREADCACHE.get();
+						while (iter.hasNext()) {
+							String key = (String) iter.next();
+							threadCacheMap.put(key, response.getString(key));
+						}
+					}
+
+				} finally {
+					query.releaseConnection();
 				}
-			} finally {
-				query.releaseConnection();
 			}
 		}
 
 		return response;
 	}				
 
-	
+
 	/**
 	 * Searches in given EvaluationContext for an attribute
 	 * @param attributeType, type of attribute to look for
@@ -235,23 +230,24 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 	private EvaluationResult makeAttributeBagResult(URI attributeType, String attributeValue) {
 		AttributeValue attribute;
 		try {
+			// if attribute is geometry, add additional gml:Point info to attributeValue
+			if (attributeType.toString().equals(GeometryAttribute.identifier))
+				attributeValue = GEOMETRY_POINT_PRE + attributeValue + GEOMETRY_POINT_POST;
+			
 			attribute = Balana.getInstance().getAttributeFactory().createValue(attributeType, attributeValue);
 			Set<AttributeValue> set = new HashSet<AttributeValue>();
 			set.add(attribute);
 
-			return new EvaluationResult(new BagAttribute(attribute.getType(), set));
-		} 
-		catch (UnknownIdentifierException e) { e.printStackTrace(); } 
+			return new EvaluationResult(new BagAttribute(attributeType, set));
+		}
+		catch (UnknownIdentifierException e) { e.printStackTrace(); }
 		catch (ParsingException e) { e.printStackTrace(); }
 
 		// empty bag if it fails
 		return new EvaluationResult(BagAttribute.createEmptyBag(attributeType));
 	}
-	
+
 	public static void clearThreadCache() {
-		// TODO remove
-		System.out.println("clearing cache");
-		
 		THREADCACHE.get().clear();
 	}
 
