@@ -1,24 +1,23 @@
 package org.snet.policystore;
 
-import java.util.List;
 import java.util.Map;
 
 public interface DBPolicyStoreManager {
-
-	/**
-	 * Retrieves Policy which corresponds to given id
-	 * @param id
-	 * @return xacml policy as string
-	 */
-	public String getPolicy(String id);
 	
 	/**
-	 * Retrieves a List of all policies which correspond to given domain/service combination 
+	 * Retrieves all policies belonging to the given domain as a Map
 	 * @param domain
-	 * @param service
-	 * @return List of policies
+	 * @return Map with the serviceIds as keys and the policy strings as values
 	 */
-	public List<String> getPolicy(String domain, String service);
+	public Map<String, String> getAll(String domain);
+	
+	/**
+	 * Retrieves the corresponding policy 
+	 * @param domain, customer domain of policy
+	 * @param service, service the policy is valid for
+	 * @return policy
+	 */
+	public String getPolicy(String domain, String service);
 	
 	/**
 	 * Adds a Policy to the PolicyStore
@@ -30,17 +29,11 @@ public interface DBPolicyStoreManager {
 	public String addPolicy(String domain, String service, String policy);
 	
 	/**
-	 * Delete Policy with given id
-	 * @param policyId
+	 * Deletes Policy which corresponds to given domain/service combination
+	 * @param domain
+	 * @param service
 	 * @return Deleted policy as string or null if failed
 	 */
-	public String deletePolicy(String policyId);
-	
-	/**
-	 * Retrieves all policies belonging to the given domain as a Map
-	 * @param domain
-	 * @return Map with the policyIds as keys and the policy strings as values
-	 */
-	public Map<String, String> getAll(String domain);
+	public String deletePolicy(String domain, String service);
 	
 }
