@@ -35,11 +35,15 @@ public class TimeAttributeFinderModule extends CurrentEnvModule {
      */
     public static final String url = "hora.roa.es";
     
+    /**
+     * Standard environment variable that represents the current timestamp
+     */
+    public static final String ENVIRONMENT_CURRENT_TIMESTAMP = "org:snet:tresor:time:current-timestamp";
     
     /**
      * Private method to get the time from the NTP specified server through the url parameter.
      */
-    private static Date getTimeDate(Date timeDate) throws IOException{    
+    private static Date getTimeDate(Date timeDate) throws IOException{
         String[] args = url.split(" ");
                 
         if (args.length == 1)
@@ -132,6 +136,16 @@ public class TimeAttributeFinderModule extends CurrentEnvModule {
         return makeBag(type, formatter.format(timeDate));
     }
     
+    /**
+     * Handles requests for the current Timestamp.
+     */
+    private EvaluationResult handleTimestamp(URI type,  Date timeDate) throws UnknownIdentifierException, ParsingException {
+        String unixTime = String.valueOf(timeDate.getTime()/1000);
+        
+        System.out.println("The string is: "+unixTime);
+        return makeBag(type, unixTime);
+    }
+    
     @Override
     public EvaluationResult findAttribute(URI attributeType, URI attributeId, String issuer,
             URI category, EvaluationCtx context) {
@@ -154,6 +168,9 @@ public class TimeAttributeFinderModule extends CurrentEnvModule {
             } else if (attrName.equals(ENVIRONMENT_CURRENT_DATETIME)) {
                 timeDate = getTimeDate(timeDate);
                 return handleDateTime(attributeType, timeDate);
+            } else if (attrName.equals(ENVIRONMENT_CURRENT_TIMESTAMP)) {
+                timeDate = new Date();
+                return handleTimestamp(attributeType, timeDate);
             }
         
         }

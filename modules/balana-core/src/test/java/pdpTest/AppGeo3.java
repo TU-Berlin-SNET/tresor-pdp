@@ -9,6 +9,7 @@ package pdpTest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -59,10 +60,15 @@ public class AppGeo3
         
         PDP pdp = new PDP(balana.getPdpConfig());
         
+        Date timeDate = new Date();
+        String unixTime = String.valueOf(timeDate.getTime()/1000);
+        System.out.println("The string is: "+unixTime);
+        
+        
         //Policy for this request
         //<string>/opt/NetBeans/TRESOR/WSO2-Balana-Basic_OK/policies-request/geoxacml-policies/policy-3-actions.xml</string>
         
-        String request = new Scanner(new File("/opt/Netbeans/TRESOR/z_sql-policy-request/Test_Request.xml")).useDelimiter("\\A").next();
+        String request = new Scanner(new File("/opt/Netbeans/TRESOR/balana/policies-request/missing attributes/geo_time-Request.xml")).useDelimiter("\\A").next();
         //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Test_Request.xml")).useDelimiter("\\A").next();
         //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Request_Date_3.0.xml")).useDelimiter("\\A").next();
         

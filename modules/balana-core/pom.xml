@@ -105,6 +105,16 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>2.11.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.fusesource.leveldbjni</groupId>
+            <artifactId>leveldbjni-linux64</artifactId>
+            <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>10.10.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>
