@@ -1,11 +1,12 @@
-package org.snet.contexthandler;
+package org.snet.tresor.pdp.contexthandler;
 
 import java.io.Reader;
 
 import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
-import org.snet.saml.SAMLHandler;
+import org.snet.tresor.pdp.contexthandler.handler.SAMLHandler;
+import org.snet.tresor.pdp.contexthandler.handler.XACMLHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.PDP;

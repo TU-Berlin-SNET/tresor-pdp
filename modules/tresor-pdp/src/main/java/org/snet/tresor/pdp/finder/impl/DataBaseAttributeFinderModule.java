@@ -1,5 +1,5 @@
 
-package org.snet.tresor.finder.impl;
+package org.snet.tresor.pdp.finder.impl;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;

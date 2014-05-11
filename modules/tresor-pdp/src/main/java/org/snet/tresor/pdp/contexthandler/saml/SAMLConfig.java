@@ -1,13 +1,13 @@
-package org.snet.saml;
+package org.snet.tresor.pdp.contexthandler.saml;
 
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.ConfigurationException;
-import org.snet.saml.xacml3.XACML3GenericMarshaller;
-import org.snet.saml.xacml3.XACML3RequestType;
-import org.snet.saml.xacml3.XACML3RequestTypeUnmarshaller;
-import org.snet.saml.xacml3.XACML3ResponseType;
-import org.snet.saml.xacml3.XACML3ResponseTypeUnmarshaller;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3GenericMarshaller;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3RequestType;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3RequestTypeUnmarshaller;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3ResponseType;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3ResponseTypeUnmarshaller;
 
 /**
  * Utility Class for SAML-related methods

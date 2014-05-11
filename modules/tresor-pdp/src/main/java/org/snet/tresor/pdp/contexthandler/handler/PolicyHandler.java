@@ -1,9 +1,13 @@
-package org.snet.contexthandler;
+package org.snet.tresor.pdp.contexthandler.handler;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -11,6 +15,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
+import org.snet.tresor.pdp.contexthandler.ContextHandler;
+import org.snet.tresor.pdp.contexthandler.Helper;
+import org.snet.tresor.pdp.policystore.DBPolicyStoreManager;
+import org.snet.tresor.pdp.policystore.RedisDBPolicyStoreManager;
 import org.w3c.dom.Document;
 
 /**
@@ -21,7 +29,8 @@ public class PolicyHandler {
 
 	static PolicyHandler policyHandler;
 	
-	ContextHandler contextHandler;	
+	ContextHandler contextHandler;
+	DBPolicyStoreManager policyStore = RedisDBPolicyStoreManager.getInstance();
 	List<Document> policies;
 	ParserPool parserPool;
 	
@@ -46,19 +55,26 @@ public class PolicyHandler {
 	public String handleGet(Reader request) throws Exception {
 		StringWriter buffer = new StringWriter();
 		
-		for (int i = 0; i < this.policies.size(); i++) {
-			Document policy = this.policies.get(i);
-			buffer.append(i + ": " + transformToString(policy) + System.getProperty("line.separator"));			
+		Map<String, String> map = this.policyStore.getAll("domain1");
+		
+		if (map != null) {
+			Set<Entry<String, String>> entries = map.entrySet();
+			for (Entry<String, String> e : entries) {
+				buffer.append(e.getKey() + ": " + e.getValue() + System.getProperty("line.separator"));
+			}
 		}
 		
 		return buffer.toString();
 	}
 	
-	public void handlePut(Reader request) throws Exception {
-		Document doc = this.parserPool.parse(request);			
+	public void handlePut(InputStream request) throws Exception {
+		
+		Document doc = this.parserPool.parse(request);		
+		
+					
 		// TODO: add error handling and stuff
-		this.addPolicy(doc);
-		this.updatePDP();
+//		this.addPolicy(doc);
+//		this.updatePDP();
 	}
 	
 	public String handleDelete(Reader request, int contentlength) throws Exception {

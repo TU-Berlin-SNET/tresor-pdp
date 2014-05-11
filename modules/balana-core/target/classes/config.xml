@@ -1,12 +1,13 @@
 <config defaultPDP="pdp" defaultAttributeFactory="attr"
         defaultCombiningAlgFactory="comb" defaultFunctionFactory="func">
     <pdp name="pdp">
-        <attributeFinderModule class="org.wso2.balana.finder.impl.CurrentEnvModule"/>
         <attributeFinderModule class="org.wso2.balana.finder.impl.SelectorModule"/>
-        <attributeFinderModule class="org.snet.tresor.finder.impl.GeoAttributeFinderModule"/>
+        <attributeFinderModule class="org.snet.tresor.finder.impl.LocationAttributeFinderModule"/>
+        <attributeFinderModule class="org.snet.tresor.finder.impl.TimeAttributeFinderModule"/>
+        <attributeFinderModule class="org.snet.tresor.finder.impl.DataBaseAttributeFinderModule"/>
         <policyFinderModule class="org.wso2.balana.finder.impl.FileBasedPolicyFinderModule">
             <set>
-                <string>/opt/Netbeans/TRESOR/Test_Policy.xml</string>
+                <string>/opt/Netbeans/TRESOR/z_sql-policy-request/Test_Policy.xml</string>
             </set>
         </policyFinderModule>
     </pdp>
@@ -15,8 +16,8 @@
         <!--algorithm class="org.wso2.balana.combine.xacml3.DenyUnlessPermitRuleAlg"/-->
     </combiningAlgFactory>
     <functionFactory name="func" useStandardFunctions="true"/>
-    <!--condition>
-        <function class="org.wso2.balana.cond.TimeInRangeFunction"/>
-      </condition>
+    <!--condition>16Policy_Time_3.0_v2_from-editor
+        <function class="org.wso2.balana.cond.TimeInRangeFunction"/>  /opt/Netbeans/TRESOR/z_time-policy-request/2-PolicyTime.xml
+      </condition>     /opt/Netbeans/TRESOR/Test_Policy.xml
     </functionFactory-->
 </config>

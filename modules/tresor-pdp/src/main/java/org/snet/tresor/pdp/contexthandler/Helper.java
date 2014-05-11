@@ -1,12 +1,14 @@
-package org.snet.contexthandler;
+package org.snet.tresor.pdp.contexthandler;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.geotools.xacml.geoxacml.config.GeoXACML;
-import org.snet.finder.impl.LocationAttributeFinderModule;
-import org.snet.saml.SAMLConfig;
+import org.snet.tresor.pdp.Configuration;
+import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
+import org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule;
 import org.w3c.dom.Document;
 import org.wso2.balana.Balana;
 import org.wso2.balana.PDP;
@@ -21,6 +23,24 @@ import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
  */
 public class Helper {
 
+	public static URI CATEGORY_SUBJECT_URI;
+	public static URI CATEGORY_RESOURCE_URI;
+	public static URI DATATYPE_STRING_URI;
+	public static URI ID_DOMAIN_URI;
+	public static URI ID_SERVICE_URI;
+	
+	static {
+		try {
+			CATEGORY_SUBJECT_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
+			CATEGORY_RESOURCE_URI = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");				
+			DATATYPE_STRING_URI = new URI("http://www.w3.org/2001/XMLSchema#string");
+			ID_DOMAIN_URI = new URI("domain");
+			ID_SERVICE_URI = new URI("service");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static boolean initialized = false;
 	
 	/**
@@ -67,7 +87,7 @@ public class Helper {
         	try {
         		GeoXACML.initialize();
         		SAMLConfig.InitSAML();
-        		Balana.getInstance().setPdpConfig(PDPConfiguration.getPDPConfig());
+        		Balana.getInstance().setPdpConfig(Configuration.getPDPConfig());
         		initialized = true;
         	} catch (Exception e) {
         		e.printStackTrace();

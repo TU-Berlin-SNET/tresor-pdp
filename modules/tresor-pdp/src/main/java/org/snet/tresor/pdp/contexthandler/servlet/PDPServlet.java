@@ -1,5 +1,6 @@
-package org.snet.rest;
+package org.snet.tresor.pdp.contexthandler.servlet;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -7,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.snet.contexthandler.ContextHandler;
+import org.snet.tresor.pdp.contexthandler.ContextHandler;
 
 /**
  * A simple Servlet which responds to POST-requests as is specified in
@@ -37,7 +38,7 @@ public class PDPServlet extends HttpServlet {
 	
 	public void init() throws ServletException {
 		this.contextHandler = ContextHandler.getInstance();
-		super.init();		
+		super.init();
 	}
 	
 }

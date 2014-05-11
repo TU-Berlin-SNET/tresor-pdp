@@ -1,4 +1,4 @@
-package org.snet.rest;
+package org.snet.tresor.pdp.contexthandler.servlet;
 
 import java.io.IOException;
 

@@ -1,5 +1,5 @@
 
-package org.snet.policystore;
+package org.snet.tresor.pdp.policystore;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

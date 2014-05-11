@@ -1,4 +1,4 @@
-package org.snet.saml.xacml3;
+package org.snet.tresor.pdp.contexthandler.saml.xacml3;
 
 import org.opensaml.xacml.XACMLConstants;
 import org.opensaml.xml.XMLObject;

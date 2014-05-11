@@ -1,4 +1,4 @@
-package org.snet.test;
+package org.snet.tresor.pdp.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.StringReader;
@@ -42,7 +42,7 @@ import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.signature.Signer;
 import org.opensaml.xml.validation.ValidationException;
-import org.snet.saml.SAMLConfig;
+import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
 import org.w3c.dom.Element;
 
 /**

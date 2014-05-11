@@ -1,11 +1,11 @@
-package org.snet.rest;
+package org.snet.tresor.pdp.contexthandler.servlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.snet.contexthandler.PolicyHandler;
+import org.snet.tresor.pdp.contexthandler.handler.PolicyHandler;
 
 /**
  * A simple Servlet which provides a restful interface for getting, adding and removing of policies.
@@ -17,7 +17,7 @@ public class PolicyHandlerServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		try {
+		try {			
 			String res = this.policyHandler.handleGet(request.getReader());
 			response.setStatus(200);
 			response.setContentType("text/plain");
@@ -32,8 +32,8 @@ public class PolicyHandlerServlet extends HttpServlet {
 	
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			this.policyHandler.handlePut(request.getReader());
+		try {			
+			this.policyHandler.handlePut(request.getInputStream());
 			response.setStatus(200);
 		} catch (Exception e) {
 			response.setStatus(400);

@@ -1,4 +1,4 @@
-package org.snet.test;
+package org.snet.tresor.pdp.test;
 
 import java.io.File;
 import java.util.ArrayList;

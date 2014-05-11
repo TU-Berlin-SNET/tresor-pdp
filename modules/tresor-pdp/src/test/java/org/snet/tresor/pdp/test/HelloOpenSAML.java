@@ -1,4 +1,4 @@
-package org.snet.test;
+package org.snet.tresor.pdp.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -28,9 +28,9 @@ import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
-import org.snet.saml.SAMLConfig;
-import org.snet.saml.xacml3.XACML3RequestType;
-import org.snet.saml.xacml3.XACML3ResponseType;
+import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3RequestType;
+import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3ResponseType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -1,11 +1,13 @@
-package org.snet.saml;
+package org.snet.tresor.pdp.contexthandler.handler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+
 import org.opensaml.xml.ConfigurationException;
+import org.snet.tresor.pdp.contexthandler.saml.SAMLUtility;
 import org.w3c.dom.Element;
 
 /** Class to order the conversion from XACMLAuthzDecisionQuery to a normal XACML Request

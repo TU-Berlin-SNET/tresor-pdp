@@ -1,4 +1,4 @@
-package org.snet.finder.impl;
+package org.snet.tresor.pdp.finder.impl;
 
 import java.io.InputStreamReader;
 import java.net.URI;

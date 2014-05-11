@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.snet.test;
+package org.snet.tresor.pdp.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -13,13 +13,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
+
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 import org.geotools.xacml.geoxacml.attr.proxy.GeometryAttributeProxy;
 import org.geotools.xacml.geoxacml.config.GeoXACML;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.parse.BasicParserPool;
-import org.snet.contexthandler.ContextHandler;
-import org.snet.saml.SAMLConfig;
+import org.snet.tresor.pdp.contexthandler.ContextHandler;
+import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
 import org.wso2.balana.Balana;
 import org.wso2.balana.PDP;
 import org.wso2.balana.finder.impl.FileBasedPolicyFinderModule;

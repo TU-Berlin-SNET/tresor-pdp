@@ -1,0 +1,11 @@
+{
+	"geoxacml": "true",
+	"saml": "true",		
+	"attributefindermodules": [ "org.wso2.balana.finder.impl.CurrentEnvModule",
+								"org.wso2.balana.finder.impl.SelectorModule",
+								"org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule" ],
+	"policyfindermodules": [ "org.snet.tresor.pdp.finder.impl.DBPolicyFinderModule" ],
+	"resourcefindermodules": [ ],
+	"policystoremanager": "org.snet.tresor.pdp.policystore.RedisDBPolicyStoreManager",
+	"locationservers": [ {"attribute":"current-wifi", "url":"http://localhost:8080/wifiPIP"} ]
+}

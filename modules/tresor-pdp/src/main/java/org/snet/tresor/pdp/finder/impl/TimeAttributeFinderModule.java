@@ -1,4 +1,4 @@
-package org.snet.tresor.finder.impl;
+package org.snet.tresor.pdp.finder.impl;
 
 import java.io.IOException;
 import java.net.InetAddress;

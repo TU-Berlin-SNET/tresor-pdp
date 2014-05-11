@@ -1,5 +1,5 @@
 
-package org.snet.saml.xacml3;
+package org.snet.tresor.pdp.contexthandler.saml.xacml3;
 
 import java.util.List;
 import javax.xml.namespace.QName;

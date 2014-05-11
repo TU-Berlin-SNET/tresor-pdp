@@ -1,4 +1,4 @@
-package org.snet.test;
+package org.snet.tresor.pdp.test;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -13,8 +13,8 @@ import org.geotools.xacml.geoxacml.config.GeoXACML;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opensaml.xml.parse.BasicParserPool;
-import org.snet.contexthandler.ContextHandler;
-import org.snet.saml.SAMLConfig;
+import org.snet.tresor.pdp.contexthandler.ContextHandler;
+import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
 import org.wso2.balana.Balana;
 import org.wso2.balana.PDP;
 import org.wso2.balana.attr.AttributeFactory;

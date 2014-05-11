@@ -1,4 +1,4 @@
-package org.snet.test;
+package org.snet.tresor.pdp.test;
 
 public class TestConstants {
 
