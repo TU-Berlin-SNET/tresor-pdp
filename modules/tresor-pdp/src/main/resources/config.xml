@@ -3,7 +3,6 @@
     <pdp name="pdp">
         <attributeFinderModule class="org.wso2.balana.finder.impl.CurrentEnvModule"/>
         <attributeFinderModule class="org.wso2.balana.finder.impl.SelectorModule"/>
-        <attributeFinderModule class="org.snet.tresor.finder.impl.GeoAttributeFinderModule"/>
         <policyFinderModule class="org.wso2.balana.finder.impl.FileBasedPolicyFinderModule">
             <set>
                 <!--<string>/home/malik/Downloads/TRESOR/Test/policies/policy-1-time-stamp.xml</string>-->

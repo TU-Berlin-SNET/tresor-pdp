@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
 import org.snet.tresor.pdp.contexthandler.Helper;
-import org.snet.tresor.pdp.policystore.DBPolicyStoreManager;
+import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.AbstractPolicy;
@@ -29,10 +29,10 @@ public class DBPolicyFinderModule extends PolicyFinderModule{
 
 	private ParserPool parser;
 	private PolicyFinder finder;
-	private DBPolicyStoreManager policyStore;	
+	private PolicyStoreManager policyStore;	
 	private static Log log = LogFactory.getLog(FileBasedPolicyFinderModule.class);
 	
-	public DBPolicyFinderModule(DBPolicyStoreManager policyStore) {
+	public DBPolicyFinderModule(PolicyStoreManager policyStore) {
 		this.policyStore = policyStore;
 		this.parser = new BasicParserPool();
 	}

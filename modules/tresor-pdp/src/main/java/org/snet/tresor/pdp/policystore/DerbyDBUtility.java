@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Class to handle all the operations with a Derby Data Base
  * @author zequeira
  */
-public class DerbyDBUtility implements DBPolicyStoreManager{
+public class DerbyDBUtility implements PolicyStoreManager{
     
     private static final String driver = "org.apache.derby.jdbc.ClientDriver";
     private static final String protocol = "jdbc:derby://localhost:1527/";
@@ -61,7 +61,6 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
         }
     }
     
-    @Override
     public Map<String, String> getAll(String domain) {
         try {
             //to prevent the error getting a policy that already was deleted
@@ -81,7 +80,6 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
         }
     }
     
-    @Override
     public String getPolicy(String domain, String service) {
         try {
             //to prevent the error getting a policy that already was deleted
@@ -101,7 +99,6 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
         }
     }
     
-    @Override
     public String addPolicy(String domain, String service, String policy) {
         try {
             this.psInsert = connection.prepareStatement("insert into "+dbTable+" (domain, service, policy) values (?, ?, ?)");
@@ -119,25 +116,24 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
         }
     }
     
-    @Override
-    public String deletePolicy(String domain, String service) {
+    public int deletePolicy(String domain, String service) {
         try {
             this.psUpdate = connection.prepareStatement("DELETE FROM "+dbTable+" WHERE domain='"+domain+"' and service='"+service+"'");
             int result = this.psUpdate.executeUpdate();
             connection.commit();
             
             if ( result > 0) {
-                return "Policy";
+                return 1;
             } else {
-                return null;
+                return 0;
             }
         } catch (SQLException ex) {
             Logger.getLogger(DerbyDBUtility.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+            return 0;
         }
     }
     
-    public void closeConnection() throws SQLException {
+    public void close() throws SQLException {
         // release all open resources to avoid unnecessary memory usage
         // ResultSet
         try {

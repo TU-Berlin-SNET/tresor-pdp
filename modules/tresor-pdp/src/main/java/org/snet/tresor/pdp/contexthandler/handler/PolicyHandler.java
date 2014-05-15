@@ -17,7 +17,7 @@ import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
 import org.snet.tresor.pdp.contexthandler.ContextHandler;
 import org.snet.tresor.pdp.contexthandler.Helper;
-import org.snet.tresor.pdp.policystore.DBPolicyStoreManager;
+import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 import org.snet.tresor.pdp.policystore.RedisDBPolicyStoreManager;
 import org.w3c.dom.Document;
 
@@ -30,7 +30,7 @@ public class PolicyHandler {
 	static PolicyHandler policyHandler;
 	
 	ContextHandler contextHandler;
-	DBPolicyStoreManager policyStore = RedisDBPolicyStoreManager.getInstance();
+	PolicyStoreManager policyStore = RedisDBPolicyStoreManager.getInstance();
 	List<Document> policies;
 	ParserPool parserPool;
 	

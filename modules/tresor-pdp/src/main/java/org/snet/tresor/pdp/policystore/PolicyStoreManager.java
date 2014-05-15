@@ -2,7 +2,7 @@ package org.snet.tresor.pdp.policystore;
 
 import java.util.Map;
 
-public interface DBPolicyStoreManager {
+public interface PolicyStoreManager {
 	
 	/**
 	 * Retrieves all policies belonging to the given domain as a Map
@@ -35,5 +35,10 @@ public interface DBPolicyStoreManager {
 	 * @return 1 if successful, 0 if failed
 	 */
 	public int deletePolicy(String domain, String service);
+	
+	/**
+	 * Disconnect from PolicyStore and/or close PolicyStoreManager
+	 */
+	public void close();
 	
 }

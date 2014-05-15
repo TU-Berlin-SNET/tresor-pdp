@@ -82,6 +82,17 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 		this.httpClient = new HttpClient(this.connectionManager);		
 		this.pipUrlMap = new ConcurrentHashMap<String, String>();
 	}
+	
+	/**
+	 * Create new LocationAttributeFinderModule with given pips
+	 * @param pipInfo, array containing information about pips in the following form [ "attributeId", "pipURL", "attributeId", "pipURL", ...]
+	 */
+	public LocationAttributeFinderModule(String... pipInfo) {
+		this();
+
+		for (int i = 0; i < pipInfo.length - 1; i+=2)
+			this.addPIP(pipInfo[i], pipInfo[i+1]);
+	}
 
 	/**
 	 * @return map containing mappings between attribute-ids and pip urls

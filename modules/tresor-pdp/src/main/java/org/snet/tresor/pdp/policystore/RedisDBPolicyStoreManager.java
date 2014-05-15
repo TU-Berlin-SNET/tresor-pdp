@@ -6,20 +6,11 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class RedisDBPolicyStoreManager implements DBPolicyStoreManager {
-	static RedisDBPolicyStoreManager instance;
-	
-	public static RedisDBPolicyStoreManager getInstance() {
-		if (instance == null)
-			instance = new RedisDBPolicyStoreManager();
-		
-		return instance;
-	}
-	
+public class RedisDBPolicyStoreManager implements PolicyStoreManager {	
 	JedisPool redisdbpool;
 	Jedis redisdb;
 	
-	private RedisDBPolicyStoreManager() {
+	public RedisDBPolicyStoreManager() {
 		this.redisdbpool = new JedisPool(new JedisPoolConfig(), "localhost");
 		this.redisdb = redisdbpool.getResource();
 	}
@@ -46,6 +37,10 @@ public class RedisDBPolicyStoreManager implements DBPolicyStoreManager {
 			return 0;
 		else
 			return 1;
+	}
+	
+	public void close() {
+		this.redisdb.close();
 	}
 	
 }
