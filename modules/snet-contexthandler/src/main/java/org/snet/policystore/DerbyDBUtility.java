@@ -137,7 +137,7 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
         }
     }
     
-    public void closeConnection() throws SQLException {
+    public void closeConnection() {
         // release all open resources to avoid unnecessary memory usage
         // ResultSet
         try {
@@ -146,7 +146,7 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
                 this.resultSet = null;
             }
         } catch (SQLException sqle) {
-            throw sqle;
+            Logger.getLogger(DerbyDBUtility.class.getName()).log(Level.SEVERE, null, sqle);
         }
 
         // Statement and PreparedStatements
@@ -156,7 +156,7 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
                 this.statement = null;
             }
         } catch (SQLException sqle) {
-            throw sqle;
+            Logger.getLogger(DerbyDBUtility.class.getName()).log(Level.SEVERE, null, sqle);
         }
         
         //Connection
@@ -166,8 +166,8 @@ public class DerbyDBUtility implements DBPolicyStoreManager{
                 connection = null;
             }
         } catch (SQLException sqle) {
-            throw sqle;
-        }    
+            Logger.getLogger(DerbyDBUtility.class.getName()).log(Level.SEVERE, null, sqle);
+        }   
     }
     
 }

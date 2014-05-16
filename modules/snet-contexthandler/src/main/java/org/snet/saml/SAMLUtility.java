@@ -31,14 +31,10 @@ import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.Statement;
 import org.opensaml.security.SAMLSignatureProfileValidator;
 import org.opensaml.xacml.XACMLConstants;
-import org.opensaml.xacml.ctx.RequestType;
 import org.opensaml.xacml.ctx.ResponseType;
 import org.opensaml.xacml.ctx.impl.RequestTypeImpl;
-import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
-import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
 import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionStatementType;
 import org.opensaml.xacml.profile.saml.impl.XACMLAuthzDecisionQueryTypeImpl;
-import org.opensaml.xacml.profile.saml.impl.XACMLAuthzDecisionQueryTypeImplBuilder;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.io.Unmarshaller;
@@ -61,7 +57,10 @@ import org.opensaml.xml.validation.ValidationException;
 import org.w3c.dom.Element;
 
 /**
- * 
+ * Class for extract the XACML request from the SAML messages and for wrapping the XACML response from the PDP
+ * into SAML message.
+ * ALso for checking the integrity of the Signature or the Certificate on the SAML messages
+ * received by the Context Handler.
  * @author zequeira
  */
 public class SAMLUtility {
@@ -73,6 +72,11 @@ public class SAMLUtility {
     private static PrivateKey privKey = null;
     private static PublicKey publicKey= null;
     
+        /**
+        * Constructor where we initiate the parser, and load the Private and Public Key to be used 
+        * in the signatures process.
+        * @author zequeira
+        */
         public SAMLUtility() throws ConfigurationException, NoSuchAlgorithmException, NoSuchProviderException, FileNotFoundException, IOException, InvalidKeySpecException {
             parserPool = new BasicParserPool();
             parserPool.setNamespaceAware(true);
@@ -97,13 +101,22 @@ public class SAMLUtility {
             KeyFactory kf2 = KeyFactory.getInstance("RSA");
             publicKey = kf2.generatePublic(spec2);
 	}
-    
+        
+        /**
+        * Method to get the signature information to use it in the verification process.
+        * @return signature
+        */
         public static Signature getSignature() {
             signingCredential = new BasicCredential();
             Signature signature = (Signature) Configuration.getBuilderFactory()
                                         .getBuilder(Signature.DEFAULT_ELEMENT_NAME)
                                         .buildObject(Signature.DEFAULT_ELEMENT_NAME);
             
+            /**
+            * Establish whether we use the Public Key to check the signature from the incoming SAML message or
+            * the Private Key to sign the response generated from the PDP
+            * @return signature
+            */
             if(privateKey_publicKey == "Private"){
                 signingCredential.setPrivateKey(privKey);
             }
@@ -122,6 +135,11 @@ public class SAMLUtility {
             return signature;    
         }
         
+        /**
+        * Method to get the Signature object from a certificate to sign responses
+        * @throws java.security.cert.CertificateException
+        * @return signature
+        */
         public static Signature getSignatureCertificate() throws CertificateException, FileNotFoundException, IOException, org.opensaml.xml.security.SecurityException{
             
             publicCredential = new BasicX509Credential();
@@ -138,7 +156,7 @@ public class SAMLUtility {
                                         .getBuilder(Signature.DEFAULT_ELEMENT_NAME)
                                         .buildObject(Signature.DEFAULT_ELEMENT_NAME);
             
-            publicCredential. setPrivateKey(privKey);
+            publicCredential.setPrivateKey(privKey);
             publicCredential.setUsageType(UsageType.SIGNING);
             
             signature.setSigningCredential(publicCredential);
@@ -156,6 +174,11 @@ public class SAMLUtility {
             return signature;
         }
         
+        /**
+        * Method to check the signature integrity of the SAML message received.
+        * @param SAMLxacmlRequest, SAML request
+        * @throws org.opensaml.xml.validation.ValidationException, if the signature on the SAML message is not valid
+        */
         public static void checkSignature(XACMLAuthzDecisionQueryTypeImpl SAMLxacmlRequest) throws ValidationException {
             
             //check the signature follows SAML standard
@@ -167,6 +190,12 @@ public class SAMLUtility {
             sigValidator.validate(SAMLxacmlRequest.getSignature());
         }
         
+        /**
+        * Method to load the certificate, extract the Public Key from it to use it to check 
+        * the signature integrity of the SAML message received.
+        * @param SAMLxacmlRequest, SAML request
+        * @throws org.opensaml.xml.validation.ValidationException, if the signature on the SAML message is not valid
+        */
         public static void checkSignatureCertificate(XACMLAuthzDecisionQueryTypeImpl SAMLxacmlRequest) throws ValidationException, CertificateException, FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
             
             //Getting the Public Key from the Certificate
@@ -193,13 +222,10 @@ public class SAMLUtility {
             signatureValidator.validate(SAMLxacmlRequest.getSignature());
         }
         
-        
-        
         /**
-         * Creates a new SAML-XACML Response Signed from a common XACML .xml file or String Response
-         * 
-         * @param xacmlResponseString - the xml response from the pdp in String format
-         * @return The String SAML-XACML Response Signed
+         * Creates a new SAML-XACML response signed from a common XACML String response
+         * @param xacmlResponseString, the String response from the pdp
+         * @return The String SAML-XACML response signed
          * @throws Exception
          */
         public String makeSAMLxacmlResponse(String xacmlResponseString) throws Exception{
@@ -222,7 +248,7 @@ public class SAMLUtility {
                 
 		Issuer issuer = (Issuer) Configuration.getBuilderFactory().getBuilder(Issuer.DEFAULT_ELEMENT_NAME)
 		.buildObject(Issuer.DEFAULT_ELEMENT_NAME);
-		issuer.setValue("Omer");				
+		issuer.setValue("Zequeira");				
 		
 		XACMLAuthzDecisionStatementType xacmlDecisionStatement = (XACMLAuthzDecisionStatementType) Configuration.getBuilderFactory()
 				.getBuilder(XACMLAuthzDecisionStatementType.TYPE_NAME_XACML30)
@@ -250,73 +276,25 @@ public class SAMLUtility {
 		
                 return buffer.toString();
         }
-	
-	public String XACMLRequest2XACMLAuthzDecisionQuery() throws Exception {
-                BasicParserPool parserPool = new BasicParserPool();
-		parserPool.setNamespaceAware(true);
-                
-		// load xacml Request
-		Element xacmlRequestXML = parserPool.parse(new FileInputStream(
-				new File("/opt/Netbeans/TRESOR/OpenSAML/geoxacml-request-coordinate.xml"))
-				).getDocumentElement();
-                
-                QName qName= new QName(xacmlRequestXML.getNamespaceURI(), xacmlRequestXML.getLocalName(), XACMLConstants.XACMLCONTEXT_PREFIX);
-                
-		RequestType xacmlRequest = (RequestType) Configuration.getUnmarshallerFactory()
-				.getUnmarshaller(qName)
-				.unmarshall(xacmlRequestXML);
-				
-		// prepare XacmlAuthzDecisionQueryType
-		XACMLAuthzDecisionQueryTypeImplBuilder xacmlDecisionQueryBuilder = (XACMLAuthzDecisionQueryTypeImplBuilder)
-				Configuration.getBuilderFactory().getBuilder(XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_NAME_XACML20);
-		XACMLAuthzDecisionQueryType xacmlDecisionQuery = xacmlDecisionQueryBuilder.buildObject(
-				SAMLProfileConstants.SAML20XACML30P_NS,
-				XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_LOCAL_NAME,
-				SAMLProfileConstants.SAML20XACMLPROTOCOL_PREFIX);
-		
-                privateKey_publicKey = "Private";
-                Signature signature = getSignature();
-                xacmlDecisionQuery.setSignature(signature);
-                
-		Issuer issuer = (Issuer) Configuration.getBuilderFactory().getBuilder(Issuer.DEFAULT_ELEMENT_NAME)
-				.buildObject(Issuer.DEFAULT_ELEMENT_NAME);
-		issuer.setValue("Omer");
-                        
-		// set needed elements
-		xacmlDecisionQuery.setID("1234");
-		xacmlDecisionQuery.setDestination("localhost");
-		xacmlDecisionQuery.setIssuer(issuer);
-		xacmlDecisionQuery.setVersion(SAMLVersion.VERSION_20);
-		xacmlDecisionQuery.setRequest(xacmlRequest);
-		xacmlDecisionQuery.setIssueInstant(DateTime.now());
-		
-		// marshall back to xml
-		Element xacmlDecisionQueryXML = Configuration.getMarshallerFactory()
-				.getMarshaller(XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_NAME_XACML20)
-				.marshall(xacmlDecisionQuery);
-                
-                Signer.signObject(signature);
-                
-		StringWriter buffer = new StringWriter();
-		TransformerFactory.newInstance().newTransformer()
-			.transform(new DOMSource(xacmlDecisionQueryXML), new StreamResult(buffer));
-		
-                return buffer.toString();
-	}
-	
-	public String XACMLAuthzDecisionQuery2XACMLRequest(Element SAMLxacmlRequestXML) throws Exception {
+        
+        /**
+        * Method to extract the XACML request from the SAML message.
+        * @param SAMLxacmlRequestXML, The SAML message signed with the XACML request on it
+        * @return The XACML request to give to the PDP
+        */
+        public String XACMLAuthzDecisionQuery2XACMLRequest(Element SAMLxacmlRequestXML) throws Exception {
 		
 		UnmarshallerFactory fac = Configuration.getUnmarshallerFactory();
 		Unmarshaller unmarshaller = fac.getUnmarshaller(SAMLxacmlRequestXML);
 		
 		XACMLAuthzDecisionQueryTypeImpl xacmlQuery = (XACMLAuthzDecisionQueryTypeImpl) unmarshaller.unmarshall(SAMLxacmlRequestXML);
                 
-                /*privateKey_publicKey = "Public";
+                privateKey_publicKey = "Public";
                 Signature signature = getSignature();
-                checkSignature(xacmlQuery);*/
-                
+                checkSignature(xacmlQuery);
+                /*
                 checkSignatureCertificate(xacmlQuery);
-                
+                */
 		RequestTypeImpl req = (RequestTypeImpl) xacmlQuery.getRequest();		
 		Element xacmlElem = req.getDOM();
 		
