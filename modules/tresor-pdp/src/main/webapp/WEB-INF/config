@@ -1,0 +1,11 @@
+{
+	"attributefindermodules": [ { "classname": "org.wso2.balana.finder.impl.CurrentEnvModule" },
+								{ "classname": "org.wso2.balana.finder.impl.SelectorModule" },
+								{ "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",
+								  "parameters": [ "current-wifi", "http://localhost:8080/wifiPIP",
+								  				  "current-geolocation", "http://localhost:8080/wifiPIP" ] }
+							  	],
+	"policyfindermodules": [ { "classname": "org.wso2.balana.finder.impl.FileBasedPolicyFinderModule" } ],
+	"resourcefindermodules": [ ],
+	"policystoremanager": { "classname": "org.snet.tresor.pdp.policystore.RedisDBPolicyStoreManager" }
+}

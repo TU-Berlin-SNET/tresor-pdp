@@ -40,6 +40,6 @@
         <module>modules/balana-samples</module>
         <module>modules/balana-documentation</module>
         <module>modules/balana-distribution</module>
-        <module>modules/snet-contexthandler</module>
+        <module>modules/tresor-pdp</module>
     </modules>
 </project>

@@ -1,0 +1,90 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	<servlet>
+		<servlet-name>HomeServlet</servlet-name>
+		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.HomeServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>PDPServlet</servlet-name>
+		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.PDPServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>PolicyHandlerServlet</servlet-name>
+		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.PolicyHandlerServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>HomeServlet</servlet-name>
+		<url-pattern></url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>PDPServlet</servlet-name>
+		<url-pattern>/pdp</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>PolicyHandlerServlet</servlet-name>
+		<url-pattern>/policy</url-pattern>
+		<url-pattern>/policy/*</url-pattern>
+	</servlet-mapping>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>home</web-resource-name>
+			<url-pattern>/</url-pattern>
+			<http-method>HEAD</http-method>
+			<http-method>POST</http-method>
+			<http-method>PUT</http-method>
+			<http-method>DELETE</http-method>
+			<http-method>TRACE</http-method>
+			<http-method>OPTIONS</http-method>
+			<http-method>CONNECT</http-method>
+			<http-method>PATCH</http-method>
+		</web-resource-collection>
+		<auth-constraint />
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>pdp</web-resource-name>
+			<url-pattern>/pdp/</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>HEAD</http-method>
+			<http-method>PUT</http-method>
+			<http-method>DELETE</http-method>
+			<http-method>TRACE</http-method>
+			<http-method>OPTIONS</http-method>
+			<http-method>CONNECT</http-method>
+			<http-method>PATCH</http-method>
+		</web-resource-collection>
+		<auth-constraint />
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>policy</web-resource-name>
+			<url-pattern>/policy</url-pattern>
+				<http-method>HEAD</http-method>
+				<http-method>POST</http-method>
+				<http-method>DELETE</http-method>
+				<http-method>TRACE</http-method>
+				<http-method>OPTIONS</http-method>
+				<http-method>CONNECT</http-method>
+				<http-method>PATCH</http-method>
+		</web-resource-collection>
+		<web-resource-collection>
+			<web-resource-name>specific policy</web-resource-name>
+				<url-pattern>/policy/*</url-pattern>
+				<http-method>HEAD</http-method>
+				<http-method>POST</http-method>
+				<http-method>DELETE</http-method>
+				<http-method>TRACE</http-method>
+				<http-method>OPTIONS</http-method>
+				<http-method>CONNECT</http-method>
+				<http-method>PATCH</http-method>
+		</web-resource-collection>
+		<auth-constraint />
+	</security-constraint>
+</web-app>
