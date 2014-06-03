@@ -3,43 +3,49 @@ package org.snet.tresor.pdp.finder.impl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URI;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
-import org.snet.tresor.pdp.contexthandler.Helper;
+import org.snet.tresor.pdp.Helper;
+import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.AbstractPolicy;
 import org.wso2.balana.MatchResult;
 import org.wso2.balana.Policy;
-import org.wso2.balana.attr.AttributeValue;
-import org.wso2.balana.attr.BagAttribute;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.PolicyFinder;
 import org.wso2.balana.finder.PolicyFinderModule;
 import org.wso2.balana.finder.PolicyFinderResult;
-import org.wso2.balana.finder.impl.FileBasedPolicyFinderModule;
 
-public class DBPolicyFinderModule extends PolicyFinderModule{
-
+/**
+ * PolicyFinderModule which uses the PolicyStoreManager interface to retrieve
+ * policies from the Policy Store
+ * @author malik
+ */
+public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
+	private static Log log = LogFactory.getLog(PolicyStorePolicyFinderModule.class);
+	
 	private ParserPool parser;
 	private PolicyFinder finder;
-	private PolicyStoreManager policyStore;	
-	private static Log log = LogFactory.getLog(FileBasedPolicyFinderModule.class);
+	private PolicyStoreManager policyStoreManager;	
 	
-	public DBPolicyFinderModule(PolicyStoreManager policyStore) {
-		this.policyStore = policyStore;
+	public PolicyStorePolicyFinderModule() {
+//		this.policyStoreManager = TresorPDP.getInstance().getPolicyStoreManager();
+	}
+	
+	public PolicyStorePolicyFinderModule(PolicyStoreManager policyStore) {
+		this.policyStoreManager = policyStore;
 		this.parser = new BasicParserPool();
 	}
 
 	@Override
 	public void init(PolicyFinder finder) {
 		this.finder = finder;
+		this.policyStoreManager = TresorPDP.getInstance().getPolicyStoreManager();
 	}
 	
     @Override
@@ -49,10 +55,17 @@ public class DBPolicyFinderModule extends PolicyFinderModule{
 	
 	@Override
 	public PolicyFinderResult findPolicy(EvaluationCtx context) {
-		String domain = getAttributeAsString(Helper.DATATYPE_STRING_URI, Helper.ID_DOMAIN_URI, null, Helper.CATEGORY_SUBJECT_URI, context);
-		String service = getAttributeAsString(Helper.DATATYPE_STRING_URI, Helper.ID_SERVICE_URI, null, Helper.CATEGORY_RESOURCE_URI, context);
+		String domain = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
+													FinderConstants.ID_DOMAIN_URI, null, 
+													FinderConstants.CATEGORY_SUBJECT_URI, 
+													context);
 		
-		String policyString = this.policyStore.getPolicy(domain, service);
+		String service = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
+													 FinderConstants.ID_SERVICE_URI, null, 
+													 FinderConstants.CATEGORY_RESOURCE_URI, 
+													 context);
+		
+		String policyString = this.policyStoreManager.getPolicy(domain, service);
 		AbstractPolicy policy = loadPolicy(policyString, this.finder);
 		
 		if (policy != null) {
@@ -63,8 +76,7 @@ public class DBPolicyFinderModule extends PolicyFinderModule{
 			
 			if (match.getResult() == MatchResult.MATCH) {
 				return new PolicyFinderResult(policy);
-			}
-			
+			}			
 		}
 		
 		if (log.isDebugEnabled())
@@ -115,31 +127,4 @@ public class DBPolicyFinderModule extends PolicyFinderModule{
         return policy;
     }
 	
-	/**
-	 * Searches in given EvaluationContext for an attribute
-	 * @param attributeType, type of attribute to look for
-	 * @param attributeId, id of attribute to look for
-	 * @param issuer, issuer of attribute to look for
-	 * @param category, category of attribute to look for
-	 * @param context, context in which to look
-	 * @return a string representation of the value or null
-	 */
-	private String getAttributeAsString(URI attributeType, URI attributeId,	String issuer, URI category, EvaluationCtx context) {
-		String value = null;
-		BagAttribute bag = (BagAttribute) context.getAttribute(attributeType, attributeId, issuer, category).getAttributeValue();
-
-		if (!bag.isEmpty()) {
-			AttributeValue val;
-			Iterator it = bag.iterator();
-			while (it.hasNext()) {
-				val = (AttributeValue) it.next();
-				if (!val.isBag() && val.getType().equals(attributeType)) {
-					value = val.encode();
-					break;
-				}				
-			}
-		}
-
-		return value;
-	}
 }
