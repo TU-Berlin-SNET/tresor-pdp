@@ -7,7 +7,7 @@
 							  	  ],
 	"policyfindermodules"		: [ { "classname": "org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule" } ],
 	"resourcefindermodules"		: [ ],
-	"policystoremanager"		: { "classname": "org.snet.tresor.pdp.policystore.RedisDBPolicyStoreManager" },
+	"policystoremanager"		: { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStoreManager", "parameters": [ "webapps/root/WEB-INF/policies" ] },
 	"contexthandlermodules" 	: [ { "resource": "pdp", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PDPHandler" },
 									{ "resource": "policy", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler" } ],
 	"tresorauth"				: { "classname": "org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth" }
