@@ -12,27 +12,25 @@ import org.json.JSONObject;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 
+/**
+ * Class providing HTTP basic authentication
+ * @author malik
+ *
+ */
 public class HTTPBasicAuth implements TresorAuth {
+	private static Log log = LogFactory.getLog(HTTPBasicAuth.class);
 	
 	/**
 	 * Hashtable, Keys: "user:password", values: "domain"
 	 */
 	private Hashtable<String, String> users;
 	
-	public HTTPBasicAuth() {
-		
-		// TODO remove
-		log.info("httpbasicauth loaded");
-		
+	public HTTPBasicAuth() {		
 		this.users = new Hashtable<String, String>();
 		
+		// TODO remove on production, only for demonstration
 		this.users.put("admin:admin", "domain");
 	}
-	
-	/**
-	 * Logger
-	 */
-	private static Log log = LogFactory.getLog(HTTPBasicAuth.class);
 	
 	public AuthUser authenticate(HttpServletRequest request, HttpServletResponse response) {		
 		String auth = request.getHeader(ServletConstants.HEADER_AUTHORIZATION);
@@ -49,15 +47,11 @@ public class HTTPBasicAuth implements TresorAuth {
 				String userdomain = users.get(userPass);
 
 				authUser = new BasicAuthUser(username, userdomain);
-				// TODO remove
-				log.info("authenticated");
 			}
 		}
 		
 		// if auth failed
 		if (authUser == null) {
-			// TODO remove
-			log.info("not authenticated");
 			if (auth == null)
 				log.error("No Auth header available");
 			else if (auth != null && !auth.toUpperCase().startsWith("BASIC "))
@@ -69,11 +63,7 @@ public class HTTPBasicAuth implements TresorAuth {
 		return authUser;
 	}
 	
-	public JSONObject getErrorResponseJSON() {
-		
-		// TODO remove
-		log.info("error response");
-		
+	public JSONObject getErrorResponseJSON() {		
 		return new JSONObject()
 					.put(Handler.KEYJSON_ERROR, true)
 					.put("WWW-Authenticate", "BASIC realm=\"policystore\"")

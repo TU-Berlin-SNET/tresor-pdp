@@ -17,8 +17,8 @@ public class FinderConstants {
 			CATEGORY_SUBJECT_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
 			CATEGORY_RESOURCE_URI = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
 			DATATYPE_STRING_URI = new URI("http://www.w3.org/2001/XMLSchema#string");
-			ID_DOMAIN_URI = new URI("domain");
-			ID_SERVICE_URI = new URI("service");
+			ID_DOMAIN_URI = new URI("domain-id");
+			ID_SERVICE_URI = new URI("service-id");
 			ID_SUBJECT_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
 			ID_DEVICE_URI = new URI("device-id");		
 		} catch (Exception e) {

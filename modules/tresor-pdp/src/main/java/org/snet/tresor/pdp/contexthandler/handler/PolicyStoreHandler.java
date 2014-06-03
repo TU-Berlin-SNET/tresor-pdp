@@ -1,8 +1,8 @@
 package org.snet.tresor.pdp.contexthandler.handler;
 
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
+import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.xml.parse.ParserPool;
 import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.auth.AuthUser;
@@ -18,22 +20,20 @@ import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 
 /**
- * Handler-class which handles getting, adding and removing of policies.
- * 
+ * Handler for interfacing with the policyStoreManager
  * @author malik
  */
 public class PolicyStoreHandler implements Handler {
 	private static Log log = LogFactory.getLog(PolicyStoreHandler.class);
 	
 	private PolicyStoreManager policystoremanager;
-	private TresorAuth authenticator;		
+	private TresorAuth authenticator;
+	private ParserPool parser;
 	
-	public PolicyStoreHandler() {
-		// TODO remove
-		log.info("loading policystorehandler");
-		
+	public PolicyStoreHandler() {		
 		this.policystoremanager = TresorPDP.getInstance().getPolicyStoreManager();
 		this.authenticator = TresorPDP.getInstance().getTresorAuth();
+		this.parser = new BasicParserPool();
 	}
 	
 	public JSONObject handle(HttpServletRequest request,
@@ -41,35 +41,29 @@ public class PolicyStoreHandler implements Handler {
 		AuthUser authUser = this.authenticator.authenticate(request, response);
 		JSONObject responseJSON = null;
 		
+		// if user is authenticated..
 		if (authUser != null) {
-			// TODO remove
-			log.info("authuser not null");
+			// ..and authorized
 			if (authUser.isAuthorizedTo(httpMethod, request.getRequestURI())) {				
-				// TODO remove
-				log.info("authuser authorized");
-			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_GET))
-				responseJSON = this.handleGet(request, response, authUser);
-			
-			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_PUT))
-				responseJSON = this.handlePut(request, response, authUser);
-			
-			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_POST))
-				responseJSON = this.handlePost(request, response, authUser);
-			
-			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_DELETE))
-				responseJSON = this.handleDelete(request, response, authUser);
-			
+
+				if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_GET))
+					responseJSON = this.handleGet(request, response, authUser);
+
+				if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_PUT))
+					responseJSON = this.handlePut(request, response, authUser);
+
+				if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_DELETE))
+					responseJSON = this.handleDelete(request, response,	authUser);
+				
 			} else {
-				// TODO remove
-				log.info("authuser not authorized");
+				// user is authenticated but not authorized
 				responseJSON = new JSONObject()
 								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_FORBIDDEN);								
+								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_FORBIDDEN);
 			}
 			
 		} else {
-			// TODO remove
-			log.info("authuser not authenticated");
+			// user is not authenticated
 			responseJSON = this.authenticator.getErrorResponseJSON();
 		}
 		
@@ -78,39 +72,22 @@ public class PolicyStoreHandler implements Handler {
 	
 	private JSONObject handleGet(HttpServletRequest request,
 			HttpServletResponse response, AuthUser authUser) {
-		JSONObject responseJSON = null;
-		
-		// TODO remove
-		log.info("policystorehandler, handleGet");		
+		JSONObject responseJSON = null;		
 		
 		String domain = authUser.getDomain();
 		String[] params = request.getRequestURI().split("/");
 		
-		// TODO remove
-		log.info("params.length= " + params.length);
-		
 		Map<String, String> policyMap = this.getPolicies(domain, params);
-		
-		// TODO remove
-		log.info("policyMap.isEmpty= " + policyMap.isEmpty());
-		
-		// TODO remove
-		log.info("policyMap.isEmpty= " + policyMap.keySet().toArray());
-		
-		for (Entry<String, String> e : policyMap.entrySet())
-			System.out.println(e.getKey() + " " + e.getValue());
 		
 		if (policyMap != null) {
 			
+			// if asked for specific policy and policyMap returned empty
 			if (params.length == 3 && policyMap.isEmpty()) {
-				// TODO remove
-				log.info("params.length = 3 and policymap empty");
 				responseJSON = new JSONObject()
 								.put(KEYJSON_ERROR, true)
 								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NOT_FOUND);
 			} else {
-				// TODO remove
-				log.info("params.length != 3 || policymap not empty");
+				// asked for all policies so return what we got, does not matter whether empty or not
 				responseJSON = new JSONObject()
 								.put(KEYJSON_ERROR, false)
 								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_OK)
@@ -119,8 +96,6 @@ public class PolicyStoreHandler implements Handler {
 			}
 			
 		} else {
-			// TODO remove
-			log.info("policymap == null");
 			responseJSON = new JSONObject()
 							.put(KEYJSON_ERROR, true)
 							.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
@@ -130,7 +105,7 @@ public class PolicyStoreHandler implements Handler {
 		
 	}
 
-	public JSONObject handlePut(HttpServletRequest request,
+	private JSONObject handlePut(HttpServletRequest request,
 			HttpServletResponse response, AuthUser authUser) {		
 		JSONObject responseJSON = null;
 		JSONObject requestJSON = Helper.getJSONFromBody(request);
@@ -140,12 +115,28 @@ public class PolicyStoreHandler implements Handler {
 		
 		if (requestJSON != null && requestJSON.has(KEYJSON_POLICY)) {
 			String policy = requestJSON.getString(KEYJSON_POLICY);
-			
-			if (params.length == 2) {				
+		
+			// check whether XML is valid, i.e. whether we can parse it
+			boolean validXML = false;
+			try {
+				this.parser.parse(new StringReader(policy));
+				validXML = true;
+			} catch (Exception e) {				
+				log.info("Error parsing policy", e);
+				validXML = false;
+				responseJSON = new JSONObject()
+									.put(KEYJSON_ERROR, true)
+									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
+			}
+		
+			// if XML is valid and request is to create new policy (indicated by only two params)
+			if (validXML && params.length == 2) {
 				if (requestJSON.has(KEYJSON_SERVICE)) {
+					// get the service the policy belongs to
 					String service = requestJSON.getString(KEYJSON_SERVICE);
 					boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
 					
+					// if no policy exists for that service add it
 					if (!policyExists) {
 						this.policystoremanager.addPolicy(domain, service, policy);
 						responseJSON = new JSONObject()
@@ -153,9 +144,10 @@ public class PolicyStoreHandler implements Handler {
 										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_CREATED)
 										.put("Location", "/" + params[1] + "/" + service);										
 					} else {
+						// if a policy for that service already exists, throw error
 						responseJSON = new JSONObject()
 										.put(KEYJSON_ERROR, true)
-										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST)
+										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_FORBIDDEN)
 										.put(KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_TEXTPLAIN)
 										.put(KEYJSON_CONTENT, "Policy already exists");
 					}
@@ -167,16 +159,20 @@ public class PolicyStoreHandler implements Handler {
 				}
 			}
 			
-			if (params.length == 3) {
+			// if XML is valid and request is to update existing policy (indicated by three params, last one for serviceID)
+			// see REST Api
+			if (validXML && params.length == 3) {
 				String service = params[2];
 				boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
 				
+				// if the policy exists, replace with new one
 				if (policyExists) {
 					this.policystoremanager.addPolicy(domain, service, policy);
 					responseJSON = new JSONObject()
 									.put(KEYJSON_ERROR, false)
 									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NO_CONTENT);
 				} else {
+					// if the policy does not exist throw error
 					responseJSON = new JSONObject()
 									.put(KEYJSON_ERROR, true)
 									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NOT_FOUND);
@@ -184,35 +180,35 @@ public class PolicyStoreHandler implements Handler {
 				
 			}
 			
-			if (params.length < 2 || params.length > 3) {
+			// if xml is valid but parameter count is off, throw error
+			if (validXML && (params.length < 2 || params.length > 3)) {
 				responseJSON = new JSONObject()
 								.put(KEYJSON_ERROR, true)
 								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
 			}
 			
+		} else {
+			responseJSON = new JSONObject()
+								.put(KEYJSON_ERROR, true)
+								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
 		}
 		
 		return responseJSON;
 	}
-	
-	public JSONObject handlePost(HttpServletRequest request,
-			HttpServletResponse response, AuthUser authUser) {
-		return new JSONObject()
-					.put(KEYJSON_ERROR, true)
-					.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_METHOD_NOT_ALLOWED)
-					.put("Allow", "GET, PUT, DELETE");
-	}
 
-	public JSONObject handleDelete(HttpServletRequest request,
+	private JSONObject handleDelete(HttpServletRequest request,
 			HttpServletResponse response, AuthUser authUser) {
 		JSONObject responseJSON = null;
 		String[] params = request.getRequestURI().split("/");
 		
-		if (params.length == 3) {					
+		// delete only possible if param count is 3, indicating direct access to policy, e.g. /policy/serviceID
+		if (params.length == 3) {
 			String domain = authUser.getDomain();
 			String service = params[2];
-			boolean policyExists = this.policystoremanager.getPolicy(domain, service) == null;
 			
+			boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
+			
+			// if the policy exists, delete it
 			if (policyExists) {
 				int result = this.policystoremanager.deletePolicy(domain, service);
 				
@@ -229,19 +225,20 @@ public class PolicyStoreHandler implements Handler {
 				}
 				
 			} else {
+				// if policy does not exist
 				responseJSON = new JSONObject()
 								.put(KEYJSON_ERROR, true)
 								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NOT_FOUND);
 			}				
 			
 		} else {
+			// if parameter count is not three
 			responseJSON = new JSONObject()
 							.put(KEYJSON_ERROR, true)
 							.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
 		}
 		
-		return responseJSON;
-				
+		return responseJSON;			
 	}
 	
 	/**

@@ -1,5 +1,7 @@
 package org.snet.tresor.pdp.contexthandler.handler;
 
+import java.io.Reader;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
+import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.w3c.dom.Document;
@@ -18,7 +21,6 @@ import org.wso2.balana.ctx.RequestCtxFactory;
 /**
  * Handler for requests to the pdp
  * @author malik
- *
  */
 public class PDPHandler implements Handler {
 	private static Log log = LogFactory.getLog(PDPHandler.class);	
@@ -26,8 +28,6 @@ public class PDPHandler implements Handler {
 	private PDP pdp;
 	
 	public PDPHandler() {
-		// TODO remove
-		log.info("pdp handler loader");
 		this.pdp = TresorPDP.getInstance().getPDP();
 		this.parser = new BasicParserPool();		
 	}
@@ -37,46 +37,25 @@ public class PDPHandler implements Handler {
 		JSONObject responseJSON = null;
 		
 		if (httpMethod == ServletConstants.HTTP_POST) {
-			// TODO remove
-			log.info("handling pdp post event");
-			String contenttype = request.getHeader(ServletConstants.HEADER_CONTENTTYPE);
-			boolean evaluated = false;
+			String contenttype = request.getContentType().toLowerCase();
 			String decision = null;
-						
-			if (contenttype.equals(ServletConstants.CONTENTTYPE_XACMLSAML)) {
-				// TODO remove
-				log.info("handling saml");
+			
+			if (contenttype.startsWith(ServletConstants.CONTENTTYPE_XACMLSAML))
 				decision = this.handleSAML(request);
-				evaluated = true;
-			}								
 							
-			if (contenttype.equals(ServletConstants.CONTENTTYPE_XACMLXML)) {
-				// TODO remove
-				log.info("handling xacml");
+			if (contenttype.startsWith(ServletConstants.CONTENTTYPE_XACMLXML))
 				decision = this.handleXACML(request);
-				evaluated = true;
-			}
-							
+			
 			if (decision != null) {
-				// TODO remove
-				log.info("decision reached");
 				responseJSON = new JSONObject()
 								.put(KEYJSON_ERROR, false)
 								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_OK)
 								.put(KEYJSON_CONTENTTYPE, contenttype)
 								.put(KEYJSON_CONTENT, decision);				
 			} else {
-				// TODO remove
-				log.info("no decision reached");
-				if (evaluated) {
-					responseJSON = new JSONObject()
-					.put(KEYJSON_ERROR, true)
-					.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				} else {
-					responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, true)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-				}
+				responseJSON = new JSONObject()
+								.put(KEYJSON_ERROR, true)
+								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
 			}
 			
 		} else {
@@ -93,9 +72,10 @@ public class PDPHandler implements Handler {
 		AbstractRequestCtx xacmlRequest = null;
 
 		try {
-			Document xacmlDoc = parser.parse(request.getInputStream());
+			Reader body = Helper.getRequestInputStreamReader(request);
+			Document xacmlDoc = parser.parse(body);
 			xacmlRequest = RequestCtxFactory.getFactory().getRequestCtx(xacmlDoc.getDocumentElement());
-		} catch (Exception e) { log.error("Error creating request context"); }
+		} catch (Exception e) { log.error("Error creating request context", e); }
 		
 		if (xacmlRequest != null) {
 			decision = this.pdp.evaluate(xacmlRequest).encode();

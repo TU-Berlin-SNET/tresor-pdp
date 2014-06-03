@@ -32,22 +32,19 @@ public class ContextHandler {
 
 	/**
 	 * Pass request to corresponding handler
-	 * @param request, the httpservlet request
-	 * @param response, the httpservlet response
+	 * @param request the httpservlet request
+	 * @param response the httpservlet response
 	 */
 	public JSONObject handle(HttpServletRequest request, HttpServletResponse response) {
 		String[] params = request.getRequestURI().split("/");
 		JSONObject responseJSON = null;
 		
-		if (params.length >= 2) {
-			String resource = params[1].toLowerCase();			
-			Handler handler = this.handlers.get(resource);			
+		// minimum two parameters (first is usually blank, second is resource)
+		if (params.length > 1) {
+			String resource = params[1].toLowerCase();
+			Handler handler = this.handlers.get(resource);
 			
-			if (handler != null) {
-				
-				// TODO remove
-				log.info("handler= " + handler.getClass().toString());
-				
+			if (handler != null) {				
 				String reqMethod = request.getMethod();				
 				responseJSON = handler.handle(request, response, reqMethod);				
 			} else {
@@ -64,12 +61,10 @@ public class ContextHandler {
 	/**
 	 * Associates the given resource with the given handler, replaces previous associations if applicable
 	 * This method is NOT thread-safe and should only be used on startup to add handlers
-	 * @param resource, name of the resource
-	 * @param handler, handler handling request on that resource
+	 * @param resource name of the resource
+	 * @param handler handler handling request on that resource
 	 */
 	public void putHandler(String resource, Handler handler) {
-		// TODO remove
-		log.info("adding handler");
 		this.handlers.put(resource, handler);
 	}
 	

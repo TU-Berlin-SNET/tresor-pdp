@@ -43,8 +43,12 @@ import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
 public class Configuration {
 	// System Property Key of the config File (if applicable)
 	private static final String TRESOR_PDP_CONFIG_PROPERTY = "org.snet.tresor.pdp.config";
+	
+	// default location if system property is not set
+	private static final String DEFAULT_CONFIG_PATH = "webapps/root/WEB-INF/config";
+	
     // the logger we'll use for all messages
-    private static Log logger = LogFactory.getLog(Configuration.class);
+    private static Log log = LogFactory.getLog(Configuration.class);
     
     private PolicyStoreManager POLICYSTORE_MANAGER;
     
@@ -88,46 +92,54 @@ public class Configuration {
 	 * Loads and parses the configuration file if applicable, loads default configuration otherwise
 	 * Initializes GeoXACML and SAML support
 	 */
-	public void initConfiguration() {
-		String configPath = System.getProperty(TRESOR_PDP_CONFIG_PROPERTY);
+	public void initConfiguration() {				
+		File configFile = null;
 		JSONObject configJSON = null;
 		
 		GeoXACML.initialize();
-		logger.info("GeoXACML: success");
+		log.info("GeoXACML: success");
 		
 		try {
 			SAMLConfig.InitSAML();
-			logger.info("SAML: success");
+			log.info("SAML: success");
 		} catch (Exception e) {
-			logger.error("SAML: fail", e);
+			log.error("SAML: fail", e);
 		}		
 
+		String configPath = System.getProperty(TRESOR_PDP_CONFIG_PROPERTY);
+		if (configPath == null) {
+			configPath = Configuration.DEFAULT_CONFIG_PATH;
+			log.info("No config path given, using default path");
+		}
+					
+		configFile = new File(configPath);
+		
 		// if there is a configuration file..		
-		if (configPath != null) {
+		if (configFile.isFile()) {
 				// ..parse it..
 				JSONTokener tokener;
 				try {
-					tokener = new JSONTokener(new FileInputStream(new File(configPath)));
+					tokener = new JSONTokener(new FileInputStream(configFile));
 					configJSON = new JSONObject(tokener);
 				} catch (JSONException e) {
-					logger.error("Failed to parse config file");
+					log.error("Failed to parse config file");
 					e.printStackTrace();
 				} catch (FileNotFoundException e) {
-					logger.error("Config file not found");
+					log.error("Config file not found");
 					e.printStackTrace();
 				}
 		} else {
-			logger.info("No config file given");
+			log.info("Config file does not exist");
 		}
 		
 		
 		try {
 			parsePolicyStoreManager(configJSON);	
 		} catch (ReflectiveOperationException e) {
-			logger.error("Error doing reflective operation", e);
+			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.POLICYSTORE_MANAGER == null) {
-				logger.info("No policystoremanager created, creating default");
+				log.info("No policystoremanager created, creating default");
 				this.POLICYSTORE_MANAGER = new DummyPolicyStoreManager();
 			}
 		}
@@ -135,10 +147,10 @@ public class Configuration {
 		try {
 			parsePDP(configJSON);	
 		} catch (ReflectiveOperationException e) {
-			logger.error("Error doing reflective operation", e);
+			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.TRESOR_PDP == null) {
-				logger.info("No PDP created, creating default");
+				log.info("No PDP created, creating default");
 				this.TRESOR_PDP = new PDP(Balana.getInstance().getPdpConfig());
 			}	
 		}
@@ -146,10 +158,10 @@ public class Configuration {
 		try {
 			parseTresorAuth(configJSON);	
 		} catch (ReflectiveOperationException e) {
-			logger.error("Error doing reflective operation", e);
+			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.TRESOR_AUTH == null) {
-				logger.info("No Tresor Auth created, creating default");
+				log.info("No Tresor Auth created, creating default");
 				this.TRESOR_AUTH = new HTTPBasicAuth();
 			}
 		}
@@ -157,15 +169,15 @@ public class Configuration {
 		try {
 			parseContextHandler(configJSON);
 		} catch (ReflectiveOperationException e) {
-			logger.error("Error doing reflective operation", e);
+			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.CONTEXT_HANDLER == null) {
-				logger.info("No Contexthandler created, creating default");
+				log.info("No Contexthandler created, creating default");
 				this.CONTEXT_HANDLER = ContextHandler.getInstance();
 			}
 		}
 		
-		logger.info("configuration finished");
+		log.info("configuration finished");
 	}
 
 	/**

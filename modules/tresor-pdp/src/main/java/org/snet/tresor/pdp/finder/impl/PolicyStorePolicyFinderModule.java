@@ -33,18 +33,12 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 	private PolicyFinder finder;
 	private PolicyStoreManager policyStoreManager;	
 	
-	public PolicyStorePolicyFinderModule() {
-//		this.policyStoreManager = TresorPDP.getInstance().getPolicyStoreManager();
-	}
-	
-	public PolicyStorePolicyFinderModule(PolicyStoreManager policyStore) {
-		this.policyStoreManager = policyStore;
-		this.parser = new BasicParserPool();
-	}
+	public PolicyStorePolicyFinderModule() { }
 
 	@Override
 	public void init(PolicyFinder finder) {
 		this.finder = finder;
+		this.parser = new BasicParserPool();
 		this.policyStoreManager = TresorPDP.getInstance().getPolicyStoreManager();
 	}
 	
@@ -54,7 +48,7 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
     }
 	
 	@Override
-	public PolicyFinderResult findPolicy(EvaluationCtx context) {
+	public PolicyFinderResult findPolicy(EvaluationCtx context) {		
 		String domain = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
 													FinderConstants.ID_DOMAIN_URI, null, 
 													FinderConstants.CATEGORY_SUBJECT_URI, 
@@ -65,8 +59,12 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 													 FinderConstants.CATEGORY_RESOURCE_URI, 
 													 context);
 		
-		String policyString = this.policyStoreManager.getPolicy(domain, service);
-		AbstractPolicy policy = loadPolicy(policyString, this.finder);
+		AbstractPolicy policy = null;
+		if (domain != null && service != null) {
+			String policyString = this.policyStoreManager.getPolicy(domain, service);
+			policy = loadPolicy(policyString, this.finder);
+		}
+		
 		
 		if (policy != null) {
 			MatchResult match = policy.match(context);
@@ -99,8 +97,8 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
         Reader reader = null;
 
         try {
-        	reader = new StringReader(policyString);       
-            Document doc = this.parser.parse(reader);            
+        	reader = new StringReader(policyString);
+            Document doc = this.parser.parse(reader);
 
             // handle the policy, if it's a known type
             Element root = doc.getDocumentElement();

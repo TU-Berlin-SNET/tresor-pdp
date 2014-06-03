@@ -6,6 +6,10 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+/**
+ * Manager for storing/retrieving policies from a redis database
+ * @author malik
+ */
 public class RedisDBPolicyStoreManager implements PolicyStoreManager {	
 	JedisPool redisdbpool;
 	Jedis redisdb;

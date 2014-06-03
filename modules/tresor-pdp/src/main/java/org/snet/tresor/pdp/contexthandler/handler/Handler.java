@@ -5,6 +5,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
+/**
+ * Interface for handlers
+ * @author malik
+ */
 public interface Handler {
 	
 	/**
