@@ -16,6 +16,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.snet.tresor.pdp.Helper;
 import org.wso2.balana.Balana;
 import org.wso2.balana.ParsingException;
 import org.wso2.balana.UnknownIdentifierException;
@@ -35,26 +36,6 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 
 	static String GEOMETRY_POINT_PRE = "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"EPSG:4326\"><gml:coordinates>";
 	static String GEOMETRY_POINT_POST = "</gml:coordinates></gml:Point>";
-	
-	private static URI SUBJECT_CATEGORY;
-	private static URI STRING_DATATYPE;
-	private static URI SUBJECT_ID;
-	private static URI DEVICE_ID;	
-
-	/**
-	 * Static Initializer for URIs to catch possible early Exceptions
-	 */
-	static {
-		try {
-			SUBJECT_CATEGORY = new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
-			STRING_DATATYPE = new URI("http://www.w3.org/2001/XMLSchema#string");
-			SUBJECT_ID = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
-			DEVICE_ID = new URI("device-id");			
-		} catch (Exception e) {
-			earlyException = new IllegalArgumentException();
-			earlyException.initCause(e);
-		}
-	}
 
 	/**
 	 * Thread-specific cache for the retrieved values
@@ -160,8 +141,17 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 		} else {
 			// else get the value from pip
 
-			String subjectID = getAttributeAsString(STRING_DATATYPE, SUBJECT_ID, issuer, SUBJECT_CATEGORY, context);
-			String deviceID = getAttributeAsString(STRING_DATATYPE, DEVICE_ID, issuer, SUBJECT_CATEGORY, context);			
+			String subjectID = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
+														   FinderConstants.ID_SUBJECT_URI, 
+														   issuer, 
+														   FinderConstants.CATEGORY_SUBJECT_URI, 
+														   context);
+			
+			String deviceID = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
+												   		  FinderConstants.ID_DEVICE_URI, 
+												   		  issuer, 
+												   		  FinderConstants.CATEGORY_SUBJECT_URI,
+												   		  context);			
 
 			if (subjectID != null && deviceID != null) {				
 				PostMethod query = new PostMethod(pipUrl);
@@ -200,36 +190,6 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 		}
 
 		return response;
-	}				
-
-
-	/**
-	 * Searches in given EvaluationContext for an attribute
-	 * @param attributeType, type of attribute to look for
-	 * @param attributeId, id of attribute to look for
-	 * @param issuer, issuer of attribute to look for
-	 * @param category, category of attribute to look for
-	 * @param context, context in which to look
-	 * @return a string representation of the value or null
-	 */
-	private String getAttributeAsString(URI attributeType, URI attributeId,	String issuer, URI category, EvaluationCtx context) {
-		String value = null;
-		BagAttribute bag = (BagAttribute) context.getAttribute(attributeType, attributeId, issuer, category).getAttributeValue();
-
-		if (!bag.isEmpty()) {
-			AttributeValue val;
-			Iterator it = bag.iterator();
-			while (it.hasNext()) {
-				val = (AttributeValue) it.next();
-				if (!val.isBag() && val.getType().equals(attributeType)) {
-					value = val.encode();
-					break;
-				}
-				// TODO: what if we have, for example, two subjects with same dataType and Id?				
-			}
-		}
-
-		return value;
 	}
 
 	/**

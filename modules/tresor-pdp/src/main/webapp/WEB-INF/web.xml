@@ -24,8 +24,9 @@
 		<url-pattern></url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>PDPServlet</servlet-name>
+		<servlet-name>PDPServlet</servlet-name>		
 		<url-pattern>/pdp</url-pattern>
+		<url-pattern>/pdp/</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>PolicyHandlerServlet</servlet-name>
@@ -50,7 +51,8 @@
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>pdp</web-resource-name>
-			<url-pattern>/pdp/</url-pattern>
+			<url-pattern>/pdp</url-pattern>
+			<url-pattern>/pdp/</url-pattern>			
 			<http-method>GET</http-method>
 			<http-method>HEAD</http-method>
 			<http-method>PUT</http-method>
@@ -79,7 +81,6 @@
 				<url-pattern>/policy/*</url-pattern>
 				<http-method>HEAD</http-method>
 				<http-method>POST</http-method>
-				<http-method>DELETE</http-method>
 				<http-method>TRACE</http-method>
 				<http-method>OPTIONS</http-method>
 				<http-method>CONNECT</http-method>

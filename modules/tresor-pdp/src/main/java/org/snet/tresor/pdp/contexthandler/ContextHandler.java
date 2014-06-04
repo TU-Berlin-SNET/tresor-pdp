@@ -1,80 +1,71 @@
 package org.snet.tresor.pdp.contexthandler;
 
-import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.opensaml.xacml.profile.saml.SAMLProfileConstants;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.ParserPool;
-import org.snet.tresor.pdp.contexthandler.handler.SAMLHandler;
-import org.snet.tresor.pdp.contexthandler.handler.XACMLHandler;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.wso2.balana.PDP;
-import org.wso2.balana.XACMLConstants;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.JSONObject;
+import org.snet.tresor.pdp.contexthandler.handler.Handler;
 
 /**
  * Simple Class for handling incoming requests and providing them to the appropriate handler
  */
 public class ContextHandler {
-	static ContextHandler CONTEXTHANDLER;
+	private static Log log = LogFactory.getLog(ContextHandler.class);
+	private static ContextHandler INSTANCE;
 	
-	ParserPool parserPool;
-	PDP pdp;
+	private Map<String, Handler> handlers;	
 	
 	public static ContextHandler getInstance() {
-		if (CONTEXTHANDLER == null)
-			CONTEXTHANDLER = new ContextHandler(new BasicParserPool(), Helper.getPDP());
-		return CONTEXTHANDLER;
+		if (INSTANCE == null)
+			INSTANCE = new ContextHandler();
+		return INSTANCE;
 	}
 	
-	private ContextHandler(ParserPool parserPool, PDP pdp) {
-		this.parserPool = parserPool;
-		this.pdp = pdp;
+	private ContextHandler() {
+		this.handlers = new HashMap<String, Handler>();
 	}
+
+	/**
+	 * Pass request to corresponding handler
+	 * @param request the httpservlet request
+	 * @param response the httpservlet response
+	 */
+	public JSONObject handle(HttpServletRequest request, HttpServletResponse response) {
+		String[] params = request.getRequestURI().split("/");
+		JSONObject responseJSON = null;
 		
-	public void setPDP(PDP pdp) {
-		this.pdp = pdp;
+		// minimum two parameters (first is usually blank, second is resource)
+		if (params.length > 1) {
+			String resource = params[1].toLowerCase();
+			Handler handler = this.handlers.get(resource);
+			
+			if (handler != null) {				
+				String reqMethod = request.getMethod();				
+				responseJSON = handler.handle(request, response, reqMethod);				
+			} else {
+				log.info("No handler found for resource: " + resource);
+				responseJSON = new JSONObject()
+								.put("error", true)
+								.put("code", 404);						
+			}
+		}
+
+		return responseJSON;
 	}
 	
 	/**
-	 * Checks context of requests that come in (i.e. whether they are xacml or xacml-samlp)
-	 * and subsequently provides them to the appropiate handler.
-	 * @param reader, request.getReader()
-	 * @return the response from the handler or null if an error happened
+	 * Associates the given resource with the given handler, replaces previous associations if applicable
+	 * This method is NOT thread-safe and should only be used on startup to add handlers
+	 * @param resource name of the resource
+	 * @param handler handler handling request on that resource
 	 */
-	public String handle(Reader reader) {
-		String response = null;
-		Document doc = null;
-		Element elem = null;
-
-		try { 
-			doc = this.parserPool.parse(reader);
-			elem = doc.getDocumentElement();
-		} catch (Exception e) { e.printStackTrace(); }
-		
-		if (elem != null) {
-			// if elem == xacml 2 OR 3
-			if (elem.getNamespaceURI() == XACMLConstants.REQUEST_CONTEXT_2_0_IDENTIFIER ||
-					elem.getNamespaceURI() == XACMLConstants.REQUEST_CONTEXT_3_0_IDENTIFIER) {
-				response = XACMLHandler.handle(elem, pdp);
-			}
-			// if elem == xacml-samlp
-			if (elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML20P_NS ||
-					elem.getNamespaceURI() == SAMLProfileConstants.SAML20XACML30P_NS) {
-				
-				try {
-					SAMLHandler samlHandler = new SAMLHandler();
-					String request, s;
-                    request = samlHandler.handleRequest(elem);
-                    s = XACMLHandler.handle(request, this.pdp);
-                    response = samlHandler.handleResponse(s);
-				} catch (Exception e) { e.printStackTrace(); }
-				
-			}
-		}
-		
-		Helper.clearCaches();		
-		return response;
+	public void putHandler(String resource, Handler handler) {
+		this.handlers.put(resource, handler);
 	}
-
+	
 }

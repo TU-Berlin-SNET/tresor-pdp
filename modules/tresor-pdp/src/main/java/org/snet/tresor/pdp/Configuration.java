@@ -17,10 +17,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.snet.tresor.pdp.contexthandler.ContextHandler;
+import org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth;
+import org.snet.tresor.pdp.contexthandler.auth.TresorAuth;
+import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
-import org.snet.tresor.pdp.policystore.PolicyStore;
+import org.snet.tresor.pdp.policystore.DummyPolicyStoreManager;
 import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 import org.wso2.balana.Balana;
+import org.wso2.balana.PDP;
 import org.wso2.balana.PDPConfig;
 import org.wso2.balana.finder.AttributeFinder;
 import org.wso2.balana.finder.AttributeFinderModule;
@@ -39,68 +44,160 @@ public class Configuration {
 	// System Property Key of the config File (if applicable)
 	private static final String TRESOR_PDP_CONFIG_PROPERTY = "org.snet.tresor.pdp.config";
 	
-	private PDPConfig PDP_CONFIG;	
+	// default location if system property is not set
+	private static final String DEFAULT_CONFIG_PATH = "webapps/root/WEB-INF/config";
 	
-    // the classloader we'll use for loading classes
-    private ClassLoader loader;
-
     // the logger we'll use for all messages
-    private static Log logger = LogFactory.getLog(Configuration.class);
+    private static Log log = LogFactory.getLog(Configuration.class);
+    
+    private PolicyStoreManager POLICYSTORE_MANAGER;
+    
+	private ContextHandler CONTEXT_HANDLER;
 	
-	public Configuration() {
+	private TresorAuth TRESOR_AUTH;
+	
+	private PDP TRESOR_PDP;
+	
+	private static Configuration INSTANCE;
+	
+	private ClassLoader loader;
+	
+	private Configuration() {
 		this.loader = getClass().getClassLoader();
-		this.initConfiguration();
+	}
+	
+	public static Configuration getInstance() {
+		if (INSTANCE == null)
+			INSTANCE = new Configuration();
+		return INSTANCE;
+	}
+	
+	public PolicyStoreManager getPolicyStoreManager() {
+		return this.POLICYSTORE_MANAGER;
+	}
+	
+	public ContextHandler getContextHandler() {
+		return this.CONTEXT_HANDLER;
+	}
+	
+	public TresorAuth getTresorAuth() {
+		return this.TRESOR_AUTH;
+	}
+	
+	public PDP getPDP() {
+		return this.TRESOR_PDP;
 	}
 	
 	/**
 	 * Loads and parses the configuration file if applicable, loads default configuration otherwise
 	 * Initializes GeoXACML and SAML support
 	 */
-	private void initConfiguration() {
-		String configPath = System.getProperty(TRESOR_PDP_CONFIG_PROPERTY);
+	public void initConfiguration() {				
+		File configFile = null;
+		JSONObject configJSON = null;
 		
 		GeoXACML.initialize();
-		logger.info("GeoXACML: success");
+		log.info("GeoXACML: success");
 		
 		try {
 			SAMLConfig.InitSAML();
-			logger.info("SAML: success");
+			log.info("SAML: success");
 		} catch (Exception e) {
-			logger.error("SAML: fail", e);
+			log.error("SAML: fail", e);
+		}		
+
+		String configPath = System.getProperty(TRESOR_PDP_CONFIG_PROPERTY);
+		if (configPath == null) {
+			configPath = Configuration.DEFAULT_CONFIG_PATH;
+			log.info("No config path given, using default path");
+		}
+					
+		configFile = new File(configPath);
+		
+		// if there is a configuration file..		
+		if (configFile.isFile()) {
+				// ..parse it..
+				JSONTokener tokener;
+				try {
+					tokener = new JSONTokener(new FileInputStream(configFile));
+					configJSON = new JSONObject(tokener);
+				} catch (JSONException e) {
+					log.error("Failed to parse config file");
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					log.error("Config file not found");
+					e.printStackTrace();
+				}
+		} else {
+			log.info("Config file does not exist");
 		}
 		
-		// if there is a configuration file..
-		if (configPath != null) {
-			try {
-				// ..parse it..
-				JSONTokener tokener = new JSONTokener(new FileInputStream(new File(configPath)));
-				JSONObject configJSON = new JSONObject(tokener);
-				
-				// ..read pdp configuration..
-				this.PDP_CONFIG = parsePDPConfig(configJSON);
-				
-				// ..read further configuration if available..
-				if (configJSON.has("policystoremanager"))
-					parsePolicyStoreManager(configJSON.getJSONObject("policystoremanager"));
-
-				logger.info("Configuration read successfully");
-
-			} catch (FileNotFoundException e) {
-				logger.error("Could not find or open configuration file", e);
-			} catch (JSONException e) {
-				logger.error("Error parsing config file or getting a value from parsed JSONObject", e);
-			} catch (ReflectiveOperationException e) {
-				logger.error("Error doing reflective operation", e);
+		
+		try {
+			parsePolicyStoreManager(configJSON);	
+		} catch (ReflectiveOperationException e) {
+			log.error("Error doing reflective operation", e);
+		} finally {
+			if (this.POLICYSTORE_MANAGER == null) {
+				log.info("No policystoremanager created, creating default");
+				this.POLICYSTORE_MANAGER = new DummyPolicyStoreManager();
 			}
 		}
 		
-		// if there is no configuration file or parsing did not go as planned, go to default
-		if (this.PDP_CONFIG == null) {
-			logger.info("Using default configuration");
-			this.PDP_CONFIG = Balana.getInstance().getPdpConfig();
+		try {
+			parsePDP(configJSON);	
+		} catch (ReflectiveOperationException e) {
+			log.error("Error doing reflective operation", e);
+		} finally {
+			if (this.TRESOR_PDP == null) {
+				log.info("No PDP created, creating default");
+				this.TRESOR_PDP = new PDP(Balana.getInstance().getPdpConfig());
+			}	
 		}
 		
-		Balana.getInstance().setPdpConfig(this.PDP_CONFIG);
+		try {
+			parseTresorAuth(configJSON);	
+		} catch (ReflectiveOperationException e) {
+			log.error("Error doing reflective operation", e);
+		} finally {
+			if (this.TRESOR_AUTH == null) {
+				log.info("No Tresor Auth created, creating default");
+				this.TRESOR_AUTH = new HTTPBasicAuth();
+			}
+		}
+		
+		try {
+			parseContextHandler(configJSON);
+		} catch (ReflectiveOperationException e) {
+			log.error("Error doing reflective operation", e);
+		} finally {
+			if (this.CONTEXT_HANDLER == null) {
+				log.info("No Contexthandler created, creating default");
+				this.CONTEXT_HANDLER = ContextHandler.getInstance();
+			}
+		}
+		
+		log.info("configuration finished");
+	}
+
+	/**
+	 * Parses PolicyStoreManager Configuration details and sets the manager for the PolicyStore
+	 * @param managerConfig, JSONObject containing classname and optional parameters for the policystoremanager
+	 * @throws ReflectiveOperationException
+	 */
+	private void parsePolicyStoreManager(JSONObject configJSON) throws ReflectiveOperationException {		
+		PolicyStoreManager manager;
+		
+		if (configJSON != null && configJSON.has("policystoremanager")) {
+			JSONObject managerConfig = configJSON.getJSONObject("policystoremanager");
+			
+			if (managerConfig.has("parameters"))
+				manager = createInstanceWithParameters(managerConfig, PolicyStoreManager.class);
+			else
+				manager = createInstance(managerConfig, PolicyStoreManager.class);
+			
+			this.POLICYSTORE_MANAGER = manager;			
+		}
 	}
 	
 	/**
@@ -110,49 +207,72 @@ public class Configuration {
 	 * @throws ReflectiveOperationException 
 	 * @throws JSONException 
 	 */
-	private PDPConfig parsePDPConfig(JSONObject configJSON) throws JSONException, ReflectiveOperationException {		
-		List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
-		Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
-		List<ResourceFinderModule> resourceFinderModules = new ArrayList<ResourceFinderModule>();		
-		
-		createInstances(configJSON.getJSONArray("attributefindermodules"), 
-						attributeFinderModules, 
-						AttributeFinderModule.class);
-		
-		createInstances(configJSON.getJSONArray("policyfindermodules"), 
-						policyFinderModules, 
-						PolicyFinderModule.class);
-		
-		createInstances(configJSON.getJSONArray("resourcefindermodules"), 
-						resourceFinderModules, 
-						ResourceFinderModule.class);
-		
-		AttributeFinder attributeFinder = new AttributeFinder();
-		attributeFinder.setModules(attributeFinderModules);
-		
-		PolicyFinder policyFinder = new PolicyFinder();
-		policyFinder.setModules(policyFinderModules);
-		
-		ResourceFinder resourceFinder = new ResourceFinder();
-		resourceFinder.setModules(resourceFinderModules);
-		
-		return new PDPConfig(attributeFinder, policyFinder, resourceFinder);		
-	}
+	private void parsePDP(JSONObject configJSON) throws JSONException, ReflectiveOperationException {		
+		if (configJSON != null) {
+			List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
+			Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
+			List<ResourceFinderModule> resourceFinderModules = new ArrayList<ResourceFinderModule>();		
+			
+			if (configJSON.has("attributefindermodules")) {
+				createInstances(configJSON.getJSONArray("attributefindermodules"), 
+								attributeFinderModules, 
+								AttributeFinderModule.class);
+			}
+			
+			if (configJSON.has("policyfindermodules")) {
+				createInstances(configJSON.getJSONArray("policyfindermodules"), 
+								policyFinderModules, 
+								PolicyFinderModule.class);				
+			}
 
-	/**
-	 * Parses PolicyStoreManager Configuration details and sets the manager for the PolicyStore
-	 * @param managerConfig, JSONObject containing classname and optional parameters for the policystoremanager
-	 * @throws ReflectiveOperationException
-	 */
-	private void parsePolicyStoreManager(JSONObject managerConfig) throws ReflectiveOperationException {
-		PolicyStoreManager manager;
-		
-		if (managerConfig.has("parameters"))
-			manager = createInstanceWithParameters(managerConfig, PolicyStoreManager.class);
-		else
-			manager = createInstance(managerConfig, PolicyStoreManager.class);
-		
-		PolicyStore.setManager(manager);
+			if (configJSON.has("resourcefindermodules")) {
+				createInstances(configJSON.getJSONArray("resourcefindermodules"), 
+								resourceFinderModules, 
+								ResourceFinderModule.class);
+			}
+			
+			AttributeFinder attributeFinder = new AttributeFinder();
+			attributeFinder.setModules(attributeFinderModules);
+			
+			PolicyFinder policyFinder = new PolicyFinder();
+			policyFinder.setModules(policyFinderModules);
+			
+			ResourceFinder resourceFinder = new ResourceFinder();
+			resourceFinder.setModules(resourceFinderModules);
+			
+			PDPConfig config = new PDPConfig(attributeFinder, policyFinder, resourceFinder);
+			
+			Balana.getInstance().setPdpConfig(config);
+			this.TRESOR_PDP = new PDP(config);
+		}		
+	}
+	
+	private void parseTresorAuth(JSONObject configJSON) throws ReflectiveOperationException {
+		if (configJSON != null && configJSON.has("tresorauth")) {
+			JSONObject authConfig = configJSON.getJSONObject("tresorauth");
+			TresorAuth tresorAuth = createInstance(authConfig, TresorAuth.class);
+			this.TRESOR_AUTH = tresorAuth;
+		}		
+	}
+	
+	private void parseContextHandler(JSONObject configJSON) throws ReflectiveOperationException {
+		if (configJSON != null && configJSON.has("contexthandlermodules")) {			
+			ContextHandler contextHandler = ContextHandler.getInstance();
+			JSONArray handlerConfig = configJSON.getJSONArray("contexthandlermodules");
+			
+			JSONObject config;
+			String resource;
+			Handler handler;
+			
+			for (int i = 0; i < handlerConfig.length(); i++) {
+				config = handlerConfig.getJSONObject(i);
+				resource = config.getString("resource");			
+				handler = createInstance(config, Handler.class);
+				contextHandler.putHandler(resource, handler);
+			}
+			
+			this.CONTEXT_HANDLER = contextHandler;			
+		}
 	}
 	
 	/**

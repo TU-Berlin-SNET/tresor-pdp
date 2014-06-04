@@ -1,13 +1,12 @@
 package org.snet.tresor.pdp.contexthandler.servlet;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+import org.snet.tresor.pdp.Helper;
+import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.ContextHandler;
 
 /**
@@ -17,28 +16,17 @@ import org.snet.tresor.pdp.contexthandler.ContextHandler;
  */
 public class PDPServlet extends HttpServlet {
 	
-	ContextHandler contextHandler;
+	private ContextHandler contextHandler;
 	
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String s = null;
-		
-		s = this.contextHandler.handle(request.getReader());
-		
-		if (s != null && !s.isEmpty()) {
-			response.setStatus(200);
-			response.setContentType("application/xml");
-			response.setContentLength(s.length());
-			response.getWriter().print(s);
-			response.getWriter().flush();
-		} else {
-			response.setStatus(400);
-		}		
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+		JSONObject responseJSON = this.contextHandler.handle(request, response);
+		Helper.respondHTTP(responseJSON, response);
 	}
 	
-	public void init() throws ServletException {
-		this.contextHandler = ContextHandler.getInstance();
-		super.init();
+	@Override
+	public void init() {		
+		this.contextHandler = TresorPDP.getInstance().getContextHandler();		
 	}
 	
 }
