@@ -68,7 +68,7 @@ public class AppGeo3
         //Policy for this request
         //<string>/opt/NetBeans/TRESOR/WSO2-Balana-Basic_OK/policies-request/geoxacml-policies/policy-3-actions.xml</string>
         
-        String request = new Scanner(new File("/opt/Netbeans/TRESOR/balana/policies-request/missing attributes/geo_time-Request.xml")).useDelimiter("\\A").next();
+        String request = new Scanner(new File("/opt/Netbeans/TRESOR/balana/policies-request/obligations/geoxacml-3-request-actions-within-campus-permit_xacml3.0.xml")).useDelimiter("\\A").next();
         //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Test_Request.xml")).useDelimiter("\\A").next();
         //String request = new Scanner(new File("/opt/Netbeans/TRESOR/Request_Date_3.0.xml")).useDelimiter("\\A").next();
         

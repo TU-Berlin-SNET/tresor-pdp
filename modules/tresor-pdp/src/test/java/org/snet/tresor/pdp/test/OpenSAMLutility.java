@@ -161,13 +161,13 @@ public class OpenSAMLutility {
                 return buffer.toString();
         }
 	
-	private static String XACMLRequest2XACMLAuthzDecisionQuery() throws Exception {
+	public static String XACMLRequest2XACMLAuthzDecisionQuery(String file, Signature signature) throws Exception {
                 BasicParserPool parserPool = new BasicParserPool();
 		parserPool.setNamespaceAware(true);
                 
 		// load xacml Request
 		Element xacmlRequestXML = parserPool.parse(new FileInputStream(
-				new File("/opt/Netbeans/TRESOR/OpenSAML/geoxacml-request-coordinate.xml"))
+				new File(file))
 				).getDocumentElement();
                 
                 QName qName= new QName(xacmlRequestXML.getNamespaceURI(), xacmlRequestXML.getLocalName(), XACMLConstants.XACMLCONTEXT_PREFIX);
@@ -184,12 +184,12 @@ public class OpenSAMLutility {
 				XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_LOCAL_NAME,
 				SAMLProfileConstants.SAML20XACMLPROTOCOL_PREFIX);
 		
-                Signature signature = getSignature();
+                /*Signature signature = getSignature();*/
                 xacmlDecisionQuery.setSignature(signature);
                 
 		Issuer issuer = (Issuer) Configuration.getBuilderFactory().getBuilder(Issuer.DEFAULT_ELEMENT_NAME)
 				.buildObject(Issuer.DEFAULT_ELEMENT_NAME);
-		issuer.setValue("Omer");
+		issuer.setValue("Zequeira");
                         
 		// set needed elements
 		xacmlDecisionQuery.setID("1234");
@@ -210,7 +210,7 @@ public class OpenSAMLutility {
 		TransformerFactory.newInstance().newTransformer()
 			.transform(new DOMSource(xacmlDecisionQueryXML), new StreamResult(buffer));
                 
-		System.out.println("Request: "+buffer.toString());
+		//System.out.println("Request: "+buffer.toString());
                 return buffer.toString();
 	}
 	
@@ -246,10 +246,10 @@ public class OpenSAMLutility {
                 String SAMLxacmlResponse = makeSAMLxacmlResponse();
 		
 		
-		String SAMLxacmlRequest = XACMLRequest2XACMLAuthzDecisionQuery();
+		//String SAMLxacmlRequest = XACMLRequest2XACMLAuthzDecisionQuery("/opt/Netbeans/TRESOR/OpenSAML/request_0001_01.xml");
                 //XACMLAuthzDecisionQueryType SAMLxacmlRequest = XACMLRequest2XACMLAuthzDecisionQuery();
                 
-                XACMLAuthzDecisionQuery2XACMLRequestTest(SAMLxacmlRequest);
+                //XACMLAuthzDecisionQuery2XACMLRequestTest(SAMLxacmlRequest);
                 //checkSignature(SAMLxacmlRequest);
 	}
 

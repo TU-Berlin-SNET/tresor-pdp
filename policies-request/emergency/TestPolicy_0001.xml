@@ -1,0 +1,59 @@
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+        xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="TestPolicyEmergency"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable"
+        Version="1.0">
+    <Description>Test policy for Emergency</Description>
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">EMERGENCY</AttributeValue>
+                    <AttributeDesignator MustBePresent="false"
+                                         Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+                                         AttributeId="org:snet:tresor:status:emergency"
+                                         DataType="http://www.w3.org/2001/XMLSchema#string"/>
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    <Rule RuleId="rule1" Effect="Permit">
+        <Description>The Doctor should be included in the request</Description>
+        
+        <Condition>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-greater-than-or-equal">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
+					<AttributeDesignator
+							Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+							AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+							DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+				</Apply>
+				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Doctor</AttributeValue>
+            </Apply>
+        </Condition>
+    </Rule>
+    
+    <Rule RuleId="DenyAll" Effect="Deny" />
+    
+    <ObligationExpressions>
+        <ObligationExpression ObligationId="org:snet:tresor:emergency-obligation" FulfillOn="Permit">
+            <AttributeAssignmentExpression
+                    AttributeId="org:snet:tresor:status:emergency:text">
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Emergency Obligation</AttributeValue>
+            </AttributeAssignmentExpression>
+            
+            <AttributeAssignmentExpression
+                    AttributeId="org:snet:tresor:status:emergency:action">
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">log</AttributeValue>
+            </AttributeAssignmentExpression>
+        </ObligationExpression>
+        
+        <ObligationExpression ObligationId="denyPolicyObligation" FulfillOn="Deny">
+            <AttributeAssignmentExpression
+                    AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">denyObligation</AttributeValue>
+            </AttributeAssignmentExpression>
+        </ObligationExpression>
+    </ObligationExpressions>
+    
+    
+</Policy>

@@ -54,4 +54,32 @@
       </Condition>
    </Rule>
    <Rule Effect="Deny" RuleId="Deny-Rule" />
+   
+   <ObligationExpressions>
+        <ObligationExpression ObligationId="permitPolicyObligation" FulfillOn="Permit">
+            <AttributeAssignmentExpression
+                    AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">permitObligation</AttributeValue>
+            </AttributeAssignmentExpression>
+            
+            <AttributeAssignmentExpression
+                    AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
+                    <AttributeDesignator
+						MustBePresent="true"
+						Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+						AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date"
+						DataType="http://www.w3.org/2001/XMLSchema#date"/>
+            </AttributeAssignmentExpression>
+            
+            <AttributeAssignmentExpression
+                    AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
+                    <AttributeDesignator
+						MustBePresent="true"
+						Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+						AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-time"
+						DataType="http://www.w3.org/2001/XMLSchema#time"/>
+            </AttributeAssignmentExpression>
+            
+        </ObligationExpression>
+   </ObligationExpressions>
 </Policy>       

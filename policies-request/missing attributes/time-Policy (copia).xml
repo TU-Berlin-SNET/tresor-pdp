@@ -1,0 +1,125 @@
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" 
+		PolicyId="2-PolicyTime" 
+		RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable" 
+		Version="1.0">
+   <Target/>
+   <Rule Effect="Permit" RuleId="Rule-1">
+	   <Description>
+			The resource "foo" is accesible for "read" for user "bob" only on 21/03/2014 or any day before.
+		</Description>
+      <Target>
+         <AnyOf>
+            <AllOf>
+               <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">foo</AttributeValue>
+                  <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" 
+										Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" 
+										DataType="http://www.w3.org/2001/XMLSchema#string" 
+										MustBePresent="true"/>
+               </Match>
+            </AllOf>
+         </AnyOf>
+         <AnyOf>
+            <AllOf>
+               <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+                  <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" 
+										Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" 
+										DataType="http://www.w3.org/2001/XMLSchema#string" 
+										MustBePresent="false"/>
+               </Match>
+            </AllOf>
+         </AnyOf>
+      </Target>
+      <Condition>
+         <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-less-than-or-equal">
+               <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-one-and-only">
+                  <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date" 
+										Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment" 
+										DataType="http://www.w3.org/2001/XMLSchema#date" 
+										MustBePresent="true"/>
+               </Apply>
+               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#date">2014-03-21</AttributeValue>
+            </Apply>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+               <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bob</AttributeValue>
+               <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" 
+									Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" 
+									DataType="http://www.w3.org/2001/XMLSchema#string" 
+									MustBePresent="true"/>
+            </Apply>
+         </Apply>
+      </Condition>
+   </Rule>
+   
+   <Rule Effect="Permit" RuleId="rule:55">
+		<Description>
+			Check the age of the last position update (timestamp within the location provider database).
+		</Description>
+        <Target/>
+        <Condition>
+			<Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+				
+			<Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-within">
+                    <Apply FunctionId="urn:ogc:def:function:geoxacml:1.0:geometry-one-and-only">
+                        <!-- This is the recent gps position// -->
+                        <AttributeDesignator 
+							Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+							DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry" 
+							AttributeId="position"
+							MustBePresent="true"/>
+                    </Apply>
+                    
+                    <!-- This is the defined gps polygon // -->
+                    <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
+                        <gml:Polygon xmlns:gml="http://www.opengis.net/gml" srsName="EPSG:4326">
+                            <gml:outerBoundaryIs>
+                                <gml:LinearRing>
+                                    <!-- Central Campus TU Charlottenburg // -->
+                                    <gml:coordinates>52.51264289,13.32010746 52.51541127,13.31984997 52.51909348,13.32401276 52.51862343,13.3263731 52.51674317,13.32482815 52.51614252,13.32620144 52.51423604,13.3286047 52.51342641,13.33036423 52.51230335,13.33693027 52.5109452,13.33650112 52.51133698,13.33469868 52.50969149,13.33126545 52.50812429,13.32864761 52.50807205,13.32710266 52.51264289,13.32010746</gml:coordinates>
+                                </gml:LinearRing>
+                            </gml:outerBoundaryIs>
+                            <gml:outerBoundaryIs>
+                                <gml:LinearRing>
+                                    <!-- Campus Ackerstr. Wedding // -->
+                                    <gml:coordinates>52.53880502,13.38365436 52.53993393,13.38487744 52.53888333,13.38581085 52.53814594,13.38499546</gml:coordinates>
+                                </gml:LinearRing>
+                            </gml:outerBoundaryIs>
+                        </gml:Polygon>
+                    </AttributeValue>
+			</Apply>	
+				
+				
+            <!-- checks the recent time // -->
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-less-than-or-equal">
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-subtract">
+                    <!-- checks that there is only one integer in bag //-->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+                        <!-- takes the recent time as timestamp, where 1 number represents 1 second //--> 
+                        <AttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer"
+												Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+												AttributeId="now"
+												MustBePresent="true"/>
+                    </Apply>
+                    <!-- checks that there is only one integer in bag //-->
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-one-and-only">
+                        <!-- takes the timestamp from the last update, where 1 number represents 1 second //--> 
+                        <AttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer"
+												Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
+												AttributeId="lastupdate"
+												MustBePresent="true" />
+                    </Apply>
+                </Apply>
+                <!-- maximum time difference in s // -->
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">1000</AttributeValue>
+            </Apply>
+            
+			
+            </Apply>
+        </Condition>
+    </Rule>
+   
+   <Rule Effect="Deny" RuleId="Deny-Rule" />
+</Policy>
