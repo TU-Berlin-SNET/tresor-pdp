@@ -63,7 +63,7 @@ public class Configuration {
 	private ClassLoader loader;
 	
 	private Configuration() {
-		this.loader = getClass().getClassLoader();
+		this.loader = this.getClass().getClassLoader();
 	}
 	
 	public static Configuration getInstance() {
@@ -135,7 +135,7 @@ public class Configuration {
 		
 		try {
 			parsePolicyStoreManager(configJSON);	
-		} catch (ReflectiveOperationException e) {
+		} catch (Exception e) {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.POLICYSTORE_MANAGER == null) {
@@ -146,7 +146,7 @@ public class Configuration {
 		
 		try {
 			parsePDP(configJSON);	
-		} catch (ReflectiveOperationException e) {
+		} catch (Exception e) {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.TRESOR_PDP == null) {
@@ -157,7 +157,7 @@ public class Configuration {
 		
 		try {
 			parseTresorAuth(configJSON);	
-		} catch (ReflectiveOperationException e) {
+		} catch (Exception e) {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.TRESOR_AUTH == null) {
@@ -168,7 +168,7 @@ public class Configuration {
 		
 		try {
 			parseContextHandler(configJSON);
-		} catch (ReflectiveOperationException e) {
+		} catch (Exception e) {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.CONTEXT_HANDLER == null) {
@@ -183,9 +183,9 @@ public class Configuration {
 	/**
 	 * Parses PolicyStoreManager Configuration details and sets the manager for the PolicyStore
 	 * @param managerConfig, JSONObject containing classname and optional parameters for the policystoremanager
-	 * @throws ReflectiveOperationException
+	 * @throws Exception
 	 */
-	private void parsePolicyStoreManager(JSONObject configJSON) throws ReflectiveOperationException {		
+	private void parsePolicyStoreManager(JSONObject configJSON) throws Exception {		
 		PolicyStoreManager manager;
 		
 		if (configJSON != null && configJSON.has("policystoremanager")) {
@@ -204,10 +204,10 @@ public class Configuration {
 	 * Reads and creates a PDPConfig from given JSONObject
 	 * @param configJSON, JSONObject containing configuration details
 	 * @return created PDPConfig
-	 * @throws ReflectiveOperationException 
+	 * @throws Exception 
 	 * @throws JSONException 
 	 */
-	private void parsePDP(JSONObject configJSON) throws JSONException, ReflectiveOperationException {		
+	private void parsePDP(JSONObject configJSON) throws JSONException, Exception {		
 		if (configJSON != null) {
 			List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
 			Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
@@ -247,7 +247,7 @@ public class Configuration {
 		}		
 	}
 	
-	private void parseTresorAuth(JSONObject configJSON) throws ReflectiveOperationException {
+	private void parseTresorAuth(JSONObject configJSON) throws Exception {
 		if (configJSON != null && configJSON.has("tresorauth")) {
 			JSONObject authConfig = configJSON.getJSONObject("tresorauth");
 			TresorAuth tresorAuth = createInstance(authConfig, TresorAuth.class);
@@ -255,7 +255,7 @@ public class Configuration {
 		}		
 	}
 	
-	private void parseContextHandler(JSONObject configJSON) throws ReflectiveOperationException {
+	private void parseContextHandler(JSONObject configJSON) throws Exception {
 		if (configJSON != null && configJSON.has("contexthandlermodules")) {			
 			ContextHandler contextHandler = ContextHandler.getInstance();
 			JSONArray handlerConfig = configJSON.getJSONArray("contexthandlermodules");
@@ -281,9 +281,9 @@ public class Configuration {
 	 * @param classes, JSONArray containing JSONObjects with classnames (and optionally parameters)
 	 * @param output, the collection to output to
 	 * @param cls, the type of class to create
-	 * @throws ReflectiveOperationException
+	 * @throws Exception
 	 */
-	private <T> void createInstances(JSONArray classes, Collection<T> output, Class<T> cls) throws ReflectiveOperationException {
+	private <T> void createInstances(JSONArray classes, Collection<T> output, Class<T> cls) throws Exception {
 		JSONObject j;
 		T instance;
 		
@@ -307,9 +307,9 @@ public class Configuration {
 	 * @param j, JSONObject containing classname and no parameters
 	 * @param cls, type of class to create
 	 * @return created instance
-	 * @throws ReflectiveOperationException
+	 * @throws Exception
 	 */
-	private <T> T createInstance(JSONObject j, Class<T> cls) throws ReflectiveOperationException {
+	private <T> T createInstance(JSONObject j, Class<T> cls) throws Exception {
 		Class<?> c = this.loader.loadClass(j.getString("classname"));		
 		return cls.cast(c.newInstance());
 	}
@@ -320,9 +320,9 @@ public class Configuration {
 	 * @param j, JSONObject containing classname and additional parameters JSONArray
 	 * @param cls, type of class to create
 	 * @return created instance
-	 * @throws ReflectiveOperationException
+	 * @throws Exception
 	 */
-	private <T> T createInstanceWithParameters(JSONObject j, Class<T> cls) throws ReflectiveOperationException {
+	private <T> T createInstanceWithParameters(JSONObject j, Class<T> cls) throws Exception {
 		Class<?> c = this.loader.loadClass(j.getString("classname"));
 		Object instance;		
 		
