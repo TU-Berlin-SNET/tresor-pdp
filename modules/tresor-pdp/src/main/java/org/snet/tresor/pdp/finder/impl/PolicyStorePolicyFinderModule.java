@@ -96,30 +96,32 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
         AbstractPolicy policy = null;
         Reader reader = null;
 
-        try {
-        	reader = new StringReader(policyString);
-            Document doc = this.parser.parse(reader);
+        if (policyString != null) {
+            try {
+            	reader = new StringReader(policyString);
+                Document doc = this.parser.parse(reader);
 
-            // handle the policy, if it's a known type
-            Element root = doc.getDocumentElement();
-//            String name = DOMHelper.getLocalName(root);   // in our case we only have policies and NO policysets
+                // handle the policy, if it's a known type
+                Element root = doc.getDocumentElement();
+//                String name = DOMHelper.getLocalName(root);   // in our case we only have policies and NO policysets
 
-//            if (name.equals("Policy")) {
-            policy = Policy.getInstance(root);
-//            } else if (name.equals("PolicySet")) {
-//                policy = PolicySet.getInstance(root, finder);
-//            }
-        } catch (Exception e) {
-            // just only logs
-            log.error("Fail to load policy : " + policyString , e);
-        } finally {
-            if(reader != null){
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    log.error("Error while closing input reader");
-                }                
-            }
+//                if (name.equals("Policy")) {
+                policy = Policy.getInstance(root);
+//                } else if (name.equals("PolicySet")) {
+//                    policy = PolicySet.getInstance(root, finder);
+//                }
+            } catch (Exception e) {
+                // just only logs
+                log.error("Fail to load policy : " + policyString , e);
+            } finally {
+                if(reader != null){
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        log.error("Error while closing input reader");
+                    }                
+                }
+            }        	
         }
 
         return policy;

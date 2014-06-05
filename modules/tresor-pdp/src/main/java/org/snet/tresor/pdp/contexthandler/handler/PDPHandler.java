@@ -75,7 +75,7 @@ public class PDPHandler implements Handler {
 			Reader body = Helper.getRequestInputStreamReader(request);
 			Document xacmlDoc = parser.parse(body);
 			xacmlRequest = RequestCtxFactory.getFactory().getRequestCtx(xacmlDoc.getDocumentElement());
-		} catch (Exception e) { log.error("Error creating request context", e); }
+		} catch (Exception e) { log.info("Error creating request context"); }
 		
 		if (xacmlRequest != null) {
 			decision = this.pdp.evaluate(xacmlRequest).encode();
