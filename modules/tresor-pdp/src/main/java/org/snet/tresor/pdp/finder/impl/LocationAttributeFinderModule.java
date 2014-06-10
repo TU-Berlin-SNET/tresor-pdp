@@ -66,7 +66,7 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 	
 	/**
 	 * Create new LocationAttributeFinderModule with given pips
-	 * @param pipInfo, array containing information about pips in the following form [ "attributeId", "pipURL", "attributeId", "pipURL", ...]
+	 * @param pipInfo array containing information about pips in the following form [ "attributeId", "pipURL", "attributeId", "pipURL", ...]
 	 */
 	public LocationAttributeFinderModule(String... pipInfo) {
 		this();

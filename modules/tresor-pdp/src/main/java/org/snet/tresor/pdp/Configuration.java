@@ -250,7 +250,13 @@ public class Configuration {
 	private void parseTresorAuth(JSONObject configJSON) throws Exception {
 		if (configJSON != null && configJSON.has("tresorauth")) {
 			JSONObject authConfig = configJSON.getJSONObject("tresorauth");
-			TresorAuth tresorAuth = createInstance(authConfig, TresorAuth.class);
+			TresorAuth tresorAuth;
+			
+			if (authConfig.has("parameters"))
+				tresorAuth = createInstanceWithParameters(authConfig, TresorAuth.class);
+			else				
+				tresorAuth = createInstance(authConfig, TresorAuth.class);
+			
 			this.TRESOR_AUTH = tresorAuth;
 		}		
 	}
