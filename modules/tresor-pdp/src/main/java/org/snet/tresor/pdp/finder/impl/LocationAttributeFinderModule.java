@@ -46,6 +46,8 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 			return new HashMap<String, String>();
 		}
 	};
+	
+	// TODO reimplement threadcache clearing
 
 	private Map<String, String> pipUrlMap;	
 	private MultiThreadedHttpConnectionManager connectionManager;

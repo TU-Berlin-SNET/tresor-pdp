@@ -11,32 +11,60 @@ import redis.clients.jedis.JedisPoolConfig;
  * @author malik
  */
 public class RedisDBPolicyStoreManager implements PolicyStoreManager {	
-	JedisPool redisdbpool;
-	Jedis redisdb;
+	JedisPool redisPool;
 	
+	/**
+	 * Create RedisDBPolicyStoremanager with default config & localhost as location
+	 */
 	public RedisDBPolicyStoreManager() {
-		this.redisdbpool = new JedisPool(new JedisPoolConfig(), "localhost");
-		this.redisdb = redisdbpool.getResource();
+		this.redisPool = new JedisPool(new JedisPoolConfig(), "localhost");
+	}
+	
+	/**
+	 * Create RedisDBPolicyStoreManager with given parameter(s)
+	 * @param params contains location
+	 */
+	public RedisDBPolicyStoreManager(String... params) {		
+		this.redisPool = new JedisPool(new JedisPoolConfig(), params[0]);
 	}
 
 	public Map<String, String> getAll(String domain) {
-		return this.redisdb.hgetAll(domain);
+		// get client from pool
+		Jedis redis = this.redisPool.getResource();
+		
+		// get values from database
+		Map<String, String> result = redis.hgetAll(domain);
+		
+		// return client to pool
+		this.redisPool.returnResource(redis);
+		
+		// return values
+		return result;
 	}
 
 	public String getPolicy(String domain, String service) {
-		return this.redisdb.hget(domain, service);
+		Jedis redis = this.redisPool.getResource();
+		String result = redis.hget(domain, service);
+		this.redisPool.returnResource(redis);
+		return result;
 	}
 
-	public String addPolicy(String domain, String service, String policy) {		
-		long result = this.redisdb.hsetnx(domain, service, policy);		
+	public String addPolicy(String domain, String service, String policy) {
+		Jedis redis = this.redisPool.getResource();
+		long result = redis.hsetnx(domain, service, policy);
+		this.redisPool.returnResource(redis);
+		
 		if (result == 0)
 			return null;
 		else
 			return service;
 	}
 
-	public int deletePolicy(String domain, String service) {		
-		long result = this.redisdb.hdel(domain, service);
+	public int deletePolicy(String domain, String service) {
+		Jedis redis = this.redisPool.getResource();		
+		long result = redis.hdel(domain, service);
+		this.redisPool.returnResource(redis);
+		
 		if (result == 0)
 			return 0;
 		else
@@ -44,7 +72,7 @@ public class RedisDBPolicyStoreManager implements PolicyStoreManager {
 	}
 	
 	public void close() {
-		this.redisdb.close();
+		this.redisPool.destroy();
 	}
 	
 }

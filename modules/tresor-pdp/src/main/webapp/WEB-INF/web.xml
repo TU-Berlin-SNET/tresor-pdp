@@ -12,12 +12,12 @@
 	<servlet>
 		<servlet-name>PDPServlet</servlet-name>
 		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.PDPServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>
 		<servlet-name>PolicyHandlerServlet</servlet-name>
 		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.PolicyHandlerServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>HomeServlet</servlet-name>

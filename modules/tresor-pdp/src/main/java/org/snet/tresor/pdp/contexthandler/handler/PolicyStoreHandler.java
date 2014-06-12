@@ -12,8 +12,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
+import org.snet.tresor.pdp.Configuration;
 import org.snet.tresor.pdp.Helper;
-import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.auth.AuthUser;
 import org.snet.tresor.pdp.contexthandler.auth.TresorAuth;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
@@ -31,8 +31,8 @@ public class PolicyStoreHandler implements Handler {
 	private ParserPool parser;
 	
 	public PolicyStoreHandler() {		
-		this.policystoremanager = TresorPDP.getInstance().getPolicyStoreManager();
-		this.authenticator = TresorPDP.getInstance().getTresorAuth();
+		this.policystoremanager = Configuration.getInstance().getPolicyStoreManager();
+		this.authenticator = Configuration.getInstance().getTresorAuth();
 		this.parser = new BasicParserPool();
 	}
 	
@@ -138,11 +138,17 @@ public class PolicyStoreHandler implements Handler {
 					
 					// if no policy exists for that service add it
 					if (!policyExists) {
-						this.policystoremanager.addPolicy(domain, service, policy);
-						responseJSON = new JSONObject()
-										.put(KEYJSON_ERROR, false)
-										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_CREATED)
-										.put("Location", "/" + params[1] + "/" + service);										
+						String result = this.policystoremanager.addPolicy(domain, service, policy);
+						if (result != null) {
+							responseJSON = new JSONObject()
+											.put(KEYJSON_ERROR, false)
+											.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_CREATED)
+											.put("Location", "/" + params[1] + "/" + result);
+						} else {
+							responseJSON = new JSONObject()
+											.put(KEYJSON_ERROR, true)
+											.put(KEYJSON_STATUSCODE, 500);
+						}
 					} else {
 						// if a policy for that service already exists, throw error
 						responseJSON = new JSONObject()
@@ -167,10 +173,16 @@ public class PolicyStoreHandler implements Handler {
 				
 				// if the policy exists, replace with new one
 				if (policyExists) {
-					this.policystoremanager.addPolicy(domain, service, policy);
-					responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, false)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NO_CONTENT);
+					String result = this.policystoremanager.addPolicy(domain, service, policy);
+					if (result != null) {
+						responseJSON = new JSONObject()
+										.put(KEYJSON_ERROR, false)
+										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NO_CONTENT);						
+					} else {
+						responseJSON = new JSONObject()
+										.put(KEYJSON_ERROR, true)
+										.put(KEYJSON_STATUSCODE, 500);
+					}
 				} else {
 					// if the policy does not exist throw error
 					responseJSON = new JSONObject()

@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
+import org.snet.tresor.pdp.Configuration;
 import org.snet.tresor.pdp.Helper;
-import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.ContextHandler;
 
 /**
@@ -26,7 +26,7 @@ public class PDPServlet extends HttpServlet {
 	
 	@Override
 	public void init() {		
-		this.contextHandler = TresorPDP.getInstance().getContextHandler();		
+		this.contextHandler = Configuration.getInstance().getContextHandler();		
 	}
 	
 }

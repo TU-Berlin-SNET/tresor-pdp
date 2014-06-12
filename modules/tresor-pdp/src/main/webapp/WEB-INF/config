@@ -13,8 +13,8 @@
 									{ "resource": "policy", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler" } ],
 	"tresorauth"				: { "classname": "org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth",
 									"parameters": [ "username:password", "exampledomain", 
-													"admin:admin", "admindomain",
-													"user:user", "userdomain",													
+													"admin:admin", "domain",
+													"user:user", "userdomain",
 													"doctor:12345", "healthcare" ]
 								  }
 }

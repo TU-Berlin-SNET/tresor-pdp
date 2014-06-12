@@ -3,6 +3,9 @@ package org.snet.tresor.pdp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,10 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.snet.tresor.pdp.contexthandler.ContextHandler;
-import org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth;
+import org.snet.tresor.pdp.contexthandler.auth.DummyAuth;
 import org.snet.tresor.pdp.contexthandler.auth.TresorAuth;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
+import org.snet.tresor.pdp.contexthandler.handler.PDPHandler;
+import org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler;
 import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
+import org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule;
 import org.snet.tresor.pdp.policystore.DummyPolicyStoreManager;
 import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 import org.wso2.balana.Balana;
@@ -43,9 +49,6 @@ import org.wso2.balana.finder.impl.InMemoryPolicyFinderModule;
 public class Configuration {
 	// System Property Key of the config File (if applicable)
 	private static final String TRESOR_PDP_CONFIG_PROPERTY = "org.snet.tresor.pdp.config";
-	
-	// default location if system property is not set
-	private static final String DEFAULT_CONFIG_PATH = "webapps/root/WEB-INF/config";
 	
     // the logger we'll use for all messages
     private static Log log = LogFactory.getLog(Configuration.class);
@@ -92,8 +95,8 @@ public class Configuration {
 	 * Loads and parses the configuration file if applicable, loads default configuration otherwise
 	 * Initializes GeoXACML and SAML support
 	 */
-	public void initConfiguration() {				
-		File configFile = null;
+	public void initConfiguration(URL defaultConfig) {
+		InputStream configStream = null;
 		JSONObject configJSON = null;
 		
 		GeoXACML.initialize();
@@ -105,41 +108,34 @@ public class Configuration {
 		} catch (Exception e) {
 			log.error("SAML: fail", e);
 		}		
-
-		String configPath = System.getProperty(TRESOR_PDP_CONFIG_PROPERTY);
-		if (configPath == null) {
-			configPath = Configuration.DEFAULT_CONFIG_PATH;
-			log.info("No config path given, using default path");
-		}
-					
-		configFile = new File(configPath);
-		
+				
+		configStream = this.getConfigInputStream(defaultConfig);
+				
 		// if there is a configuration file..		
-		if (configFile.isFile()) {
+		if (configStream != null) {
 				// ..parse it..
 				JSONTokener tokener;
 				try {
-					tokener = new JSONTokener(new FileInputStream(configFile));
+					tokener = new JSONTokener(configStream);
 					configJSON = new JSONObject(tokener);
 				} catch (JSONException e) {
 					log.error("Failed to parse config file");
 					e.printStackTrace();
-				} catch (FileNotFoundException e) {
-					log.error("Config file not found");
-					e.printStackTrace();
+				} finally {
+					try { configStream.close(); }
+					catch (IOException e) { }
 				}
 		} else {
 			log.info("Config file does not exist");
 		}
-		
-		
+				
 		try {
 			parsePolicyStoreManager(configJSON);	
 		} catch (Exception e) {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.POLICYSTORE_MANAGER == null) {
-				log.info("No policystoremanager created, creating default");
+				log.info("Fallback to default PolicyStoreManager");
 				this.POLICYSTORE_MANAGER = new DummyPolicyStoreManager();
 			}
 		}
@@ -150,8 +146,17 @@ public class Configuration {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.TRESOR_PDP == null) {
-				log.info("No PDP created, creating default");
-				this.TRESOR_PDP = new PDP(Balana.getInstance().getPdpConfig());
+				log.info("Fallback to default PDP");
+				AttributeFinder attributeFinder = Balana.getInstance().getPdpConfig().getAttributeFinder();
+				ResourceFinder resourceFinder = Balana.getInstance().getPdpConfig().getResourceFinder();
+				
+				Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
+				policyFinderModules.add(new PolicyStorePolicyFinderModule());
+				
+				PolicyFinder policyFinder = new PolicyFinder();
+				policyFinder.setModules(policyFinderModules);
+				
+				this.TRESOR_PDP = new PDP(new PDPConfig(attributeFinder, policyFinder, resourceFinder));
 			}	
 		}
 		
@@ -161,8 +166,8 @@ public class Configuration {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.TRESOR_AUTH == null) {
-				log.info("No Tresor Auth created, creating default");
-				this.TRESOR_AUTH = new HTTPBasicAuth();
+				log.info("Fallback to default TresorAuth");
+				this.TRESOR_AUTH = new DummyAuth();
 			}
 		}
 		
@@ -172,14 +177,41 @@ public class Configuration {
 			log.error("Error doing reflective operation", e);
 		} finally {
 			if (this.CONTEXT_HANDLER == null) {
-				log.info("No Contexthandler created, creating default");
+				log.info("Fallback to default contextHandler");
 				this.CONTEXT_HANDLER = ContextHandler.getInstance();
+				this.CONTEXT_HANDLER.putHandler("pdp", new PDPHandler());
+				this.CONTEXT_HANDLER.putHandler("policy", new PolicyStoreHandler());
 			}
 		}
 		
 		log.info("configuration finished");
 	}
 
+	/**
+	 * Tries to load configuration file, either given via system property or the default one
+	 * @param url default config file, given by the servlet
+	 * @return inputstream or null if failed
+	 */
+	private InputStream getConfigInputStream(URL url) {
+		InputStream stream = null;		
+		File configFile;
+		
+		// if there is a path to a config file, try loading it
+		String configPath = System.getProperty(TRESOR_PDP_CONFIG_PROPERTY);
+		if (configPath != null && (configFile = new File(configPath)).isFile()) {
+			try { stream = new FileInputStream(configFile);	} 
+			catch (FileNotFoundException e) { log.error("Config file not found"); }
+		}
+		
+		// if stream is still null, try loading default stream
+		if (stream == null && url != null) {
+			try { stream = url.openStream(); } 
+			catch (IOException e) { log.error("loading default config failed"); }
+		}
+		
+		return stream;
+	}
+	
 	/**
 	 * Parses PolicyStoreManager Configuration details and sets the manager for the PolicyStore
 	 * @param managerConfig, JSONObject containing classname and optional parameters for the policystoremanager
@@ -337,16 +369,18 @@ public class Configuration {
 		for (int k = 0; k < paramsJSON.length(); k++)
 			params[k] = paramsJSON.getString(k);				
 		
-		// necessary workaround, May 13 2014
-		Object[] wrappedParams = { params };
-		
 		// first two for compatibility with balana, third one for our own modules
 		if (c == FileBasedPolicyFinderModule.class)
 			instance = c.getConstructor(Set.class).newInstance(new HashSet<String>(Arrays.asList(params)));
 		else if (c == InMemoryPolicyFinderModule.class)
 			instance = c.getConstructor(List.class).newInstance(Arrays.asList(params));
-		else
-			instance = c.getConstructor(String[].class).newInstance(wrappedParams);					
+		else {
+			// necessary workaround, May 13 2014
+			Object[] wrappedParams = { params };
+			
+			instance = c.getConstructor(String[].class).newInstance(wrappedParams);
+		}
+								
 		
 		return cls.cast(instance);
 	}

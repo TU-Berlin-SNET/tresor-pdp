@@ -61,19 +61,15 @@ public class Helper {
 	 * @return InputStream of request wrapped in a reader with character encoding
 	 * @throws IOException
 	 */
-	public static Reader getRequestInputStreamReader(HttpServletRequest request) throws IOException {
-		Reader reader;
+	public static Reader getRequestInputStreamReader(HttpServletRequest request) throws IOException {		
+		// try to get the charset from request
 		String charset = request.getCharacterEncoding();
 		
-		if (charset != null) {
-			// if there is a charset given, use it
-			reader = new InputStreamReader(request.getInputStream(), charset);
-		} else {
-			// else fall back to UTF-8
-			reader = new InputStreamReader(request.getInputStream(), ServletConstants.CHARSET_UTF8);
-		}
+		// if none is given, default to UTF-8
+		if (charset == null)
+			charset = ServletConstants.CHARSET_UTF8;
 		
-		return reader;
+		return new InputStreamReader(request.getInputStream(), charset);
 	}
 	
 	/**
@@ -157,6 +153,12 @@ public class Helper {
     	}
     }
     
+    /**
+     * Sets optional additional headers for httpservlet response if available
+     * @param responseJSON JSON containing response information
+     * @param response the httpservlet response
+     * @param headers string array containing the names of possible optional headers
+     */
     private static void addHeaders(JSONObject responseJSON, HttpServletResponse response, String[] headers) {
     	for (int i = 0; i < headers.length; i++) {
 			if (responseJSON.has(headers[i]))
@@ -165,6 +167,11 @@ public class Helper {
     	
     }
     
+    /**
+     * Prints given string response to servlet response outputstream and closes stream afterwards
+     * @param str the string to print
+     * @param out the httpservlet response
+     */
     private static void printResponse(String str, HttpServletResponse out) {
     	PrintWriter writer = null;
     	try {

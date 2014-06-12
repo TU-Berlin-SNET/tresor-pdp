@@ -12,20 +12,31 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * PolicyStoreManager for file based policy store, NOT thread-safe
+ * PolicyStoreManager for file based policy store, NOT THREAD SAFE
  * @author malik
  */
 public class FileBasedPolicyStoreManager implements PolicyStoreManager {
 	private static Log log = LogFactory.getLog(FileBasedPolicyStoreManager.class);
 	private File baseDirectory;
 	
+	/**
+	 * Create new FileBasedPolicyStoreManager pointing to given directoryPath
+	 * (directory is created if it does not exists)
+	 * @param directoryPath path to the directory which is designated to hold the policies
+	 */
 	public FileBasedPolicyStoreManager(String directoryPath) {		
 		this.baseDirectory = new File(directoryPath);
 		
 		if (!this.baseDirectory.isDirectory())
-			this.baseDirectory.mkdir();
+			this.baseDirectory.mkdirs();
 	}
 	
+	/**
+	 * Create new FileBasedPolicyStoreManager pointing to given directoryPath
+	 * (directory is created if it does not exists)
+	 * Compatibility method, takes first value of array as directory Path
+	 * @param directoryPath array containing the directory path
+	 */
 	public FileBasedPolicyStoreManager(String... directoryPath) {
 		this(directoryPath[0]);
 	}
@@ -84,6 +95,13 @@ public class FileBasedPolicyStoreManager implements PolicyStoreManager {
 
 	public void close() { }
 	
+	/**
+	 * Loads all files in a given directory to given policyMap as String
+	 * (expects to only find policies in the directory)
+	 * 
+	 * @param dir file directory containing policies
+	 * @param policyMap Map to save loaded policies
+	 */
 	private void putPolicies(File dir, Map<String, String> policyMap) {
 		for (File f : dir.listFiles()) {			
 			if (f.isFile())
@@ -91,6 +109,11 @@ public class FileBasedPolicyStoreManager implements PolicyStoreManager {
 		}
 	}
 	
+	/**
+	 * Reads given file into string
+	 * @param f the file to read
+	 * @return file contents as string
+	 */
 	private String readFile(File f) {
 		String policy = null;
 				
@@ -104,6 +127,12 @@ public class FileBasedPolicyStoreManager implements PolicyStoreManager {
 		return policy;
 	}
 	
+	/**
+	 * Writes given string to file
+	 * @param f the file to write
+	 * @param s the string to write
+	 * @throws IOException
+	 */
 	private void writeFile(File f, String s) throws IOException {
 		PrintWriter writer = new PrintWriter(f);
 		writer.print(s);

@@ -23,12 +23,12 @@ public class DummyPolicyStoreManager implements PolicyStoreManager {
 
 	public String getPolicy(String domain, String service) {
 		logger.info("getPolicy called for domain/service combination: " + domain+"/"+service);
-		return "";
+		return null;
 	}
 
 	public String addPolicy(String domain, String service, String policy) {
 		logger.info("addPolicy called for domain/service combination: " + domain+"/"+service);
-		return "";
+		return null;
 	}
 
 	public int deletePolicy(String domain, String service) {
@@ -37,7 +37,7 @@ public class DummyPolicyStoreManager implements PolicyStoreManager {
 	}
 
 	public void close() {
-		logger.info("disconnect called");
+		logger.info("close called");
 	}
 
 }
