@@ -27,9 +27,18 @@ public class HTTPBasicAuth implements TresorAuth {
 	
 	public HTTPBasicAuth() {		
 		this.users = new Hashtable<String, String>();
+	}
+	
+	/**
+	 * Create new HTTPBasicAuth with given username:password -> domain params
+	 * @param params array containing user information in the 
+	 * following form ["username:password", "domain", ... ]
+	 */
+	public HTTPBasicAuth(String... params) {
+		this();
 		
-		// TODO remove on production, only for demonstration
-		this.users.put("admin:admin", "domain");
+		for (int i = 0; i < params.length - 1; i+=2)
+			this.users.put(params[i], params[i+1]);		
 	}
 	
 	public AuthUser authenticate(HttpServletRequest request, HttpServletResponse response) {		

@@ -1,0 +1,248 @@
+#TRESOR PDP/ContextHandler REST Guide
+
+##General Information
+
+* Accept Header not used at the moment, written down only to indicate what kind of return value can be expected
+
+* UTF-8 is assumed and used throughout if no charset is given (Exception: error messages)
+
+* Error messages use default error pages from server if no additional content is sent from contexthandler
+
+##Relevant URLs
+
+| URL                 | Resource             | Methods               | Authentication           |
+|:--------------------|:--------------------:|:---------------------:|:------------------------:|
+| /                   | Home document        | GET                   |                          |
+| /pdp                | PDP                  | POST                  |                          |
+| /policy             | PolicyStore          | GET PUT               | X                        |
+| /policy/serviceID   | PolicyStore          | GET PUT DELETE        | X                        |
+
+---
+
+| HttpMethod | URL | function |
+|:-----------|:---:|:--------:|
+| GET | / | discover home document |
+| POST | /pdp | get pdp decision |
+| GET | /policy | get all policies belonging to my domain |
+| PUT | /policy | create a new policy |
+| GET | /policy/serviceID | get specific policy |
+| PUT | /policy/serviceID | replace existing policy |
+| DELETE | /policy/serviceID | delete existing policy |
+
+##Home document example
+~~~xml
+<resources xmlns='http://ietf.org/ns/home-documents' xmlns:atom='http://www.w3.org/2005/Atom'>
+    <resource rel='http://docs.oasis-open.org/ns/xacml/relation/pdp'>
+        <atom:link href='/pdp' />
+    </resource>
+</resources>;
+~~~
+
+##Call examples
+
+####Home (URL: /)
+Request: __GET__
+~~~http
+GET / HTTP/1.1
+Accept: application/xml
+~~~
+Success:
+~~~http
+HTTP/1.0 200 OK
+Content-Type: application/xml
+Body: <home-document>
+~~~
+Failure:
+~~~http
+HTTP/1.1 500 INTERNAL SERVER ERROR
+~~~
+
+---
+####PDP (URL: /pdp)
+Request: __POST__
+~~~http
+POST /pdp HTTP/1.1
+Accept: application/xacml+xml
+Content-Type: application/xacml+xml
+Body: <xacml-request>
+~~~
+_OR_
+~~~http
+POST /pdp HTTP/1.1
+Accept: application/samlassertion+xml
+Content-Type: application/samlassertion+xml
+Body: <xacml-saml request>
+~~~
+
+Success:
+~~~http
+HTTP/1.0 200 OK
+Content-Type: application/xacml+xml
+Body: <xacml-response>
+~~~
+_OR_
+~~~http
+HTTP/1.0 200 OK
+Content-Type: application/samlassertion+xml
+Body: <xacml-saml response>
+~~~
+Failure: _Malformed XACML request_
+~~~http
+HTTP/1.1 400 BAD REQUEST
+~~~
+
+---
+####PolicyStore (URL: /policy)
+Request: __GET__
+~~~http
+GET /policy HTTP/1.1
+Accept: application/json
+Authorization: BASIC <base64 encoded "username:password">
+~~~
+Success:
+~~~http
+HTTP/1.0 200 OK
+Content-Type: application/json
+Body: { "<serviceID1>" : "<policy1>", "<serviceID2>" : "<policy2>", ... }
+~~~
+Failure: _Authentication failed_
+~~~http
+HTTP/1.1 401 UNAUTHORIZED
+WWW-Authenticate: BASIC realm="policystore"
+Content-Type: text/html
+~~~
+Failure: _Authentication succeeded but not authorized to act_
+~~~http
+HTTP/1.1 403 FORBIDDEN
+~~~
+
+---
+Request: __PUT__
+~~~http
+PUT /policy HTTP/1.1
+Authorization: BASIC <base64 encoded "username:password">
+Content-Type: application/json
+Body: { "service" : "<serviceID>", "policy" : "<xacml policy>" }
+~~~
+Success:
+~~~http
+HTTP/1.1 201 CREATED
+Location: /policy/<serviceID>
+~~~
+Failure: _Authentication failed_
+~~~http
+HTTP/1.1 401 UNAUTHORIZED
+WWW-Authenticate: BASIC realm="policystore"
+Content-Type: text/html
+~~~
+Failure: _Authentication succeeded but not authorized to act_
+~~~http
+HTTP/1.1 403 FORBIDDEN
+~~~
+Failure: _Policy already exists_
+~~~http
+HTTP/1.1 403 FORBIDDEN
+Content-Type: text/plain
+Content: Policy already exists
+~~~
+Failure: _Malformed request, json and/or xacml policy_
+~~~http
+HTTP/1.1 400 BAD REQUEST
+~~~
+Failure: _Unknown reason, likely an indication for a problem with the policy store or a bug_
+~~~http
+HTTP/1.1 500 INTERNAL SERVER ERROR
+~~~
+
+---
+####PolicyStore (URL: /policy/serviceID)
+Request: __GET__
+~~~http
+GET /policy/serviceID HTTP/1.1
+Accept: application/json
+Authorization: BASIC <base64 encoded "username:password">
+~~~
+Success:
+~~~http
+HTTP/1.0 200 OK
+Content-Type: application/json
+Body: { "<serviceID>" : <xacml policy> }
+~~~
+Failure: _Authentication failed_
+~~~http
+HTTP/1.1 401 UNAUTHORIZED
+WWW-Authenticate: BASIC realm="policystore"
+Content-Type: text/html
+~~~
+Failure: _Authentication succeeded but not authorized to act_
+~~~http
+HTTP/1.1 403 FORBIDDEN
+~~~
+Failure: _Policy not found_
+~~~http
+HTTP/1.1 404 NOT FOUND
+~~~
+
+---
+Request: __PUT__
+~~~http
+PUT /policy/serviceID HTTP/1.1
+Authorization: BASIC <base64 encoded "username:password">
+Content-Type: application/json
+Body: { "policy": <xacml policy> }
+~~~
+Success:
+~~~http
+HTTP/1.1 204 NO CONTENT
+~~~
+Failure: _Authentication failed_
+~~~http
+HTTP/1.1 401 UNAUTHORIZED
+WWW-Authenticate: BASIC realm="policystore"
+Content-Type: text/html
+~~~
+Failure: _Authentication succeeded but not authorized to act_
+~~~http
+HTTP/1.1 403 FORBIDDEN
+~~~
+Failure: _Policy not found_
+~~~http
+HTTP/1.1 404 NOT FOUND
+~~~
+Failure: _Malformed request, json and/or xacml policy_
+~~~http
+HTTP/1.1 400 BAD REQUEST
+~~~
+Failure: _Unknown reason, likely an indication for a problem with the policy store or a bug_
+~~~http
+HTTP/1.1 500 INTERNAL SERVER ERROR
+~~~
+
+---
+Request: __DELETE__
+~~~http
+DELETE /policy/serviceID HTTP/1.1
+Authorization: BASIC <base64 encoded "username:password">
+~~~
+Success:
+~~~http
+HTTP/1.1 204 NO CONTENT
+~~~
+Failure: _Authentication failed_
+~~~http
+HTTP/1.1 401 UNAUTHORIZED
+WWW-Authenticate: BASIC realm="policystore"
+Content-Type: text/html
+~~~
+Failure: _Authentication succeeded but not authorized to act_
+~~~http
+HTTP/1.1 403 FORBIDDEN
+~~~
+Failure: _Policy not found_
+~~~http
+HTTP/1.1 404 NOT FOUND
+~~~
+Failure: _Unknown reason, likely an indication for a problem with the policy store or a bug_
+~~~http
+HTTP/1.1 500 INTERNAL SERVER ERROR
+~~~

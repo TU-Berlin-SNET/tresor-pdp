@@ -8,14 +8,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
+import org.snet.tresor.pdp.Configuration;
 import org.snet.tresor.pdp.Helper;
-import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.policystore.PolicyStoreManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.AbstractPolicy;
+import org.wso2.balana.DOMHelper;
 import org.wso2.balana.MatchResult;
 import org.wso2.balana.Policy;
+import org.wso2.balana.PolicySet;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.PolicyFinder;
 import org.wso2.balana.finder.PolicyFinderModule;
@@ -39,7 +41,7 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 	public void init(PolicyFinder finder) {
 		this.finder = finder;
 		this.parser = new BasicParserPool();
-		this.policyStoreManager = TresorPDP.getInstance().getPolicyStoreManager();
+		this.policyStoreManager = Configuration.getInstance().getPolicyStoreManager();
 	}
 	
     @Override
@@ -48,7 +50,8 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
     }
 	
 	@Override
-	public PolicyFinderResult findPolicy(EvaluationCtx context) {		
+	public PolicyFinderResult findPolicy(EvaluationCtx context) {
+		// get necessary values
 		String domain = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
 													FinderConstants.ID_DOMAIN_URI, null, 
 													FinderConstants.CATEGORY_SUBJECT_URI, 
@@ -59,13 +62,15 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 													 FinderConstants.CATEGORY_RESOURCE_URI, 
 													 context);
 		
+		
+		// get & load policy
 		AbstractPolicy policy = null;
 		if (domain != null && service != null) {
 			String policyString = this.policyStoreManager.getPolicy(domain, service);
 			policy = loadPolicy(policyString, this.finder);
 		}
 		
-		
+		// if policy was successfully loaded, evaluate
 		if (policy != null) {
 			MatchResult match = policy.match(context);
 			
@@ -84,42 +89,43 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 	}
 	
     /**
-     * Private helper that tries to load the given file-based policy, and
-     * returns null if any error occurs.
+     * Private helper that tries to load the given policy
      *
      * @param policyString policy as string
      * @param finder policy finder
-     * @return  <code>AbstractPolicy</code>
+     * @return  <code>AbstractPolicy</code> or null if an error occurs
      */
     private AbstractPolicy loadPolicy(String policyString, PolicyFinder finder) {
 
         AbstractPolicy policy = null;
         Reader reader = null;
 
-        try {
-        	reader = new StringReader(policyString);
-            Document doc = this.parser.parse(reader);
+        if (policyString != null) {
+            try {
+            	reader = new StringReader(policyString);
+                Document doc = this.parser.parse(reader);
 
-            // handle the policy, if it's a known type
-            Element root = doc.getDocumentElement();
-//            String name = DOMHelper.getLocalName(root);   // in our case we only have policies and NO policysets
+                // handle the policy, if it's a known type
+                Element root = doc.getDocumentElement();
+                String name = DOMHelper.getLocalName(root);   
 
-//            if (name.equals("Policy")) {
-            policy = Policy.getInstance(root);
-//            } else if (name.equals("PolicySet")) {
-//                policy = PolicySet.getInstance(root, finder);
-//            }
-        } catch (Exception e) {
-            // just only logs
-            log.error("Fail to load policy : " + policyString , e);
-        } finally {
-            if(reader != null){
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    log.error("Error while closing input reader");
-                }                
-            }
+                if (name.equals("Policy")) {
+                	policy = Policy.getInstance(root);
+                } else if (name.equals("PolicySet")) {
+                    policy = PolicySet.getInstance(root, finder);
+                }
+            } catch (Exception e) {
+                // just only logs
+                log.error("Fail to load policy : " + policyString , e);
+            } finally {
+                if(reader != null){
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        log.error("Error while closing input reader");
+                    }                
+                }
+            }        	
         }
 
         return policy;

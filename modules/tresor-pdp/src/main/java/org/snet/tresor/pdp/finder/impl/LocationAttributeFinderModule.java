@@ -46,6 +46,8 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 			return new HashMap<String, String>();
 		}
 	};
+	
+	// TODO reimplement threadcache clearing
 
 	private Map<String, String> pipUrlMap;	
 	private MultiThreadedHttpConnectionManager connectionManager;
@@ -66,7 +68,7 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 	
 	/**
 	 * Create new LocationAttributeFinderModule with given pips
-	 * @param pipInfo, array containing information about pips in the following form [ "attributeId", "pipURL", "attributeId", "pipURL", ...]
+	 * @param pipInfo array containing information about pips in the following form [ "attributeId", "pipURL", "attributeId", "pipURL", ...]
 	 */
 	public LocationAttributeFinderModule(String... pipInfo) {
 		this();

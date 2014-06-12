@@ -60,7 +60,7 @@ public class ContextHandler {
 	
 	/**
 	 * Associates the given resource with the given handler, replaces previous associations if applicable
-	 * This method is NOT thread-safe and should only be used on startup to add handlers
+	 * This method is NOT THREAD-SAFE and should only be used on startup to add handlers
 	 * @param resource name of the resource
 	 * @param handler handler handling request on that resource
 	 */

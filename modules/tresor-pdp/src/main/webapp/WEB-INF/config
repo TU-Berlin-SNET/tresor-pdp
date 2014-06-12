@@ -3,12 +3,18 @@
 									{ "classname": "org.wso2.balana.finder.impl.SelectorModule" },
 									{ "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",
 								  	  "parameters": [ "current-wifi", "http://localhost:8080/wifiPIP",
-								  					  "current-geolocation", "http://localhost:8080/wifiPIP" ] }
+								  					  "current-geolocation", "http://localhost:8080/wifiPIP" ] 
+								  	}
 							  	  ],
 	"policyfindermodules"		: [ { "classname": "org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule" } ],
 	"resourcefindermodules"		: [ ],
 	"policystoremanager"		: { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStoreManager", "parameters": [ "webapps/root/WEB-INF/policies" ] },
 	"contexthandlermodules" 	: [ { "resource": "pdp", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PDPHandler" },
 									{ "resource": "policy", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler" } ],
-	"tresorauth"				: { "classname": "org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth" }
+	"tresorauth"				: { "classname": "org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth",
+									"parameters": [ "username:password", "exampledomain", 
+													"admin:admin", "domain",
+													"user:user", "userdomain",
+													"doctor:12345", "healthcare" ]
+								  }
 }

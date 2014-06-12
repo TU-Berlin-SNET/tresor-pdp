@@ -8,7 +8,7 @@ package org.snet.tresor.pdp.contexthandler.auth;
 public interface AuthUser {
 
 	/**
-	 * @return the name, e.g. username
+	 * @return the name e.g. username
 	 */
 	public String getName();
 	
