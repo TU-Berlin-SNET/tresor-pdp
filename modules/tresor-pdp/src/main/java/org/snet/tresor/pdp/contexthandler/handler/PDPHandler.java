@@ -14,6 +14,7 @@ import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.wso2.balana.PDP;
 import org.wso2.balana.ctx.AbstractRequestCtx;
 import org.wso2.balana.ctx.RequestCtxFactory;
@@ -85,13 +86,28 @@ public class PDPHandler implements Handler {
 	}
 
 	private String handleSAML(HttpServletRequest request) {
-		// TODO authentification, authorization, verification
-		// TODO unpack xacml
-		// TODO get decision via pdp
-		// TODO pack xacml into xacml-saml
-		// TODO convert to string and return
-		log.fatal("SAML handling not implemented");
-		return null;
+                String decision = null;
+                AbstractRequestCtx xacmlRequest = null;
+                SAMLHandler samlHandler = null;
+                
+                try {
+                        samlHandler = new SAMLHandler();
+			Reader body = Helper.getRequestInputStreamReader(request);
+			Document samlXACMLDoc = parser.parse(body);
+                        Element xacmlReq = samlHandler.handleRequest(samlXACMLDoc.getDocumentElement());
+                                
+			xacmlRequest = RequestCtxFactory.getFactory().getRequestCtx(xacmlReq);
+		} catch (Exception e) { log.error("Error creating request context from SAML request", e); }
+                
+                if (xacmlRequest != null) {
+                    try {
+                        decision = samlHandler.handleResponse(this.pdp.evaluate(xacmlRequest).encode());
+                    } catch (Exception ex) {
+                        log.error("Error getting a SAML response", ex);
+                    }
+		}
+                
+                return decision;
 	}
 
 }

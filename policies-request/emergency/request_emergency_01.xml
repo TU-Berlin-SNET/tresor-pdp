@@ -3,7 +3,10 @@
    <Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" >
      <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id">
       <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Doctor1</AttributeValue>
-	</Attribute>
+    </Attribute>
+    <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:subject:domain-id">
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Doctor1-domain</AttributeValue>
+    </Attribute>
   </Attributes>
   
   <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">

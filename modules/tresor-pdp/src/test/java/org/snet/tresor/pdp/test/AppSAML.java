@@ -1,6 +1,7 @@
 
 package org.snet.tresor.pdp.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,17 +15,21 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Scanner;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,11 +65,13 @@ import org.opensaml.xml.signature.impl.SignatureBuilder;
 import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.signature.Signer;
+import org.opensaml.xml.util.Base64;
 import org.opensaml.xml.validation.ValidationException;
 import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
 import org.snet.tresor.pdp.contexthandler.saml.xacml3.XACML3RequestType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Class for extract the XACML request from the SAML messages and for wrapping the XACML response from the PDP
@@ -77,8 +84,10 @@ public class AppSAML {
     
     private static BasicCredential signingCredential = null;
     private static BasicX509Credential publicCredential = null;
+    private static BasicX509Credential certificateCredential = null;
     private static BasicParserPool parserPool = null;
     private static String privateKey_publicKey = null;
+    private static Boolean certificateInfo = false;
     private static PrivateKey privKeyA = null;
     private static PublicKey publicKeyA= null;
     private static PrivateKey privKeyB = null;
@@ -139,18 +148,19 @@ public class AppSAML {
         
         /**
         * Method to get the signature information to use it in the verification process.
+        * Used to get the signature object to sign the XACML response.
         * @return signature
         */
         public static Signature getSignature() throws SecurityException {
             
-            SignatureBuilder signatureBuilder = new SignatureBuilder();
+            //SignatureBuilder signatureBuilder = new SignatureBuilder();
             
             signingCredential = new BasicCredential();
             Signature signature = (Signature) Configuration.getBuilderFactory()
                                         .getBuilder(Signature.DEFAULT_ELEMENT_NAME)
                                         .buildObject(Signature.DEFAULT_ELEMENT_NAME);
             
-            Signature signatureObject = signatureBuilder.buildObject(Signature.DEFAULT_ELEMENT_NAME);
+            //Signature signatureObject = signatureBuilder.buildObject(Signature.DEFAULT_ELEMENT_NAME);
             
             /**
             * Establish whether we use the Public Key to check the signature from the incoming SAML message or
@@ -194,6 +204,7 @@ public class AppSAML {
         
         /**
         * Method to set the signature information to use it in the verification process.
+        * Used to set the Public key to check the signature's request.
         * @return signature
         */
         public static void setSignature() throws SecurityException {
@@ -239,33 +250,33 @@ public class AppSAML {
         */
         public static Signature getSignatureCertificate() throws CertificateException, FileNotFoundException, IOException, org.opensaml.xml.security.SecurityException{
             
-            publicCredential = new BasicX509Credential();
-            File certificateFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/certificate/cacert.crt");
+            certificateCredential = new BasicX509Credential();
+            File certificateFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/cacertA.crt");
             
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             InputStream fileStream = new FileInputStream(certificateFile);
             X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileStream);
             fileStream.close();
             
-            publicCredential.setEntityCertificate(certificate);
+            certificateCredential.setEntityCertificate(certificate);
             
             Signature signature = (Signature) Configuration.getBuilderFactory()
                                         .getBuilder(Signature.DEFAULT_ELEMENT_NAME)
                                         .buildObject(Signature.DEFAULT_ELEMENT_NAME);
             
-            publicCredential.setPrivateKey(privKeyA);
-            publicCredential.setUsageType(UsageType.SIGNING);
+            certificateCredential.setPrivateKey(privKeyA);
+            certificateCredential.setUsageType(UsageType.SIGNING);
             
-            signature.setSigningCredential(publicCredential);
+            signature.setSigningCredential(certificateCredential);
             signature.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1);
             signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
             
             SecurityConfiguration secConfiguration = Configuration.getGlobalSecurityConfiguration();
             NamedKeyInfoGeneratorManager namedKeyInfoGeneratorManager = secConfiguration.getKeyInfoGeneratorManager(); 
             KeyInfoGeneratorManager keyInfoGeneratorManager = namedKeyInfoGeneratorManager.getDefaultManager(); 
-            KeyInfoGeneratorFactory keyInfoGeneratorFactory = keyInfoGeneratorManager.getFactory(publicCredential); 
+            KeyInfoGeneratorFactory keyInfoGeneratorFactory = keyInfoGeneratorManager.getFactory(certificateCredential); 
             KeyInfoGenerator keyInfoGenerator = keyInfoGeneratorFactory.newInstance(); 
-            KeyInfo keyInfo = keyInfoGenerator.generate(publicCredential);
+            KeyInfo keyInfo = keyInfoGenerator.generate(certificateCredential);
             
             signature.setKeyInfo(keyInfo);
             return signature;
@@ -289,21 +300,84 @@ public class AppSAML {
         }
         
         /**
+        * Method to check the signature integrity of the SAML message received.
+        * @param SAMLxacmlRequest, SAML request
+        * @throws org.opensaml.xml.validation.ValidationException, if the signature on the SAML message is not valid
+        */
+        public static void checkSignature(XACMLAuthzDecisionQueryTypeImpl SAMLxacmlRequest, Element element) throws ValidationException, CertificateException, NoSuchAlgorithmException, InvalidKeySpecException, SecurityException {
+            
+            SignatureValidator signatureValidator = null;
+            
+            NodeList certificateNodeList = element.getElementsByTagName("ds:X509Certificate");
+            if (certificateNodeList.getLength() == 0) {
+                certificateInfo = false;
+                logger.info("There is no Certificate Info in the Request!!!");
+                privateKey_publicKey = "PublicA";
+                setSignature();
+                signatureValidator = new SignatureValidator(signingCredential);
+            } else {
+                certificateInfo = true;
+                String certificatePart = certificateNodeList.item(0).getFirstChild().getNodeValue();
+                InputStream is = new ByteArrayInputStream(Base64.decode(certificatePart));
+
+                CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+                X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(is);
+                
+                certificateCredential = new BasicX509Credential();
+            
+                X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(certificate.getPublicKey().getEncoded());
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                publicKeyA = keyFactory.generatePublic(publicKeySpec);
+
+                certificateCredential.setPublicKey(publicKeyA);
+                
+                signatureValidator = new SignatureValidator(certificateCredential);
+            }
+            
+            //check the signature follows SAML standard
+            SAMLSignatureProfileValidator profileValidator = new SAMLSignatureProfileValidator();
+            profileValidator.validate(SAMLxacmlRequest.getSignature());
+            
+            //check that the signature is correct
+            signatureValidator.validate(SAMLxacmlRequest.getSignature());
+            
+            logger.info("Signature verification from SAML Request Success!!!");
+        }
+        
+        /**
         * Method to load the certificate, extract the Public Key from it to use it to check 
         * the signature integrity of the SAML message received.
         * @param SAMLxacmlRequest, SAML request
         * @throws org.opensaml.xml.validation.ValidationException, if the signature on the SAML message is not valid
         */
-        public static void checkSignatureCertificate(XACMLAuthzDecisionQueryTypeImpl SAMLxacmlRequest) throws ValidationException, CertificateException, FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        public static void checkSignatureCertificate(XACMLAuthzDecisionQueryTypeImpl SAMLxacmlRequest, Element element) throws ValidationException, CertificateException, FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, Exception {
             
+            
+            NodeList certificateNodeList = element.getElementsByTagName("ds:X509Certificate");
+            if (certificateNodeList.getLength() == 0) {
+                throw new Exception("Cannot find X509Certificate element");
+            }
+            String certPart = certificateNodeList.item(0).getFirstChild().getNodeValue();
+            System.out.println("The cert Part is: "+certPart);
+            //InputStream is = new ByteArrayInputStream(certPart.getBytes());
+            InputStream is = new ByteArrayInputStream(Base64.decode(certPart));
+            
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            //Certificate certificate = cf.generateCertificate(is);
+            X509Certificate certificate = (X509Certificate) cf.generateCertificate(is);
+            
+            
+            
+            
+                    
             //Getting the Public Key from the Certificate
             publicCredential = new BasicX509Credential();
-            File publicKeyFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/certificate/cacert.crt");
+            /*File publicKeyFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/certificate/cacert.crt");
             
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             InputStream fileStream = new FileInputStream(publicKeyFile);
             X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileStream);
-            fileStream.close();
+            fileStream.close();*/
 
             X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(certificate.getPublicKey().getEncoded());
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -326,7 +400,7 @@ public class AppSAML {
          * @return The String SAML-XACML response signed
          * @throws Exception
          */
-        public String makeSAMLxacmlResponse(String xacmlResponseString) throws Exception{
+        public static String makeSAMLxacmlResponse(String xacmlResponseString) throws Exception{
 						
 		Element xacmlResponseXML = parserPool.parse(new StringReader(xacmlResponseString)).getDocumentElement();
                 QName qName= new QName(xacmlResponseXML.getNamespaceURI(), xacmlResponseXML.getLocalName(), XACMLConstants.XACMLCONTEXT_PREFIX);
@@ -337,12 +411,21 @@ public class AppSAML {
 		
 		Assertion assertion = (Assertion) Configuration.getBuilderFactory().getBuilder(Assertion.DEFAULT_ELEMENT_NAME)
 				.buildObject(Assertion.DEFAULT_ELEMENT_NAME);
-		
-                //privateKey_publicKey = "Private";
-                //Signature signature = getSignature();
+                
+                Signature signature = null; 
+                if (certificateInfo) {
+                    signature = getSignatureCertificate();
+                } else {
+                    privateKey_publicKey = "PrivateB";
+                    signature = getSignature();
+                }
+                assertion.setSignature(signature);
+                
+                /*privateKey_publicKey = "Private";
+                Signature signature = getSignature();
                 
                 Signature signature = getSignatureCertificate();
-                assertion.setSignature(signature);
+                assertion.setSignature(signature);*/
                 
 		Issuer issuer = (Issuer) Configuration.getBuilderFactory().getBuilder(Issuer.DEFAULT_ELEMENT_NAME)
 		.buildObject(Issuer.DEFAULT_ELEMENT_NAME);
@@ -389,10 +472,11 @@ public class AppSAML {
                 
                 /*privateKey_publicKey = "Public";
                 Signature signature = getSignature();*/
-                checkSignature(xacmlQuery);
-                /*
-                checkSignatureCertificate(xacmlQuery);
-                */
+                /*checkSignature(xacmlQuery);
+                checkSignatureCertificate(xacmlQuery, SAMLxacmlRequestXML);*/
+                
+                checkSignature(xacmlQuery, SAMLxacmlRequestXML);
+                
 		XACML3RequestType req = (XACML3RequestType) xacmlQuery.getRequest();
                 // add verification to support both "RequestTypeImpl for 2.0" and "XACML3RequestType for 3.0"
                 //RequestTypeImpl req = (RequestTypeImpl) xacmlQuery.getRequest();
@@ -417,17 +501,22 @@ public class AppSAML {
             String SAMLxacmlRequest = OpenSAMLutility.
                     XACMLRequest2XACMLAuthzDecisionQuery("/opt/Netbeans/TRESOR/OpenSAML/request_0001_01.xml", appSAML.getSignature());
             
-            System.out.println("La Request signed es:: "+SAMLxacmlRequest);
+            System.out.println("La Request signed es: "+SAMLxacmlRequest);
             
             Document doc = parserPool.parse(new StringReader((SAMLxacmlRequest)));
             Element elem = doc.getDocumentElement();
             
-            privateKey_publicKey = "PublicA";
-            setSignature();
             String xacmlRequest = 
                     XACMLAuthzDecisionQuery2XACMLRequest(elem);
             
-            System.out.println("La Original Request is:: "+xacmlRequest);
+            System.out.println("La Original Request is: "+xacmlRequest);
+            
+            String response = new Scanner(new File("/opt/Netbeans/TRESOR/balana/modules/balana-core/src/test/resources/basic/3/responses/response_0001_01.xml")).useDelimiter("\\A").next();
+            
+            response  = makeSAMLxacmlResponse(response);
+            
+            System.out.println("La Response is: "+response);
+            
         }
 
 }

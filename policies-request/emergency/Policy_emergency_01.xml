@@ -1,5 +1,5 @@
 <Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
-        xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="TestPolicyEmergency"
+        xmlns:xacml="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="Emergency Policy 01"
         RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable"
         Version="1.0">
     <Description>Test policy for Emergency</Description>
@@ -17,19 +17,19 @@
         </AnyOf>
     </Target>
     <Rule RuleId="rule1" Effect="Permit">
-        <Description>The Doctor should be included in the request</Description>
+        <Description>The Doctor should be included in the request, so check that there is a string present.</Description>
         
         <Condition>
-            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-greater-than-or-equal">
-                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-one-and-only">
-					<AttributeDesignator
-							Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
-							AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
-							DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-				</Apply>
-				<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Doctor</AttributeValue>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match"/>
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">^.{1,25}$</AttributeValue>
+                <AttributeDesignator
+                        Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                        AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+                        DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
             </Apply>
         </Condition>
+        
     </Rule>
     
     <Rule RuleId="DenyAll" Effect="Deny" />

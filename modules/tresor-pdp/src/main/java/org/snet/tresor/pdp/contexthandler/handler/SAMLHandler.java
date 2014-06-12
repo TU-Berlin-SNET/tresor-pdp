@@ -29,9 +29,9 @@ public class SAMLHandler {
 	 * @return request, in String format to be evaluated for the PDP
          * @throws org.opensaml.xml.ConfigurationException if any error happen
 	 */
-        public String handleRequest(Element element) throws ConfigurationException, Exception {
+        public Element handleRequest(Element element) throws ConfigurationException, Exception {
             
-            String request = samlUtility.XACMLAuthzDecisionQuery2XACMLRequest(element);
+            Element request = samlUtility.XACMLAuthzDecisionQuery2XACMLRequest(element);
             return request;
         }
         

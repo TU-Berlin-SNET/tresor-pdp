@@ -1,12 +1,12 @@
 <Request xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" ReturnPolicyIdList="false" CombinedDecision="false">
    <Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" >
      <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id">
-      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admsdsin</AttributeValue>
 	</Attribute>
   </Attributes>
   <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
     <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
-      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">http://xacml.snet.tu-berlin.de:3000/services/1?locale=de</AttributeValue>
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">http://xacml.snet.tu-berlin.de:3000/services/</AttributeValue>
     </Attribute>
   </Attributes>
   <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
@@ -15,7 +15,3 @@
     </Attribute>
   </Attributes>
 </Request>
-
-
-
-
