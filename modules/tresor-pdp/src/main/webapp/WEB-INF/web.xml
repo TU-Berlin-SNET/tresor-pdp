@@ -26,11 +26,17 @@
 	<servlet-mapping>
 		<servlet-name>PDPServlet</servlet-name>		
 		<url-pattern>/pdp</url-pattern>
+	</servlet-mapping>
+        <servlet-mapping>
+		<servlet-name>PDPServlet</servlet-name>
 		<url-pattern>/pdp/</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>PolicyHandlerServlet</servlet-name>
 		<url-pattern>/policy</url-pattern>
+	</servlet-mapping>
+        <servlet-mapping>
+		<servlet-name>PolicyHandlerServlet</servlet-name>
 		<url-pattern>/policy/*</url-pattern>
 	</servlet-mapping>
 	<security-constraint>
