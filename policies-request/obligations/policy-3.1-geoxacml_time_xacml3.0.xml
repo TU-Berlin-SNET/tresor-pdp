@@ -27,7 +27,7 @@
                         <!-- takes the recent time as timestamp, where 1 number represents 1 second //--> 
                         <AttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer"
 												Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
-												AttributeId="now"
+												AttributeId="org:snet:tresor:attribute:current-timestamp"
 												MustBePresent="true"/>
                     </Apply>
                     <!-- checks that there is only one integer in bag //-->
@@ -35,7 +35,7 @@
                         <!-- takes the timestamp from the last update, where 1 number represents 1 second //--> 
                         <AttributeDesignator DataType="http://www.w3.org/2001/XMLSchema#integer"
 												Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
-												AttributeId="lastupdate"
+												AttributeId="org:snet:tresor:attribute:timestamp-geo"
 												MustBePresent="true" />
                     </Apply>
                 </Apply>
@@ -49,7 +49,7 @@
                         <AttributeDesignator 
 							Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
 							DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry" 
-							AttributeId="position"
+							AttributeId="org:snet:tresor:attribute:current-geolocation"
 							MustBePresent="false"/>
                     </Apply>
                     
@@ -78,7 +78,7 @@
     <Rule Effect="Deny" RuleId="DenyAll"/>
     
     <ObligationExpressions>
-        <ObligationExpression ObligationId="permitPolicyObligation" FulfillOn="Permit">
+        <ObligationExpression ObligationId="org:snet:tresor:obligation:on-permit" FulfillOn="Permit">
             <AttributeAssignmentExpression
                     AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">permitObligation</AttributeValue>
@@ -89,7 +89,7 @@
                     <AttributeDesignator
 						MustBePresent="false"
 						Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
-						AttributeId="position"
+						AttributeId="org:snet:tresor:attribute:current-geolocation"
 						DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry"/>
             </AttributeAssignmentExpression>
             
@@ -98,13 +98,13 @@
                     <AttributeDesignator
 						MustBePresent="false"
 						Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment"
-						AttributeId="wifi"
+						AttributeId="org:snet:tresor:attribute:current-wifi"
 						DataType="http://www.w3.org/2001/XMLSchema#string"/>
             </AttributeAssignmentExpression>
             
         </ObligationExpression>
         
-        <ObligationExpression ObligationId="denyPolicyObligation" FulfillOn="Deny">
+        <ObligationExpression ObligationId="org:snet:tresor:obligation:on-deny" FulfillOn="Deny">
             <AttributeAssignmentExpression
                     AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">denyObligation</AttributeValue>

@@ -38,7 +38,7 @@ public class TimeAttributeFinderModule extends CurrentEnvModule {
     /**
      * Standard environment variable that represents the current timestamp
      */
-    public static final String ENVIRONMENT_CURRENT_TIMESTAMP = "org:snet:tresor:time:current-timestamp";
+    public static final String ENVIRONMENT_CURRENT_TIMESTAMP = "org:snet:tresor:attribute:current-timestamp";
     
     /**
      * Private method to get the time from the NTP specified server through the url parameter.

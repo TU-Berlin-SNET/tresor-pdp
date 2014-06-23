@@ -18,7 +18,7 @@
   
   <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
 	
-	<Attribute IncludeInResult="false" AttributeId="wifi">
+	<Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:current-wifi">
 		<!-- defines the recent wifi ssid // -->
 		<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">eduroam</AttributeValue>
 	</Attribute>
@@ -30,17 +30,17 @@
 	
 	
 	
-	<Attribute IncludeInResult="false" AttributeId="now" >
+	<Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:current-timestamp" >
 		<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">2000</AttributeValue>
 	</Attribute>
-	<Attribute IncludeInResult="false" AttributeId="lastupdate" >
+	<Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:timestamp-geo" >
 		<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">1000</AttributeValue>
 	</Attribute>
 	
 	
   
         <!-- defines the recent position // -->
-        <Attribute IncludeInResult="false" AttributeId="position">
+        <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:current-geolocation">
             <AttributeValue DataType="urn:ogc:def:dataType:geoxacml:1.0:geometry">
                 <gml:Point srsName="EPSG:4326">
                     <!-- position Campus Charottenburg //-->

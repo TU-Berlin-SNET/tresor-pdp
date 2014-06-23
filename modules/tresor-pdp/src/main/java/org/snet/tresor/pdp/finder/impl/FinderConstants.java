@@ -49,12 +49,11 @@ public class FinderConstants {
 			CATEGORY_RESOURCE_URI = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
 			DATATYPE_STRING_URI = new URI("http://www.w3.org/2001/XMLSchema#string");
 			ID_SUBJECT_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
-			ID_DEVICE_URI = new URI("device-id");
-			ID_DOMAIN_URI = new URI("domain-id");
-			ID_SERVICE_URI = new URI("service-id");
+			ID_DEVICE_URI = new URI("org:snet:tresor:attribute:device-id");
+			ID_DOMAIN_URI = new URI("org:snet:tresor:attribute:domain-id");
+			ID_SERVICE_URI = new URI("org:snet:tresor:attribute:service-id");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
 }

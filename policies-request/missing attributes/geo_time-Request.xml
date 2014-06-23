@@ -5,9 +5,12 @@
          xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
     
 	<Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
-		<Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
-		  <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">https://path/to/resource/maybe/with/complete/resource</AttributeValue>
-		</Attribute>
+            <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">https://path/to/resource/maybe/with/complete/resource</AttributeValue>
+            </Attribute>
+            <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:service-id">
+                <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">geolocation</AttributeValue>
+            </Attribute>
 	</Attributes>
 	
 	<Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
@@ -20,9 +23,12 @@
 	  <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" IncludeInResult="false" Issuer="bob">
 		 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Sebastian</AttributeValue>
 	  </Attribute>
-	  <Attribute AttributeId="device-id" IncludeInResult="false" Issuer="bob">
+	  <Attribute AttributeId="org:snet:tresor:attribute:device-id" IncludeInResult="false" Issuer="bob">
 		 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">deviceID</AttributeValue>
 	  </Attribute>
+          <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:domain-id">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">userdomain</AttributeValue>
+          </Attribute>
 	</Attributes>
     
     
@@ -39,14 +45,14 @@
         now - lastupdate = 100 
         100 <= 300 
         so this  access request is permitted by time // -->
-        
-        <Attribute IncludeInResult="false" AttributeId="now">
+        <!--
+        <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:current-timestamp">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">1397119400</AttributeValue>
         </Attribute>
-        <Attribute IncludeInResult="false" AttributeId="lastupdate">
+        <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:timestamp-geo">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">1397118400</AttributeValue>
         </Attribute>
-        <!-- defines the recent position // -->
+         defines the recent position // -->
         
         
 	</Attributes>

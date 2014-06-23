@@ -56,7 +56,7 @@
    <Rule Effect="Deny" RuleId="Deny-Rule" />
    
    <ObligationExpressions>
-        <ObligationExpression ObligationId="permitPolicyObligation" FulfillOn="Permit">
+        <ObligationExpression ObligationId="org:snet:tresor:obligation:on-permit" FulfillOn="Permit">
             <AttributeAssignmentExpression
                     AttributeId="urn:oasis:names:tc:xacml:2.0:example:attribute:text">
                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">permitObligation</AttributeValue>
