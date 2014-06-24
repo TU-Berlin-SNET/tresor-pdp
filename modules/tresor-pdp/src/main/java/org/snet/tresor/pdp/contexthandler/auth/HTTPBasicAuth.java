@@ -72,12 +72,12 @@ public class HTTPBasicAuth implements TresorAuth {
 		return authUser;
 	}
 	
-	public JSONObject getErrorResponseJSON() {		
+	public JSONObject getErrorResponseJSON() {	
 		return new JSONObject()
 					.put(Handler.KEYJSON_ERROR, true)
+					.put(Handler.KEYJSON_STATUSCODE, HttpServletResponse.SC_UNAUTHORIZED)
 					.put("WWW-Authenticate", "BASIC realm=\"policystore\"")
-					.put(Handler.KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_TEXTHTML)
-					.put(Handler.KEYJSON_STATUSCODE, HttpServletResponse.SC_UNAUTHORIZED);
+					.put(Handler.KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_TEXTHTML);
 	}
 
 }

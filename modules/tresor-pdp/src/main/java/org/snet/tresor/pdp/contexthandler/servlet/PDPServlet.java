@@ -22,11 +22,12 @@ public class PDPServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		JSONObject responseJSON = this.contextHandler.handle(request, response);
 		Helper.respondHTTP(responseJSON, response);
+		Helper.clearCaches();
 	}
 	
 	@Override
-	public void init() {		
-		this.contextHandler = Configuration.getInstance().getContextHandler();		
+	public void init() {
+		this.contextHandler = Configuration.getInstance().getContextHandler();
 	}
 	
 }

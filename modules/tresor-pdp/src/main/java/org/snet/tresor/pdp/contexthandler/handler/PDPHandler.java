@@ -24,47 +24,38 @@ import org.wso2.balana.ctx.RequestCtxFactory;
  * @author malik
  */
 public class PDPHandler implements Handler {
-	private static Log log = LogFactory.getLog(PDPHandler.class);	
+	private static Log log = LogFactory.getLog(PDPHandler.class);
 	private ParserPool parser;
 	private PDP pdp;
 	
 	public PDPHandler() {
 		this.pdp = Configuration.getInstance().getPDP();
-		this.parser = new BasicParserPool();		
+		this.parser = new BasicParserPool();
 	}
 	
-	public JSONObject handle(HttpServletRequest request,
-			HttpServletResponse response, String httpMethod) {
+	public JSONObject handle(HttpServletRequest request, HttpServletResponse response) {		
+		String contenttype = request.getContentType();		
+		
+		// check whether the content type is supported
+		if (!this.isSupported(contenttype)) {
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+							ServletConstants.CONTENTTYPE_TEXTPLAIN,
+							"Accepted Content-types: application/xacml+xml, application/samlassertion+xml");
+		}
+		
+		String decision = null;
+		if (contenttype.startsWith(ServletConstants.CONTENTTYPE_XACMLSAML))
+			decision = this.handleSAML(request);
+		
+		if (contenttype.startsWith(ServletConstants.CONTENTTYPE_XACMLXML))
+			decision = this.handleXACML(request);
+		
 		JSONObject responseJSON = null;
 		
-		if (httpMethod == ServletConstants.HTTP_POST) {
-			String contenttype = request.getContentType().toLowerCase();
-			String decision = null;
-			
-			if (contenttype.startsWith(ServletConstants.CONTENTTYPE_XACMLSAML))
-				decision = this.handleSAML(request);
-							
-			if (contenttype.startsWith(ServletConstants.CONTENTTYPE_XACMLXML))
-				decision = this.handleXACML(request);
-		
-			// if we reached a proper decision, return it
-			if (decision != null) {
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, false)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_OK)
-								.put(KEYJSON_CONTENTTYPE, contenttype)
-								.put(KEYJSON_CONTENT, decision);
-			} else {
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-			}
-			
-		} else {
-			responseJSON = new JSONObject()
-							.put(KEYJSON_ERROR, true)
-							.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-		}
+		if (decision != null)
+			responseJSON = Helper.createResponseJSON(false, HttpServletResponse.SC_OK, contenttype, decision);
+		else
+			responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_BAD_REQUEST);
 		
 		return responseJSON;
 	}
@@ -75,14 +66,14 @@ public class PDPHandler implements Handler {
 	 * @return the decision as a string or null
 	 */
 	private String handleXACML(HttpServletRequest request) {
-		String decision = null;		
+		String decision = null;
 		AbstractRequestCtx xacmlRequest = null;
 
 		try {
-			Reader body = Helper.getRequestInputStreamReader(request);			
+			Reader body = Helper.getRequestInputStreamReader(request);
 			Document xacmlDoc = parser.parse(body);
 			
-			xacmlRequest = RequestCtxFactory.getFactory().getRequestCtx(xacmlDoc.getDocumentElement());			
+			xacmlRequest = RequestCtxFactory.getFactory().getRequestCtx(xacmlDoc.getDocumentElement());
 		} catch (Exception e) { log.info("Error creating request context"); }
 		
 		if (xacmlRequest != null) {
@@ -115,6 +106,13 @@ public class PDPHandler implements Handler {
 		}
                 
                 return decision;
+	}
+	
+	private boolean isSupported(String contenttype) {		
+		return contenttype != null && (
+				contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_XACMLSAML) ||
+				contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_XACMLXML)
+			);		
 	}
 
 }

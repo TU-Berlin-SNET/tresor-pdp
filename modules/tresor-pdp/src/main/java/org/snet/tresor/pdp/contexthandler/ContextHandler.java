@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
+import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
 
 /**
@@ -44,14 +45,11 @@ public class ContextHandler {
 			String resource = params[1].toLowerCase();
 			Handler handler = this.handlers.get(resource);
 			
-			if (handler != null) {				
-				String reqMethod = request.getMethod();				
-				responseJSON = handler.handle(request, response, reqMethod);				
+			if (handler != null) {
+				responseJSON = handler.handle(request, response);
 			} else {
 				log.info("No handler found for resource: " + resource);
-				responseJSON = new JSONObject()
-								.put("error", true)
-								.put("code", 404);						
+				responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_NOT_FOUND);
 			}
 		}
 

@@ -15,10 +15,9 @@ public interface Handler {
 	 * Handle given request and return response as json for servlet to return
 	 * @param request the httpservlet request
 	 * @param response the httpservlet response
-	 * @param httpMethod the http method used
 	 * @return JSONObject containing information for responding to client or null if not processable (http 500)
 	 */
-	public JSONObject handle(HttpServletRequest request, HttpServletResponse response, String httpMethod);
+	public JSONObject handle(HttpServletRequest request, HttpServletResponse response);
 	
 	/**
 	 * array containing possible keys for additional possible header information in jsonobject
