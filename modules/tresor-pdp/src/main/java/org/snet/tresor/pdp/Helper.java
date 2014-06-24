@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
+import org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule;
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.BagAttribute;
 import org.wso2.balana.ctx.EvaluationCtx;
@@ -90,6 +91,46 @@ public class Helper {
     }
     
     /**
+     * Create response json
+     * @param error whether an error happened
+     * @param httpcode the http code
+     * @return json object containing response details
+     */
+    public static JSONObject createResponseJSON(boolean error, int httpcode) {
+		return new JSONObject().put(Handler.KEYJSON_ERROR, error)
+				.put(Handler.KEYJSON_STATUSCODE, httpcode);
+    }
+    
+    /**
+     * Create response json
+     * @param error whether an error happened
+     * @param httpcode the http code
+     * @param contenttype the contenttype
+     * @param content the actual content
+     * @return json object containing response details
+     */
+    public static JSONObject createResponseJSON(boolean error, int httpcode, String contenttype, String content) {
+		return new JSONObject().put(Handler.KEYJSON_ERROR, error)
+				.put(Handler.KEYJSON_STATUSCODE, httpcode)
+				.put(Handler.KEYJSON_CONTENTTYPE, contenttype)
+				.put(Handler.KEYJSON_CONTENT, content);
+    }
+    
+    
+    /**
+     * Sets optional additional headers for httpservlet response if available
+     * @param responseJSON JSON containing response information
+     * @param response the httpservlet response
+     * @param headers string array containing the names of possible optional headers
+     */
+    private static void addHeaders(JSONObject responseJSON, HttpServletResponse response, String[] headers) {
+    	for (int i = 0; i < headers.length; i++) {
+			if (responseJSON.has(headers[i]))
+				response.setHeader(headers[i], responseJSON.getString(headers[i]));
+		}
+    }
+    
+    /**
      * Responds with information given in the JSON, expects a specific structure
      * @param responseJSON jsonobject containing response information
      * @param response the httpservlet response
@@ -111,8 +152,7 @@ public class Helper {
         
     	} else {    		
     		respondHTTP(true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response);
-    	}
-    	    	
+    	}    	    	
     }
     
     /**
@@ -154,20 +194,6 @@ public class Helper {
     }
     
     /**
-     * Sets optional additional headers for httpservlet response if available
-     * @param responseJSON JSON containing response information
-     * @param response the httpservlet response
-     * @param headers string array containing the names of possible optional headers
-     */
-    private static void addHeaders(JSONObject responseJSON, HttpServletResponse response, String[] headers) {
-    	for (int i = 0; i < headers.length; i++) {
-			if (responseJSON.has(headers[i]))
-				response.setHeader(headers[i], responseJSON.getString(headers[i]));
-		}
-    	
-    }
-    
-    /**
      * Prints given string response to servlet response outputstream and closes stream afterwards
      * @param str the string to print
      * @param out the httpservlet response
@@ -183,6 +209,13 @@ public class Helper {
     		try { writer.close(); }
     		catch (Exception e) { }
     	}
+    }
+    
+    /**
+     * Clear potentially cached data
+     */
+    public static void clearCaches() {
+    	LocationAttributeFinderModule.clearThreadCache();
     }
     
 }

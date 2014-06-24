@@ -1,7 +1,6 @@
 package org.snet.tresor.pdp.contexthandler.handler;
 
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,245 +35,187 @@ public class PolicyStoreHandler implements Handler {
 		this.parser = new BasicParserPool();
 	}
 	
-	public JSONObject handle(HttpServletRequest request,
-			HttpServletResponse response, String httpMethod) {
+	public JSONObject handle(HttpServletRequest request, HttpServletResponse response) {
 		AuthUser authUser = this.authenticator.authenticate(request, response);
+
+		// check for authentication failure
+		if (authUser == null)
+			return this.authenticator.getErrorResponseJSON();
+
+		String httpMethod = request.getMethod();
+		boolean authorized = authUser.isAuthorizedTo(httpMethod, request.getRequestURI());
+		
+		// check for insufficient authorization
+		if (!authorized)
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_FORBIDDEN);
+
 		JSONObject responseJSON = null;
 		
-		// if user is authenticated..
-		if (authUser != null) {
-			// ..and authorized
-			if (authUser.isAuthorizedTo(httpMethod, request.getRequestURI())) {				
+		// if user is authorized..
+		if (authorized) {
+			String userdomain = authUser.getDomain();
+			// handle the request
+			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_GET))
+				responseJSON = this.handleGet(request, userdomain);
 
-				if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_GET))
-					responseJSON = this.handleGet(request, response, authUser);
+			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_PUT))
+				responseJSON = this.handlePut(request, userdomain);
 
-				if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_PUT))
-					responseJSON = this.handlePut(request, response, authUser);
-
-				if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_DELETE))
-					responseJSON = this.handleDelete(request, response,	authUser);
-				
-			} else {
-				// user is authenticated but not authorized
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_FORBIDDEN);
-			}
-			
-		} else {
-			// user is not authenticated
-			responseJSON = this.authenticator.getErrorResponseJSON();
+			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_DELETE))
+				responseJSON = this.handleDelete(request, userdomain);
 		}
 		
 		return responseJSON;
 	}
 	
-	private JSONObject handleGet(HttpServletRequest request,
-			HttpServletResponse response, AuthUser authUser) {
-		JSONObject responseJSON = null;		
-		
-		String domain = authUser.getDomain();
-		String[] params = request.getRequestURI().split("/");
-		
-		Map<String, String> policyMap = this.getPolicies(domain, params);
-		
-		if (policyMap != null) {
-			
-			// if asked for specific policy and policyMap returned empty
-			if (params.length == 3 && policyMap.isEmpty()) {
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NOT_FOUND);
-			} else {
-				// asked for all policies so return what we got, does not matter whether empty or not
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, false)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_OK)
-								.put(KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_JSON)
-								.put(KEYJSON_CONTENT, new JSONObject(policyMap).toString());
-			}
-			
-		} else {
-			responseJSON = new JSONObject()
-							.put(KEYJSON_ERROR, true)
-							.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-		}
-		
-		return responseJSON;
-		
-	}
-
-	private JSONObject handlePut(HttpServletRequest request,
-			HttpServletResponse response, AuthUser authUser) {		
-		JSONObject responseJSON = null;
-		JSONObject requestJSON = Helper.getJSONFromBody(request);
-		
-		String domain = authUser.getDomain();
-		String[] params = request.getRequestURI().split("/");
-		
-		if (requestJSON != null && requestJSON.has(KEYJSON_POLICY)) {
-			String policy = requestJSON.getString(KEYJSON_POLICY);
-		
-			// check whether XML is valid, i.e. whether we can parse it
-			boolean validXML = false;
-			try {
-				this.parser.parse(new StringReader(policy));
-				validXML = true;
-			} catch (Exception e) {				
-				log.info("Error parsing policy", e);
-				validXML = false;
-				responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, true)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-			}
-		
-			// if XML is valid and request is to create new policy (indicated by only two params)
-			if (validXML && params.length == 2) {
-				if (requestJSON.has(KEYJSON_SERVICE)) {
-					// get the service the policy belongs to
-					String service = requestJSON.getString(KEYJSON_SERVICE);
-					boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
-					
-					// if no policy exists for that service add it
-					if (!policyExists) {
-						String result = this.policystoremanager.addPolicy(domain, service, policy);
-						if (result != null) {
-							responseJSON = new JSONObject()
-											.put(KEYJSON_ERROR, false)
-											.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_CREATED)
-											.put("Location", "/" + params[1] + "/" + result);
-						} else {
-							responseJSON = new JSONObject()
-											.put(KEYJSON_ERROR, true)
-											.put(KEYJSON_STATUSCODE, 500);
-						}
-					} else {
-						// if a policy for that service already exists, throw error
-						responseJSON = new JSONObject()
-										.put(KEYJSON_ERROR, true)
-										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_FORBIDDEN)
-										.put(KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_TEXTPLAIN)
-										.put(KEYJSON_CONTENT, "Policy already exists");
-					}
-					
-				} else {
-					responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, true)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-				}
-			}
-			
-			// if XML is valid and request is to update existing policy (indicated by three params, last one for serviceID)
-			// see REST Api
-			if (validXML && params.length == 3) {
-				String service = params[2];
-				boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
-				
-				// if the policy exists, replace with new one
-				if (policyExists) {
-					String result = this.policystoremanager.addPolicy(domain, service, policy);
-					if (result != null) {
-						responseJSON = new JSONObject()
-										.put(KEYJSON_ERROR, false)
-										.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NO_CONTENT);						
-					} else {
-						responseJSON = new JSONObject()
-										.put(KEYJSON_ERROR, true)
-										.put(KEYJSON_STATUSCODE, 500);
-					}
-				} else {
-					// if the policy does not exist throw error
-					responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, true)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NOT_FOUND);
-				}
-				
-			}
-			
-			// if xml is valid but parameter count is off, throw error
-			if (validXML && (params.length < 2 || params.length > 3)) {
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-			}
-			
-		} else {
-			responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
-		}
-		
-		return responseJSON;
-	}
-
-	private JSONObject handleDelete(HttpServletRequest request,
-			HttpServletResponse response, AuthUser authUser) {
+	private JSONObject handleGet(HttpServletRequest request, String domain) {
 		JSONObject responseJSON = null;
 		String[] params = request.getRequestURI().split("/");
 		
-		// delete only possible if param count is 3, indicating direct access to policy, e.g. /policy/serviceID
+		// bad request
+		if (params.length != 2 && params.length != 3)
+			responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_BAD_REQUEST);
+		
+		// call only one level deep -> get all policies belonging to domain
+		if (params.length == 2) {
+			Map<String, String> policies = this.policystoremanager.getAll(domain);
+			responseJSON = Helper.createResponseJSON(false,	HttpServletResponse.SC_OK,
+					ServletConstants.CONTENTTYPE_JSON, new JSONObject(policies).toString());
+		}
+			
+		// call two levels deep -> get specific policy
 		if (params.length == 3) {
-			String domain = authUser.getDomain();
 			String service = params[2];
+			String policy = this.policystoremanager.getPolicy(domain, service);
 			
-			boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
+			if (policy == null)
+				responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_NOT_FOUND);
+			else {
+				JSONObject policyJSON = new JSONObject().put(service, policy);
+				responseJSON = Helper.createResponseJSON(false, HttpServletResponse.SC_OK,
+						ServletConstants.CONTENTTYPE_JSON, policyJSON.toString());
+			}			
+		}
+		
+		return responseJSON;
+		
+	}
+	
+	private JSONObject handlePut(HttpServletRequest request, String domain) {
+		
+		if (!this.isSupported(request.getContentType()))
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+					ServletConstants.CONTENTTYPE_TEXTPLAIN, "Accepted Content-Types: application/json");
+		
+		JSONObject reqBody = Helper.getJSONFromBody(request);		
+		String[] params = request.getRequestURI().split("/");
+		
+		if ((params.length != 2 && params.length != 3) || !this.isValidPutBody(reqBody))
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_BAD_REQUEST);
+		
+		JSONObject responseJSON = null;
+		
+		if (params.length == 2)
+			responseJSON = this.putNew(domain, params, reqBody);
+		
+		if (params.length == 3)
+			responseJSON = this.putReplace(domain, params[2], reqBody);
 			
-			// if the policy exists, delete it
-			if (policyExists) {
-				int result = this.policystoremanager.deletePolicy(domain, service);
-				
-				if (result == 0) {
-					responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, true)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				}
-				
-				if (result == 1) {
-					responseJSON = new JSONObject()
-									.put(KEYJSON_ERROR, false)
-									.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NO_CONTENT);
-				}
-				
-			} else {
-				// if policy does not exist
-				responseJSON = new JSONObject()
-								.put(KEYJSON_ERROR, true)
-								.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_NOT_FOUND);
-			}				
+		return responseJSON;
+	}
+	
+	private JSONObject putNew(String domain, String[] params, JSONObject reqBody) {		
+		String service = reqBody.optString(KEYJSON_SERVICE);
+		
+		// check for service variable
+		if (service == null || service.isEmpty())
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_BAD_REQUEST);
+		
+		// check if policy already exists
+		boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
+		if (policyExists)
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_FORBIDDEN, 
+					ServletConstants.CONTENTTYPE_TEXTPLAIN, "Policy already exists");
+		
+		// try adding to policystore
+		JSONObject responseJSON = null;
+		if (!policyExists) {
+			String policy = reqBody.getString(KEYJSON_POLICY);
+			String result = this.policystoremanager.addPolicy(domain, service, policy);
 			
-		} else {
-			// if parameter count is not three
-			responseJSON = new JSONObject()
-							.put(KEYJSON_ERROR, true)
-							.put(KEYJSON_STATUSCODE, HttpServletResponse.SC_BAD_REQUEST);
+			if (result == null)
+				responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			else
+				responseJSON = Helper.createResponseJSON(false, HttpServletResponse.SC_CREATED)
+					.put("Location", "/" + params[1] + "/" + result);
+		}
+		return responseJSON;
+	}
+		
+	private JSONObject putReplace(String domain, String service, JSONObject reqBody) {
+		// check if policy already exists
+		boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;		
+		if (!policyExists)
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_NOT_FOUND);
+		
+		// try adding to policystore
+		JSONObject responseJSON = null;
+		if (policyExists) {
+			String policy = reqBody.getString(KEYJSON_POLICY);
+			String result = this.policystoremanager.addPolicy(domain, service, policy);
+			
+			if (result == null)
+				responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			else
+				responseJSON = Helper.createResponseJSON(false, HttpServletResponse.SC_NO_CONTENT);
+		}
+		return responseJSON;
+	}
+
+	private JSONObject handleDelete(HttpServletRequest request, String domain) {		
+		String[] params = request.getRequestURI().split("/");
+		
+		if (params.length != 3)
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_BAD_REQUEST);
+		
+		String service = params[2];
+		boolean policyExists = this.policystoremanager.getPolicy(domain, service) != null;
+		
+		if (!policyExists)
+			return Helper.createResponseJSON(true, HttpServletResponse.SC_NOT_FOUND);
+		
+		JSONObject responseJSON = null;
+		
+		if (policyExists) {
+			int result = this.policystoremanager.deletePolicy(domain, service);
+			if (result == 1)
+				responseJSON = Helper.createResponseJSON(false, HttpServletResponse.SC_NO_CONTENT);
+			else
+				responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		
 		return responseJSON;			
 	}
-	
-	/**
-	 * Gets either one or all policies which belong to given domain or domain/service pair
-	 * Which one depends on params length, params[2] taken as service
-	 * @param domain the domain the user belongs to
-	 * @param params params given through request uri
-	 * @return map containing policies as key:service value:policy pairs or null if params.length is not as expected
-	 */
-	private Map<String, String> getPolicies(String domain, String[] params) {
-		Map<String, String> map = null;
-		
-		if (params.length == 2)
-			map = this.policystoremanager.getAll(domain);
-		
-		if (params.length == 3) {
-			map = new HashMap<String, String>();
-			String policy = this.policystoremanager.getPolicy(domain, params[2]);
-			
-			if (policy != null)
-				map.put(params[2], policy);
-		}
-					
-		return map;
-	}
 
+	private boolean isValidPutBody(JSONObject requestBody) {
+		boolean result = false;
+
+		if (requestBody != null) {
+			// try parsing it
+			try {
+				String policy = requestBody.getString(KEYJSON_POLICY);
+				this.parser.parse(new StringReader(policy));
+				result = true;
+			} catch (Exception e) {
+				log.info("Error parsing policy");
+			}
+		}
+
+		return result;
+	}
+	
+	private boolean isSupported(String contenttype) {		
+		return contenttype != null && contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_JSON);
+	}
+	
 }

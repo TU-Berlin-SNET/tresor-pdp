@@ -1,8 +1,5 @@
 package org.snet.tresor.pdp.contexthandler.servlet;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,10 +24,7 @@ public class HomeServlet extends HttpServlet {
 	
 	@Override
 	public void init() {
-		URL url = null;
-		try { url = this.getServletContext().getResource("/WEB-INF/config"); } 
-		catch (MalformedURLException e) { }
-		finally { Configuration.getInstance().initConfiguration(url); }
+		Configuration.getInstance().initConfiguration();
 	}
 	
 }

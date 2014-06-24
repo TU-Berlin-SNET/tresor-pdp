@@ -38,7 +38,29 @@
 </resources>;
 ~~~
 
-##Call examples
+##Quick Overview
+Resource: Home    
+URL: /   
+GET ___returns___ HTTP 200 or 500   
+
+Resource: PDP   
+URL: /pdp   
+POST ___accepts___ application/xacml+xml or application/samlassertion+xml,   
+     ___returns___ HTTP 200, 400 or 415   
+
+Resource: Policy   
+URL: /policy   
+GET ___returns___ HTTP 200, 401 or 403   
+PUT ___accepts___ application/json,     
+    ___returns___ HTTP 201, 401, 403, 400, 415 or 500   
+   
+URL: /policy/serviceID   
+GET ___returns___ HTTP 200, 401, 403 or 404   
+PUT ___accepts___ application/json,   
+    ___returns___ HTTP 204, 401, 403, 404, 400, 415 or 500   
+DELETE ___returns___ HTTP 204, 401, 403, 404 or 500   
+
+##Detailed Overview
 
 ####Home (URL: /)
 Request: __GET__
@@ -89,6 +111,11 @@ Body: <xacml-saml response>
 Failure: _Malformed XACML request_
 ~~~http
 HTTP/1.1 400 BAD REQUEST
+~~~
+Failure: _Unsupported Media Type_
+~~~http
+HTTP/1.1 415 UNSUPPORTED MEDIA TYPE
+Body: { "Accepted Content-Types: application/xacml+xml, application/samlassertion+xml"}
 ~~~
 
 ---
@@ -148,6 +175,11 @@ Content: Policy already exists
 Failure: _Malformed request, json and/or xacml policy_
 ~~~http
 HTTP/1.1 400 BAD REQUEST
+~~~
+Failure: _Unsupported Media Type_
+~~~http
+HTTP/1.1 415 UNSUPPORTED MEDIA TYPE
+Body: { "Accepted Content-Types: application/json" }
 ~~~
 Failure: _Unknown reason, likely an indication for a problem with the policy store or a bug_
 ~~~http
@@ -212,6 +244,11 @@ HTTP/1.1 404 NOT FOUND
 Failure: _Malformed request, json and/or xacml policy_
 ~~~http
 HTTP/1.1 400 BAD REQUEST
+~~~
+Failure: _Unsupported Media Type_
+~~~http
+HTTP/1.1 415 UNSUPPORTED MEDIA TYPE
+Body: { "Accepted Content-Types: application/json" }
 ~~~
 Failure: _Unknown reason, likely an indication for a problem with the policy store or a bug_
 ~~~http
