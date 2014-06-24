@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xacml-samlp:XACMLAuthzDecisionQuery xmlns:xacml-samlp="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol" Destination="localhost" ID="1234" IssueInstant="2014-06-24T09:04:20.431Z" Version="2.0">
+   <saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">Zequeira</saml2:Issuer>
+   <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+         <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+         <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+         <ds:Reference URI="#1234">
+            <ds:Transforms>
+               <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+               <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+            </ds:Transforms>
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+            <ds:DigestValue>5RqbWoYl9fPcvU3sTmY4p14EK5U=</ds:DigestValue>
+         </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue>nygYiF41ZADK742xJl15eJYk1fM5b/gfsJXtXYCyYS3YTscfu9QIxNcMzSPlJ5+ihHAG+ao2qp5Rs+Lt6UmVQUGjnp90nTOuoTjZX+xkd9ySh1H0Xyy6h6WLHlyA4kLaDKzs7AkM0FNnWlW7vPGPHcHr4BLTf9AhGXWRpxjuDhaI4AZrVncRtUl8dQjuTfh1YKBUGSHo/QzU1JbUVBbpOuwg1b9q8U3Yge5K6uTVfeGoVMhZs+wXj0y0weqMCBaK0vHsWfKPPiN1OlA1iQwn0leYv52t/+utqtoAa0TUlxwXpWfyRws1dex5sDxEeaH1eH9DDopv8x/VN5jQd6YhXA==</ds:SignatureValue>
+      <ds:KeyInfo>
+         <ds:X509Data>
+            <ds:X509Certificate>MIID4zCCAsugAwIBAgIJALzvpyFCUvffMA0GCSqGSIb3DQEBBQUAMIGHMQswCQYDVQQGEwJERTEP
+MA0GA1UECAwGQmVybGluMQ8wDQYDVQQHDAZCZXJsaW4xDzANBgNVBAoMBlQtTGFiczENMAsGA1UE
+CwwEU05FVDEPMA0GA1UEAwwGVFJFU09SMSUwIwYJKoZIhvcNAQkBFhZ6ZXF1ZWlyYUBjb3JyZW8u
+dWdyLmVzMB4XDTE0MDYwNDE1MjU0NloXDTE3MDYwMzE1MjU0NlowgYcxCzAJBgNVBAYTAkRFMQ8w
+DQYDVQQIDAZCZXJsaW4xDzANBgNVBAcMBkJlcmxpbjEPMA0GA1UECgwGVC1MYWJzMQ0wCwYDVQQL
+DARTTkVUMQ8wDQYDVQQDDAZUUkVTT1IxJTAjBgkqhkiG9w0BCQEWFnplcXVlaXJhQGNvcnJlby51
+Z3IuZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC02Y8dhIc5oGcxcY34BwDz85El
+Onaa2YMoC1bX4IyThTUxleCOspZY6jlKHzs6T3pr2Kjwfjwd0u4T1W9Qhe1SB2Lk22eLzrwScPkh
+NrOkoNGTlVgEC7XDf52c1tZKcha8vuHdX43AXurrFfJoG9+jgYHacTlsIh5NGUSSgvLLbnB+xJUx
+iCOh5he20wXRbbXz5+vZQMBki9f1M92cSJ3fkGsFhbUpegIgYVKM7mnmgalZPNXp0ZQCaQnGf8xK
+J4sEb2REkNykMszSxfPgo0wU8izhMrw7AfnLgNxN3kbQEaZcVv6CMrV0JXfy+gopC868jmIihAmK
+0o3EWKoNfByLAgMBAAGjUDBOMB0GA1UdDgQWBBTnyWKnVWvwfr0sUY4VOZ75V/TCSTAfBgNVHSME
+GDAWgBTnyWKnVWvwfr0sUY4VOZ75V/TCSTAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IB
+AQAgvnBcbm9IlROFB7Sn9AiiDuZFL2vlZQQMeFf+3AWEYG4S0o0dOXEG2mgHOneKHleEhjpAOuTE
+giAjbu6DQLDR4kS1sfz+F5bTCB4chBEDsKPdg1UEvFEX0cttWjLuHDG3S3ZSMcJ8OoYAlffvn5uT
+C2tkCJE4IbdIDaTIzQLJgfTZuPDWL/ex2tWmKcR34DVVZJkahc9mZjAzi845Y46PYQu7iZVyIzzq
+j0xo6eRU34LNpVmm76h6sG130wnNQ0tNBCmcj+CgG0V/GV15Ql/oR5VitDM+xT8CNYDfKnkYNTkR
+9SKuYCPhV7g2+k/Uta7kYeG2yak8IJ8VueeEcgPY</ds:X509Certificate>
+         </ds:X509Data>
+      </ds:KeyInfo>
+   </ds:Signature>
+   <Request xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" CombinedDecision="false" ReturnPolicyIdList="false">
+      <Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+         <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bob</AttributeValue>
+         </Attribute>
+         <Attribute AttributeId="org:snet:tresor:attribute:domain-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">userdomain</AttributeValue>
+         </Attribute>
+      </Attributes>
+      <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+         <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">foo/foo1</AttributeValue>
+         </Attribute>
+         <Attribute AttributeId="org:snet:tresor:attribute:service-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">saml-xacml-example0001</AttributeValue>
+         </Attribute>
+      </Attributes>
+      <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+         <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bar1</AttributeValue>
+         </Attribute>
+      </Attributes>
+   </Request>
+</xacml-samlp:XACMLAuthzDecisionQuery>

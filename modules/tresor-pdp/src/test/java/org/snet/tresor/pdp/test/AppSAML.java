@@ -499,11 +499,11 @@ public class AppSAML {
             privateKey_publicKey = "PrivateA";
             
             String SAMLxacmlRequest = OpenSAMLutility.
-                    XACMLRequest2XACMLAuthzDecisionQuery("/opt/Netbeans/TRESOR/OpenSAML/request_0001_01.xml", appSAML.getSignature());
+                    XACMLRequest2XACMLAuthzDecisionQuery("/opt/Netbeans/TRESOR/balana/policies-request/saml-xacml/request_0001_01.xml", appSAML.getSignature());
             
             System.out.println("La Request signed es: "+SAMLxacmlRequest);
             
-            Document doc = parserPool.parse(new StringReader((SAMLxacmlRequest)));
+            /*Document doc = parserPool.parse(new StringReader((SAMLxacmlRequest)));
             Element elem = doc.getDocumentElement();
             
             String xacmlRequest = 
@@ -515,7 +515,7 @@ public class AppSAML {
             
             response  = makeSAMLxacmlResponse(response);
             
-            System.out.println("La Response is: "+response);
+            System.out.println("La Response is: "+response);*/
             
         }
 

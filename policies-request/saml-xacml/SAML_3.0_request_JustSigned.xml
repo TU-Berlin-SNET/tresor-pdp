@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xacml-samlp:XACMLAuthzDecisionQuery xmlns:xacml-samlp="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol" Destination="localhost" ID="1234" IssueInstant="2014-06-24T09:04:50.627Z" Version="2.0">
+   <saml2:Issuer xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">Zequeira</saml2:Issuer>
+   <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+         <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+         <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+         <ds:Reference URI="#1234">
+            <ds:Transforms>
+               <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+               <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+            </ds:Transforms>
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+            <ds:DigestValue>bj4G/2epd382dKwOyW3H1tmfk8o=</ds:DigestValue>
+         </ds:Reference>
+      </ds:SignedInfo>
+      <ds:SignatureValue>gpjSDORvSHCEjGgvDLtZ52QRfA+bDAuZ1S1dsjWJ8W3nQ4hjWo0D3icTUGwUZ2zDgLXc9hE84b5UR8bW7PYccIR9ubUcAzCeKcQek1Tn1kCC6QAUx7+q/nqyffRDAl6GhjrcYOdLPepRqlGn+8ieJ9B+5Gpa+iOLUZN3TXnXFHIzdAGGWO2sqVBoGmHMoFDaXK56KCw6QHO/+C9zzg4Zlrua7SAoVbmDAwGSemZG8cNrCCvsYQF8UWXCCxLheQyKmVVpzR/FFs1zOeJ00bxyTUfAZW1s8cPEaLBv2JstvBT1+SCa855xHe5lbg5/e9jaCEGz5WUKEc3XjLmy5S5ySQ==</ds:SignatureValue>
+   </ds:Signature>
+   <Request xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" CombinedDecision="false" ReturnPolicyIdList="false">
+      <Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+         <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bob</AttributeValue>
+         </Attribute>
+         <Attribute AttributeId="org:snet:tresor:attribute:domain-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">userdomain</AttributeValue>
+         </Attribute>
+      </Attributes>
+      <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+         <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">foo/foo1</AttributeValue>
+         </Attribute>
+         <Attribute AttributeId="org:snet:tresor:attribute:service-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">saml-xacml-example0001</AttributeValue>
+         </Attribute>
+      </Attributes>
+      <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+         <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id" IncludeInResult="false">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">bar1</AttributeValue>
+         </Attribute>
+      </Attributes>
+   </Request>
+</xacml-samlp:XACMLAuthzDecisionQuery>
