@@ -17,6 +17,10 @@ import org.snet.tresor.pdp.contexthandler.auth.AuthUser;
 import org.snet.tresor.pdp.contexthandler.auth.TresorAuth;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.snet.tresor.pdp.policystore.PolicyStoreManager;
+import org.w3c.dom.Element;
+import org.wso2.balana.AbstractPolicy;
+import org.wso2.balana.DOMHelper;
+import org.wso2.balana.Policy;
 
 /**
  * Handler for interfacing with the policyStoreManager
@@ -207,9 +211,16 @@ public class PolicyStoreHandler implements Handler {
 		if (requestBody != null) {
 			// try parsing it
 			try {
-				String policy = requestBody.getString(KEYJSON_POLICY);
-				this.parser.parse(new StringReader(policy));
-				result = true;
+				String policyString = requestBody.getString(KEYJSON_POLICY);
+				Element root = this.parser.parse(new StringReader(policyString)).getDocumentElement();
+								
+				String name = DOMHelper.getLocalName(root);
+				AbstractPolicy policy = null;
+				
+                if (name.equals("Policy"))
+                	policy = Policy.getInstance(root);                
+				
+				result = policy != null;
 			} catch (Exception e) {
 				log.info("Error parsing policy");
 			}
