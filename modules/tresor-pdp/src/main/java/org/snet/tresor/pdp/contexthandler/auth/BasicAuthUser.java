@@ -1,5 +1,7 @@
 package org.snet.tresor.pdp.contexthandler.auth;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Representation of a user containing required information for further processing after auth procedure 
  * @author malik
@@ -22,7 +24,7 @@ public class BasicAuthUser implements AuthUser{
 		return this.domain;
 	}
 
-	public boolean isAuthorizedTo(String action, String resource) {
+	public boolean isAuthorizedTo(HttpServletRequest request) {
 		// every user is allowed to act however it wants to on resources in its own domain
 		return true;
 	}

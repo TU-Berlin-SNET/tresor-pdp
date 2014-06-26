@@ -1,14 +1,13 @@
 {
-	"attributefindermodules"	: [ { "classname": "org.wso2.balana.finder.impl.CurrentEnvModule" },
-                                            { "classname": "org.wso2.balana.finder.impl.SelectorModule" },
-                                            { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" },
-                                            { "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",
-                                                    "parameters": [ "org:snet:tresor:attribute:current-wifi",               "http://localhost:3000/wifiPIP",
-                                                                    "org:snet:tresor:attribute:current-geolocation",        "http://localhost:3000/wifiPIP",
-                                                                    "org:snet:tresor:attribute:timestamp-geo",              "http://localhost:3000/wifiPIP",
-                                                                    "org:snet:tresor:attribute:current-bluetooth-location", "http://localhost:3000/wifiPIP",
-                                                                    "org:snet:tresor:attribute:current-nfc-location",       "http://localhost:3000/wifiPIP"] 
-                                            }
+	"attributefindermodules"	: [ { "classname": "org.wso2.balana.finder.impl.SelectorModule" },
+                                    { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" },
+                                    { "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",
+                                                   "parameters": [ "org:snet:tresor:attribute:current-wifi",               "http://localhost:3000/wifiPIP",
+                                                                   "org:snet:tresor:attribute:current-geolocation",        "http://localhost:3000/wifiPIP",
+                                                                   "org:snet:tresor:attribute:timestamp-geo",              "http://localhost:3000/wifiPIP",
+                                                                   "org:snet:tresor:attribute:current-bluetooth-location", "http://localhost:3000/wifiPIP",
+                                                                   "org:snet:tresor:attribute:current-nfc-location",       "http://localhost:3000/wifiPIP"] 
+                                    }
                                           ],
 	"policyfindermodules"		: [ { "classname": "org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule" } ],
 	"resourcefindermodules"		: [ ],
@@ -16,9 +15,10 @@
 	"contexthandlermodules" 	: [ { "resource": "pdp", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PDPHandler" },
                                             { "resource": "policy", "classname" : "org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler" } ],
 	"tresorauth"				: { "classname": "org.snet.tresor.pdp.contexthandler.auth.HTTPBasicAuth",
-                                                    "parameters": [ "username:password", "exampledomain", 
-                                                                    "admin:admin", "domain",
-                                                                    "user:user", "userdomain",
-                                                                    "doctor:12345", "healthcare" ]
+                                    "parameters": [ "username:password", "exampledomain",
+                                    				"broker:broker", "broker", 
+                                                    "admin:admin", "domain",
+                                                    "user:user", "userdomain",
+                                                    "doctor:12345", "healthcare" ]
                                                   }
 }

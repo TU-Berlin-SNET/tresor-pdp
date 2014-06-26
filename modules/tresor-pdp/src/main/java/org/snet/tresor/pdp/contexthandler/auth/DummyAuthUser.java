@@ -1,5 +1,7 @@
 package org.snet.tresor.pdp.contexthandler.auth;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Dummy Auth User implementation
  * @author malik
@@ -14,7 +16,7 @@ public class DummyAuthUser implements AuthUser {
 		return "DummyDomain";
 	}
 
-	public boolean isAuthorizedTo(String action, String resource) {
+	public boolean isAuthorizedTo(HttpServletRequest request) {
 		return true;
 	}
 

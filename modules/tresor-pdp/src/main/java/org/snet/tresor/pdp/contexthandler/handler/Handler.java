@@ -50,6 +50,11 @@ public interface Handler {
 	public static final String KEYJSON_SERVICE = "service";
 	
 	/**
+	 * key for the domain value
+	 */
+	public static final String KEYJSON_DOMAIN = "domain";
+	
+	/**
 	 * key for the policy value
 	 */
 	public static final String KEYJSON_POLICY = "policy";

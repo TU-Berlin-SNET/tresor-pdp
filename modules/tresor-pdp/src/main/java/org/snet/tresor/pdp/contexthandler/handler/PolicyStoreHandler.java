@@ -43,7 +43,7 @@ public class PolicyStoreHandler implements Handler {
 			return this.authenticator.getErrorResponseJSON();
 
 		String httpMethod = request.getMethod();
-		boolean authorized = authUser.isAuthorizedTo(httpMethod, request.getRequestURI());
+		boolean authorized = authUser.isAuthorizedTo(request);
 		
 		// check for insufficient authorization
 		if (!authorized)
@@ -59,7 +59,7 @@ public class PolicyStoreHandler implements Handler {
 				responseJSON = this.handleGet(request, userdomain);
 
 			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_PUT))
-				responseJSON = this.handlePut(request, userdomain);
+				responseJSON = this.handlePut(request, userdomain, authUser);
 
 			if (httpMethod.equalsIgnoreCase(ServletConstants.HTTP_DELETE))
 				responseJSON = this.handleDelete(request, userdomain);
@@ -101,7 +101,7 @@ public class PolicyStoreHandler implements Handler {
 		
 	}
 	
-	private JSONObject handlePut(HttpServletRequest request, String domain) {
+	private JSONObject handlePut(HttpServletRequest request, String userdomain, AuthUser authUser) {
 		
 		if (!this.isSupported(request.getContentType()))
 			return Helper.createResponseJSON(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
@@ -113,13 +113,17 @@ public class PolicyStoreHandler implements Handler {
 		if ((params.length != 2 && params.length != 3) || !this.isValidPutBody(reqBody))
 			return Helper.createResponseJSON(true, HttpServletResponse.SC_BAD_REQUEST);
 		
+		// TODO this is a hacky solution, make it better
+		if (reqBody.has("domain") && authUser.getName().equals("broker"))
+			userdomain = reqBody.getString("domain");
+		
 		JSONObject responseJSON = null;
 		
 		if (params.length == 2)
-			responseJSON = this.putNew(domain, params, reqBody);
+			responseJSON = this.putNew(userdomain, params, reqBody);
 		
 		if (params.length == 3)
-			responseJSON = this.putReplace(domain, params[2], reqBody);
+			responseJSON = this.putReplace(userdomain, params[2], reqBody);
 			
 		return responseJSON;
 	}
