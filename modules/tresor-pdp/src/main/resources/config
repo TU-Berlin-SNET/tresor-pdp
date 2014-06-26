@@ -3,9 +3,11 @@
                                             { "classname": "org.wso2.balana.finder.impl.SelectorModule" },
                                             { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" },
                                             { "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",
-                                                    "parameters": [ "org:snet:tresor:attribute:current-wifi",   "http://localhost:3000/wifiPIP",
-                                                                    "org:snet:tresor:attribute:current-geolocation", "http://localhost:3000/wifiPIP",
-                                                                    "org:snet:tresor:attribute:timestamp-geo", "http://localhost:3000/wifiPIP" ] 
+                                                    "parameters": [ "org:snet:tresor:attribute:current-wifi",               "http://localhost:3000/wifiPIP",
+                                                                    "org:snet:tresor:attribute:current-geolocation",        "http://localhost:3000/wifiPIP",
+                                                                    "org:snet:tresor:attribute:timestamp-geo",              "http://localhost:3000/wifiPIP",
+                                                                    "org:snet:tresor:attribute:current-bluetooth-location", "http://localhost:3000/wifiPIP",
+                                                                    "org:snet:tresor:attribute:current-nfc-location",       "http://localhost:3000/wifiPIP"] 
                                             }
                                           ],
 	"policyfindermodules"		: [ { "classname": "org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule" } ],

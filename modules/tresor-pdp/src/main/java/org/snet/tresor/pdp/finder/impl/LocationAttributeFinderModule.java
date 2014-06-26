@@ -159,9 +159,9 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 				try {
 					// create json data and set in query
 					JSONObject jsonData = new JSONObject();
-					jsonData.put("subject-id", subjectID);
-					jsonData.put("device-id", deviceID);
-					jsonData.put("attribute-id", attributeId.toString());
+					jsonData.put("subjectId", subjectID);
+					jsonData.put("deviceId", deviceID);
+					jsonData.put("attributeId", attributeId.toString());
 					jsonData.putOpt("issuer", issuer);
 					query.setRequestEntity(new StringRequestEntity(jsonData.toString(), "application/json", "UTF-8"));
 
