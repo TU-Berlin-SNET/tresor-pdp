@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.PropertyConfigurator;
 import org.geotools.xacml.geoxacml.config.GeoXACML;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -94,6 +95,8 @@ public class Configuration {
 	 */
 	public void initConfiguration() {
 		
+		this.configLog();
+		
 		GeoXACML.initialize();
 		log.info("GeoXACML: success");
 		
@@ -154,6 +157,13 @@ public class Configuration {
 		}		
 		
 		log.info("configuration finished");
+	}
+	
+	private void configLog() {		
+		InputStream stream = this.loader.getResourceAsStream("log4j-config");
+		
+		if (stream != null)
+			PropertyConfigurator.configure(stream);		
 	}
 
 	private JSONObject getConfig() {
