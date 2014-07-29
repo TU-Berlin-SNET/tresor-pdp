@@ -51,7 +51,7 @@ public class RedisDBPolicyStoreManager implements PolicyStoreManager {
 
 	public String addPolicy(String domain, String service, String policy) {
 		Jedis redis = this.redisPool.getResource();
-		long result = redis.hsetnx(domain, service, policy);
+		long result = redis.hset(domain, service, policy);
 		this.redisPool.returnResource(redis);
 		
 		if (result == 0)
