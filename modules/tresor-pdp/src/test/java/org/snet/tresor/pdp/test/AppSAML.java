@@ -96,6 +96,9 @@ public class AppSAML {
     // the logger for tracking the events
     private static Log logger = LogFactory.getLog(AppSAML.class);
     
+    // root path for balana directory
+    private static String path = null;
+    
         /**
         * Constructor where we initiate the parser, and load the Private and Public Key to be used 
         * in the signatures process.
@@ -105,7 +108,12 @@ public class AppSAML {
             parserPool = new BasicParserPool();
             parserPool.setNamespaceAware(true);
             
-            File file = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/privkeyA_pk8.der");
+            path = (new File("../..")).getCanonicalPath();
+            System.out.println("get ACTUAL Path: " +path);
+            
+            //File file = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/privkeyA_pk8.der");
+            File file = new File(path+"/.ssh/A-Key/privkeyA_pk8.der");
+            
             FileInputStream fis = new FileInputStream(file);
             DataInputStream dis = new DataInputStream(fis);
             byte[] keyBytes = new byte[(int) file.length()];
@@ -115,7 +123,8 @@ public class AppSAML {
             KeyFactory kf = KeyFactory.getInstance("RSA");
             privKeyA = kf.generatePrivate(spec);
             
-            File f = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/pubkeyA.der");
+            //File f = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/pubkeyA.der");
+            File f = new File(path+"/.ssh/A-Key/pubkeyA.der");
             fis = new FileInputStream(f);
             dis = new DataInputStream(fis);
             keyBytes = new byte[(int)f.length()];
@@ -125,7 +134,8 @@ public class AppSAML {
             KeyFactory kf2 = KeyFactory.getInstance("RSA");
             publicKeyA = kf2.generatePublic(spec2);
             
-            file = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/privkeyB_pk8.der");
+            //file = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/privkeyB_pk8.der");
+            file = new File(path+"/.ssh/B-Key/privkeyB_pk8.der");
             fis = new FileInputStream(file);
             dis = new DataInputStream(fis);
             keyBytes = new byte[(int) file.length()];
@@ -135,7 +145,8 @@ public class AppSAML {
             kf = KeyFactory.getInstance("RSA");
             privKeyB = kf.generatePrivate(spec);
             
-            f = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/pubkeyB.der");
+            //f = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/pubkeyB.der");
+            f = new File(path+"/.ssh/B-Key/pubkeyB.der");
             fis = new FileInputStream(f);
             dis = new DataInputStream(fis);
             keyBytes = new byte[(int)f.length()];
@@ -251,7 +262,8 @@ public class AppSAML {
         public static Signature getSignatureCertificate() throws CertificateException, FileNotFoundException, IOException, org.opensaml.xml.security.SecurityException{
             
             certificateCredential = new BasicX509Credential();
-            File certificateFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/cacertA.crt");
+            //File certificateFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/cacertA.crt");
+            File certificateFile = new File(path+"/.ssh/A-Key/cacertA.crt");
             
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             InputStream fileStream = new FileInputStream(certificateFile);
@@ -495,8 +507,18 @@ public class AppSAML {
             SAMLConfig.InitSAML();
             
             AppSAML appSAML = new AppSAML();
+            logger.info("SAML initiated!!!"); 
             
             privateKey_publicKey = "PrivateA";
+            
+            File f = new File(".../balana/policies-request/saml-xacml/request_0001_01.xml");
+            
+            
+            System.out.println("get AbsolutePath");
+            System.out.println(f.getAbsolutePath());
+            System.out.println("get CanonicalPath");
+            System.out.println(f.getCanonicalPath());
+            
             
             String SAMLxacmlRequest = OpenSAMLutility.
                     XACMLRequest2XACMLAuthzDecisionQuery("/opt/Netbeans/TRESOR/balana/policies-request/saml-xacml/request_0001_01.xml", appSAML.getSignature());

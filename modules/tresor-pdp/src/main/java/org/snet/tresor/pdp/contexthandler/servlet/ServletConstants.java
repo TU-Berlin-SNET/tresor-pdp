@@ -14,7 +14,7 @@ public class ServletConstants {
 	
 	public static final String CONTENTTYPE_TEXTHTML = "text/html";
 	public static final String CONTENTTYPE_TEXTPLAIN = "text/plain";
-		
+        
 	public static final String CONTENTTYPE_XACMLXML = "application/xacml+xml";
 	public static final String CONTENTTYPE_XACMLSAML = "application/samlassertion+xml";	
 	

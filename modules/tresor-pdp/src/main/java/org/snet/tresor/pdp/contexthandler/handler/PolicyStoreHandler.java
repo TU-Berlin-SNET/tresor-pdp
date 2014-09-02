@@ -28,7 +28,7 @@ import org.wso2.balana.Policy;
  */
 public class PolicyStoreHandler implements Handler {
 	private static Log log = LogFactory.getLog(PolicyStoreHandler.class);
-	
+
 	private PolicyStoreManager policystoremanager;
 	private TresorAuth authenticator;
 	private ParserPool parser;
@@ -48,7 +48,7 @@ public class PolicyStoreHandler implements Handler {
 
 		String httpMethod = request.getMethod();
 		boolean authorized = authUser.isAuthorizedTo(request);
-		
+                
 		// check for insufficient authorization
 		if (!authorized)
 			return Helper.createResponseJSON(true, HttpServletResponse.SC_FORBIDDEN);
