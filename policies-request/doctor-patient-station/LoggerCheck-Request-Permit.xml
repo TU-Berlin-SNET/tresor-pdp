@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Request xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" ReturnPolicyIdList="false" CombinedDecision="false"
+         xmlns:gml="http://www.opengis.net/gml" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
+    
+  <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+    <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">patientInfo</AttributeValue>
+    </Attribute>
+    <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:service-id">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Patient1</AttributeValue>
+    </Attribute>
+  </Attributes>
+  
+  <Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" >
+    <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id">
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Doctor1</AttributeValue>
+    </Attribute>
+    <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:domain-id">
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Hospital1</AttributeValue>
+    </Attribute>
+    <Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:user-group">
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Domain Users</AttributeValue>
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Group Policy Creator Owners</AttributeValue>
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">TRESOR_MMV</AttributeValue>
+        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Domain Admins</AttributeValue>
+    </Attribute>
+  </Attributes>
+  
+  <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+    <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
+      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">GET</AttributeValue>
+    </Attribute>
+  </Attributes>
+  
+  <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
+	<!--   http://xacml.snet.tu-berlin.de:3000/patients/4/edit?locale=en
+        
+	<Attribute IncludeInResult="false" AttributeId="org:snet:tresor:attribute:user-group">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Domain Users</AttributeValue>
+	</Attribute>  -->
+	<!-- -->
+  </Attributes>
+</Request>
