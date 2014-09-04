@@ -1,4 +1,4 @@
-package org.snet.tresor.pdp.contexthandler.auth;
+package org.snet.tresor.pdp.contexthandler.authentication;
 
 import java.util.Hashtable;
 
@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 
@@ -17,15 +17,15 @@ import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
  * @author malik
  *
  */
-public class HTTPBasicAuth implements TresorAuth {
-	private static Log log = LogFactory.getLog(HTTPBasicAuth.class);
+public class BasicAuthenticator implements Authenticator {
+	private static Logger log = LoggerFactory.getLogger(BasicAuthenticator.class);
 	
 	/**
 	 * Hashtable, Keys: "user:password", values: "domain"
 	 */
 	private Hashtable<String, String> users;
 	
-	public HTTPBasicAuth() {		
+	public BasicAuthenticator() {		
 		this.users = new Hashtable<String, String>();
 	}
 	
@@ -34,16 +34,16 @@ public class HTTPBasicAuth implements TresorAuth {
 	 * @param params array containing user information in the 
 	 * following form ["username:password", "domain", ... ]
 	 */
-	public HTTPBasicAuth(String... params) {
+	public BasicAuthenticator(String... params) {
 		this();
 		
 		for (int i = 0; i < params.length - 1; i+=2)
 			this.users.put(params[i], params[i+1]);		
 	}
 	
-	public AuthUser authenticate(HttpServletRequest request, HttpServletResponse response) {		
+	public AuthenticatedUser authenticate(HttpServletRequest request, HttpServletResponse response) {		
 		String auth = request.getHeader(ServletConstants.HEADER_AUTHORIZATION);
-		AuthUser authUser = null;
+		AuthenticatedUser authUser = null;
 		
 		// check if it is HTTP Basic Auth
 		if (auth != null && auth.toUpperCase().startsWith("BASIC ")) {
@@ -55,7 +55,7 @@ public class HTTPBasicAuth implements TresorAuth {
 				String username = userPass.split(":")[0];
 				String userdomain = users.get(userPass);
 
-				authUser = new BasicAuthUser(username, userdomain);
+				authUser = new BasicAuthenticatedUser(username, userdomain);
 			}
 		}
 		

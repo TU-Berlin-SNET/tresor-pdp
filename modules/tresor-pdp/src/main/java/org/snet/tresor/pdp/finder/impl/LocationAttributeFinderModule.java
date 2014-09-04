@@ -16,6 +16,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.Helper;
 import org.wso2.balana.Balana;
 import org.wso2.balana.ParsingException;
@@ -46,7 +48,9 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 			return new HashMap<String, String>();
 		}
 	};
-
+	
+	private static final Logger log = LoggerFactory.getLogger(LocationAttributeFinderModule.class);
+	
 	private Map<String, String> pipUrlMap;	
 	private MultiThreadedHttpConnectionManager connectionManager;
 	private HttpClient httpClient;
@@ -131,66 +135,66 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 	 * @throws Exception
 	 */
 	private JSONObject queryPIP(String pipUrl, URI attributeId, String issuer,	EvaluationCtx context) throws Exception {
-		JSONObject response = null;
 
-		// try to get the value from cache
+		// if we have the value in the cache already, then return it immediately
 		String cachedValue = THREADCACHE.get().get(attributeId.toString());
+		if (cachedValue != null)
+			return new JSONObject().put(attributeId.toString(), cachedValue);
 
-		if (cachedValue != null) {
-			response = new JSONObject().put(attributeId.toString(), cachedValue);
-		} else {
-			// else get the value from pip
+		// otherwise get attributes in preparation to query the pip		
+		String subjectID = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
+				FinderConstants.ID_SUBJECT_URI, 
+				issuer, 
+				FinderConstants.CATEGORY_SUBJECT_URI, 
+				context);
 
-			String subjectID = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
-														   FinderConstants.ID_SUBJECT_URI, 
-														   issuer, 
-														   FinderConstants.CATEGORY_SUBJECT_URI, 
-														   context);
-			
-			String deviceID = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
-												   		  FinderConstants.ID_DEVICE_URI, 
-												   		  issuer, 
-												   		  FinderConstants.CATEGORY_SUBJECT_URI,
-												   		  context);			
+		String deviceID = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
+				FinderConstants.ID_DEVICE_URI, 
+				issuer, 
+				FinderConstants.CATEGORY_SUBJECT_URI,
+				context);			
 
-			if (subjectID != null && deviceID != null) {				
-				PostMethod query = new PostMethod(pipUrl);
+		JSONObject response = null;
+		
+		if (subjectID != null && deviceID != null) {				
+			PostMethod query = new PostMethod(pipUrl);
 
-				try {
-					// create json data and set in query
-					JSONObject jsonData = new JSONObject();
-					jsonData.put("subjectId", subjectID);
-					jsonData.put("deviceId", deviceID);
-					jsonData.put("attributeId", attributeId.toString());
-					jsonData.putOpt("issuer", issuer);
-					query.setRequestEntity(new StringRequestEntity(jsonData.toString(), "application/json", "UTF-8"));
-
-					// fire query
-					this.httpClient.executeMethod(query);
-
-					// if query was successful...
-					if (query.getStatusCode() == 200) {
-						// ...parse the response Body...
-						JSONTokener tokener = new JSONTokener(new InputStreamReader(query.getResponseBodyAsStream()));
-						response = new JSONObject(tokener);
-
-						// ...and cache all values the pip sent
-						Iterator iter = response.keys();
-						Map<String, String> threadCacheMap = THREADCACHE.get();
-						while (iter.hasNext()) {
-							String key = (String) iter.next();
-							threadCacheMap.put(key, response.getString(key));
-						}
+			try {
+				// prepare and do the request
+				query.setRequestHeader("Content-Type", "application/json");
+				// TODO hardcoded authorization is ugly, find a way around it
+				query.setRequestHeader("Authorization", "Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm");
+				
+				JSONObject jsonData = new JSONObject();
+				jsonData.put("subjectID", subjectID);
+				jsonData.put("deviceID", deviceID);
+				jsonData.put("attributeID", attributeId.toString());
+				query.setRequestEntity(new StringRequestEntity(jsonData.toString(), "application/json", "UTF-8"));
+				
+				this.httpClient.executeMethod(query);
+				
+				if (query.getStatusCode() == 200) {
+					// parse the response Body...
+					JSONTokener tokener = new JSONTokener(new InputStreamReader(query.getResponseBodyAsStream()));
+					response = new JSONObject(tokener).getJSONObject("response");
+					log.debug("Received response: {}", response);										
+					
+					// ...and cache all values the pip sent
+					Map<String, String> threadCacheMap = THREADCACHE.get();
+					Iterator iter = response.keys();					
+					
+					while (iter.hasNext()) {
+						String key = (String) iter.next();
+						threadCacheMap.put(key, response.getString(key));
 					}
-
-				} finally {
-					query.releaseConnection();
 				}
+			} finally {
+				query.releaseConnection();
 			}
 		}
 
-		return response;
-	}
+	return response;
+}
 
 	/**
 	 * Create Attribute, pack it in a bag and create Evaluationresult from it

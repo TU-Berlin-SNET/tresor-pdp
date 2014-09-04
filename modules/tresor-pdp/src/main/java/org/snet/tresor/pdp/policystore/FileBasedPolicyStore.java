@@ -8,23 +8,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * PolicyStoreManager for file based policy store, NOT THREAD SAFE
+ * PolicyStore for file based policy store, NOT THREAD SAFE
  * @author malik
  */
-public class FileBasedPolicyStoreManager implements PolicyStoreManager {
-	private static Log log = LogFactory.getLog(FileBasedPolicyStoreManager.class);
+public class FileBasedPolicyStore implements PolicyStore {	
+	private static final Logger log = LoggerFactory.getLogger(FileBasedPolicyStore.class);
 	private File baseDirectory;
 	
 	/**
-	 * Create new FileBasedPolicyStoreManager pointing to given directoryPath
+	 * Create new FileBasedPolicyStore pointing to given directoryPath
 	 * (directory is created if it does not exists)
 	 * @param directoryPath path to the directory which is designated to hold the policies
 	 */
-	public FileBasedPolicyStoreManager(String directoryPath) {		
+	public FileBasedPolicyStore(String directoryPath) {		
 		this.baseDirectory = new File(directoryPath);
 		
 		if (!this.baseDirectory.isDirectory())
@@ -32,12 +32,12 @@ public class FileBasedPolicyStoreManager implements PolicyStoreManager {
 	}
 	
 	/**
-	 * Create new FileBasedPolicyStoreManager pointing to given directoryPath
+	 * Create new FileBasedPolicyStore pointing to given directoryPath
 	 * (directory is created if it does not exists)
 	 * Compatibility method, takes first value of array as directory Path
 	 * @param directoryPath array containing the directory path
 	 */
-	public FileBasedPolicyStoreManager(String... directoryPath) {
+	public FileBasedPolicyStore(String... directoryPath) {
 		this(directoryPath[0]);
 	}
 	

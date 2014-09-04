@@ -5,12 +5,11 @@ import java.io.Reader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
-import org.snet.tresor.pdp.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.w3c.dom.Document;
@@ -23,14 +22,30 @@ import org.wso2.balana.ctx.RequestCtxFactory;
  * Handler for requests to the pdp
  * @author malik
  */
-public class PDPHandler implements Handler {
-	private static Log log = LogFactory.getLog(PDPHandler.class);
+public class PDPHandler implements Handler {	
+	private static final Logger log = LoggerFactory.getLogger(PDPHandler.class);
+	
 	private ParserPool parser;
 	private PDP pdp;
+	private String resource;
 	
 	public PDPHandler() {
-		this.pdp = Configuration.getInstance().getPDP();
+		this.resource = "pdp";
 		this.parser = new BasicParserPool();
+	}
+	
+	public String getResourceName() {
+		return this.resource;
+	}
+	
+	public boolean setComponent(String componentName, Object component) {
+		if (componentName.equalsIgnoreCase(this.resource) && component instanceof PDP) {
+			this.pdp = (PDP) component;
+			return true;
+		}
+		
+		// TODO log unsupported
+		return false;
 	}
 	
 	public JSONObject handle(HttpServletRequest request, HttpServletResponse response) {		
@@ -74,7 +89,7 @@ public class PDPHandler implements Handler {
 			Document xacmlDoc = parser.parse(body);
 			
 			xacmlRequest = RequestCtxFactory.getFactory().getRequestCtx(xacmlDoc.getDocumentElement());
-		} catch (Exception e) { log.info("Error creating request context"); }
+		} catch (Exception e) { log.info("Error creating request context", e); }
 		
 		if (xacmlRequest != null) {
 			decision = this.pdp.evaluate(xacmlRequest).encode();

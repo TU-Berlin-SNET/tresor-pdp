@@ -7,24 +7,24 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * Manager for storing/retrieving policies from a redis database
+ * PolicyStore for storing/retrieving policies from a redis database
  * @author malik
  */
-public class RedisDBPolicyStoreManager implements PolicyStoreManager {	
+public class RedisDBPolicyStore implements PolicyStore {	
 	JedisPool redisPool;
 	
 	/**
-	 * Create RedisDBPolicyStoremanager with default config & localhost as location
+	 * Create RedisDBPolicyStore with default config & localhost as location
 	 */
-	public RedisDBPolicyStoreManager() {
+	public RedisDBPolicyStore() {
 		this.redisPool = new JedisPool(new JedisPoolConfig(), "localhost");
 	}
 	
 	/**
-	 * Create RedisDBPolicyStoreManager with given parameter(s)
+	 * Create RedisDBPolicyStore with given parameter(s)
 	 * @param params contains location
 	 */
-	public RedisDBPolicyStoreManager(String... params) {		
+	public RedisDBPolicyStore(String... params) {		
 		this.redisPool = new JedisPool(new JedisPoolConfig(), params[0]);
 	}
 

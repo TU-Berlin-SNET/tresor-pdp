@@ -12,6 +12,19 @@ import org.json.JSONObject;
 public interface Handler {
 	
 	/**
+	 * @return the name of the resource this handler handles
+	 */
+	public String getResourceName();
+	
+	/**
+	 * Set important component
+	 * @param componentName name of the component to set
+	 * @param component the component itself
+	 * @return true if setting was successful, false otherwise and may indicate unsupported component
+	 */
+	public boolean setComponent(String componentName, Object component);
+	
+	/**
 	 * Handle given request and return response as json for servlet to return
 	 * @param request the httpservlet request
 	 * @param response the httpservlet response

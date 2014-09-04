@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Class to handle all the operations with a Derby Data Base
  * @author zequeira
  */
-public class DerbyDBUtility implements PolicyStoreManager{
+public class DerbyDBUtility implements PolicyStore{
     
     private static final String driver = "org.apache.derby.jdbc.ClientDriver";
     private static final String protocol = "jdbc:derby://localhost:1527/";
