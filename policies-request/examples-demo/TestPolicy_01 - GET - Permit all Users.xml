@@ -51,7 +51,7 @@
                 <AttributeDesignator
                         Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
                         AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
-                        DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="false"/>
+                        DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
             </Apply>
         </Condition>
     </Rule>

@@ -88,6 +88,9 @@ public class SAMLUtility {
     // the logger for tracking the events
     private static final Logger logger = Logger.getLogger(SAMLUtility.class.getName());
     
+    // root path for balana directory
+    private static String path = null;
+    
         /**
         * Constructor where we initiate the parser, and load the Private and Public Key to be used 
         * in the signatures process.
@@ -98,7 +101,9 @@ public class SAMLUtility {
             parserPool.setNamespaceAware(true);
             
             try {
-                File file = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/privkeyA_pk8.der");
+                path = (new File("../..")).getCanonicalPath();
+                
+                File file = new File(path+"/.ssh/A-Key/privkeyA_pk8.der");
                 FileInputStream fis = new FileInputStream(file);
                 DataInputStream dis = new DataInputStream(fis);
                 byte[] keyBytes = new byte[(int) file.length()];
@@ -108,7 +113,7 @@ public class SAMLUtility {
                 KeyFactory kf = KeyFactory.getInstance("RSA");
                 privKeyA = kf.generatePrivate(spec);
 
-                File f = new File("/opt/Netbeans/TRESOR/balana/.ssh/A-Key/pubkeyA.der");
+                File f = new File(path+"/.ssh/A-Key/pubkeyA.der");
                 fis = new FileInputStream(f);
                 dis = new DataInputStream(fis);
                 keyBytes = new byte[(int)f.length()];
@@ -118,7 +123,7 @@ public class SAMLUtility {
                 KeyFactory kf2 = KeyFactory.getInstance("RSA");
                 publicKeyA = kf2.generatePublic(spec2);
 
-                file = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/privkeyB_pk8.der");
+                file = new File(path+"/.ssh/B-Key/privkeyB_pk8.der");
                 fis = new FileInputStream(file);
                 dis = new DataInputStream(fis);
                 keyBytes = new byte[(int) file.length()];
@@ -128,7 +133,7 @@ public class SAMLUtility {
                 kf = KeyFactory.getInstance("RSA");
                 privKeyB = kf.generatePrivate(spec);
 
-                f = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/pubkeyB.der");
+                f = new File(path+"/.ssh/B-Key/pubkeyB.der");
                 fis = new FileInputStream(f);
                 dis = new DataInputStream(fis);
                 keyBytes = new byte[(int)f.length()];
@@ -192,7 +197,7 @@ public class SAMLUtility {
         private static Signature getSignatureCertificate() {
             
             certificateCredential = new BasicX509Credential();
-            File certificateFile = new File("/opt/Netbeans/TRESOR/balana/.ssh/B-Key/cacertB.crt");
+            File certificateFile = new File(path+"/.ssh/B-Key/cacertB.crt");
             Signature signature = null;
             try {
                 CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");

@@ -30,6 +30,7 @@ public class PolicyStoreHandler implements Handler {
 	
 	private PolicyStore policystore;
 	private Authenticator authenticator;
+
 	private ParserPool parser;
 	private String resource;
 	

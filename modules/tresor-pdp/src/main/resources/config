@@ -1,4 +1,5 @@
 {
+
     "tresor-pdp": { "policystore": { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStore", "parameters": [ "webapps/root/policies" ] },
                     "attributefindermodules": [ { "classname": "org.wso2.balana.finder.impl.SelectorModule" }, 
                                                  { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" } ],
@@ -12,6 +13,8 @@
                                     				"broker:broker", "broker", 
                                                     "admin:admin", "domain",
                                                     "user:user", "userdomain",
-                                                    "doctor:12345", "healthcare" ]
-                                   }
+                                                    "doctor:12345", "healthcare",
+                                                    "Doctor1:12345", "Hospital1",
+                                                    "Doctor2:12345", "Hospital2" ]
+
 }

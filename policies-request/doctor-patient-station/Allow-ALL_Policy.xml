@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/2.0/access_control-xacml-2.0-policy-schema-os.xsd"
+        PolicyId="Logger-Check-1"
+        RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+
+    <Description>
+        Default Policy for Allowing All 
+    </Description>
+    
+    <Target>
+        <AnyOf>
+            <AllOf>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">patientInfo</AttributeValue>
+                    <AttributeDesignator MustBePresent="true"
+                                         Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                         AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                                         DataType="http://www.w3.org/2001/XMLSchema#string"/>
+                </Match>
+                <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">hospital1</AttributeValue>
+                    <AttributeDesignator AttributeId="org:snet:tresor:attribute:domain-id"
+                                         DataType="http://www.w3.org/2001/XMLSchema#string"
+                                         Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                         MustBePresent="true"/>
+                </Match>
+            </AllOf>
+        </AnyOf>
+    </Target>
+    
+    <Rule Effect="Permit" RuleId="rule:1">
+        <Description>
+            
+        </Description>
+        <Target>
+            <AnyOf>
+                <AllOf>
+                    <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">patientInfo</AttributeValue>
+                        <AttributeDesignator MustBePresent="true"
+                                             Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                                             AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                                             DataType="http://www.w3.org/2001/XMLSchema#string"/>
+                    </Match>
+                </AllOf>
+            </AnyOf>
+            <AnyOf>
+                <AllOf>
+                     <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue
+                                DataType="http://www.w3.org/2001/XMLSchema#string">GET</AttributeValue>
+                        <AttributeDesignator MustBePresent="true"
+                                             Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+                                             AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                                             DataType="http://www.w3.org/2001/XMLSchema#string"/>
+                    </Match>
+                </AllOf>
+            </AnyOf>
+        </Target>
+        
+        <Condition>
+            <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                <!-- Check that an user name is provided -->
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                    <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match"/>
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">^.{1,50}$</AttributeValue>
+                    <AttributeDesignator
+                            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                            AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+                            DataType="http://www.w3.org/2001/XMLSchema#string" 
+                            MustBePresent="true"/>
+                </Apply>
+            
+                <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of-any">
+                        <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                            <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                AttributeId="org:snet:tresor:attribute:doctor-station"
+                                DataType="http://www.w3.org/2001/XMLSchema#string" 
+                                MustBePresent="true"/>
+                            <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                AttributeId="org:snet:tresor:attribute:patient-station"
+                                DataType="http://www.w3.org/2001/XMLSchema#string" 
+                                MustBePresent="true"/>
+                    </Apply>
+
+                    <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of-any">
+                        <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                            <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                AttributeId="org:snet:tresor:attribute:doctor-role"
+                                DataType="http://www.w3.org/2001/XMLSchema#string" 
+                                MustBePresent="true"/>
+                            <AttributeDesignator
+                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                AttributeId="org:snet:tresor:attribute:patient-role"
+                                DataType="http://www.w3.org/2001/XMLSchema#string" 
+                                MustBePresent="true"/>
+                    </Apply>
+                </Apply>
+            </Apply>
+        </Condition> 
+    </Rule>
+    
+    <Rule Effect="Deny" RuleId="DenyAll"/>
+    
+</Policy>

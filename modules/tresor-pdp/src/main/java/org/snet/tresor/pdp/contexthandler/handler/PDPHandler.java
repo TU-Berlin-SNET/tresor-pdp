@@ -126,7 +126,8 @@ public class PDPHandler implements Handler {
 	private boolean isSupported(String contenttype) {		
 		return contenttype != null && (
 				contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_XACMLSAML) ||
-				contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_XACMLXML)
+				contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_XACMLXML)  ||
+                                contenttype.toLowerCase().startsWith(ServletConstants.CONTENTTYPE_XML)
 			);		
 	}
 
