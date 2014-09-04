@@ -2,7 +2,14 @@
 
     "tresor-pdp": { "policystore": { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStore", "parameters": [ "webapps/root/policies" ] },
                     "attributefindermodules": [ { "classname": "org.wso2.balana.finder.impl.SelectorModule" }, 
-                                                 { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" } ],
+                                                { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" },
+                                                { "classname": "org.snet.tresor.pdp.finder.impl.StationAttributeFinderModule",
+                                                  "parameters": [ "org:snet:tresor:attribute:doctor-station", "http://localhost:3300/doctor",
+                                                  				  "org:snet:tresor:attribute:doctor-role", "http://localhost:3300/doctor",
+                                                  				  "org:snet:tresor:attribute:patient-station", "http://localhost:3300/patient",
+                                                  				  "org:snet:tresor:attribute:patient-role", "http://localhost:3300/patient" ]
+                                                } 
+                                              ],
                     "resourcefindermodules": [ ]
                   },
     "contexthandler": { "handlers": [ { "classname" : "org.snet.tresor.pdp.contexthandler.handler.PDPHandler" },
@@ -11,7 +18,7 @@
 	"authenticator": { "classname": "org.snet.tresor.pdp.contexthandler.authentication.BasicAuthenticator",
                                     "parameters": [ "username:password", "exampledomain",
                                     				"broker:broker", "broker", 
-                                                    "admin:admin", "domain",
+                                                    "admin:admin", "HERZ",
                                                     "doctor:12345", "healthcare",
                                                     "user:user", "userdomain",
                                                     "Doctor2:12345", "Hospital2",

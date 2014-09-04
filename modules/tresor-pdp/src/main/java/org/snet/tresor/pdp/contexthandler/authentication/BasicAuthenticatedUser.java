@@ -17,8 +17,11 @@ public class BasicAuthenticatedUser implements AuthenticatedUser{
 	private String clientID;
 
 	public BasicAuthenticatedUser(String name, String clientID) {
-		this.name = name.toLowerCase();
-		this.clientID = clientID.toLowerCase();
+		// TODO investigate why
+//		this.name = name.toLowerCase();
+//		this.clientID = clientID.toLowerCase();
+		this.name = name;
+		this.clientID = clientID;
 	}
 
 	public String getName() {

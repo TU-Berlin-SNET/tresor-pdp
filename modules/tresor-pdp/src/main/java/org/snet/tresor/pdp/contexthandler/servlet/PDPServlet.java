@@ -1,5 +1,7 @@
 package org.snet.tresor.pdp.contexthandler.servlet;
 
+import java.util.Enumeration;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +28,13 @@ public class PDPServlet extends HttpServlet {
 		MDC.put("category", "PDP");
 		MDC.put("client-id", request.getHeader("TRESOR-Organization"));
 		log.info("POST request to PDP received");
+		
+		// TODO remove
+//		Enumeration<String> headers = request.getHeaderNames();		
+//		while (headers.hasMoreElements()) {
+//			String name = headers.nextElement();
+//			log.info("Available Header: {}:{}", name, request.getHeader(name));
+//		}			
 		
 		JSONObject responseJSON = this.contextHandler.handle(request, response);
 		Helper.respondHTTP(responseJSON, response);
