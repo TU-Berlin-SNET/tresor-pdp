@@ -19,7 +19,6 @@
         <Loggers>
             <Root level="INFO">
                 <AppenderRef ref="async" />
-                <AppenderRef ref="socket" />
             </Root>
         </Loggers>
     </Configuration>

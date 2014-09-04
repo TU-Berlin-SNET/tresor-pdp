@@ -21,8 +21,8 @@ public class PolicyHandlerServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		this.addInformation(request);
-		MDC.put("category", "Getting Policies");		
+		this.putMDCs(request);
+		MDC.put("category", "Getting Policies");				
 		
 		log.info("GET request to PolicyStore received");
 		
@@ -34,7 +34,7 @@ public class PolicyHandlerServlet extends HttpServlet {
 	
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) {
-		this.addInformation(request);
+		this.putMDCs(request);
 		MDC.put("category", "Adding/Replacing Policies");
 		
 		log.info("PUT request to PolicyStore received");
@@ -47,7 +47,7 @@ public class PolicyHandlerServlet extends HttpServlet {
 	
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
-		this.addInformation(request);
+		this.putMDCs(request);
 		MDC.put("category", "Deleting policies");
 		
 		log.info("DELETE request to PolicyStore received");
@@ -58,7 +58,7 @@ public class PolicyHandlerServlet extends HttpServlet {
 		MDC.clear();
 	}
 	
-	private void addInformation(HttpServletRequest request) {
+	private void putMDCs(HttpServletRequest request) {
 		MDC.put("tresor-component", "PolicyStore");
 		MDC.put("client-id", request.getHeader("TRESOR-Organization"));
 	}
