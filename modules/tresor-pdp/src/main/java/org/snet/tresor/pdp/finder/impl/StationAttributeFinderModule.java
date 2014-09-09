@@ -38,7 +38,7 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
 	private static URI STRING_DATATYPE;
 	private static URI SUBJECT_ID;
 	private static URI DEVICE_ID;
-        private static URI SERVICE_ID;
+    private static URI SERVICE_ID;
 
 	/**
 	 * Static Initializer for URIs to catch possible early Exceptions
@@ -46,11 +46,11 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
 	static {
 		try {
 			SUBJECT_CATEGORY = new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
-                        RESOURCE_CATEGORY = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
+            RESOURCE_CATEGORY = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
 			STRING_DATATYPE = new URI("http://www.w3.org/2001/XMLSchema#string");
 			SUBJECT_ID = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
 			DEVICE_ID = new URI("org:snet:tresor:attribute:device-id");
-                        SERVICE_ID = new URI("org:snet:tresor:attribute:service-id");
+            SERVICE_ID = new URI("org:snet:tresor:attribute:service-id");
 		} catch (Exception e) {
 			earlyException = new IllegalArgumentException();
 			earlyException.initCause(e);
@@ -79,6 +79,7 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
 		if (earlyException != null)
 			throw earlyException;
 
+		this.SERVICE_ID = FinderConstants.ID_SERVICE_URI;
 		this.connectionManager = new MultiThreadedHttpConnectionManager();
 		this.httpClient = new HttpClient(this.connectionManager);		
 		this.pipUrlMap = new ConcurrentHashMap<String, String>();

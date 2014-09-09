@@ -1,11 +1,11 @@
-package org.snet.tresor.pdp.contexthandler.auth;
+package org.snet.tresor.pdp.contexthandler.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
-public interface TresorAuth {
+public interface Authenticator {
 
 	/**
 	 * Handle authentication procedure and communication with client
@@ -13,7 +13,7 @@ public interface TresorAuth {
 	 * @param response the httpservlet response
 	 * @return an AuthUser or null if auth failed
 	 */
-	public AuthUser authenticate(HttpServletRequest request, HttpServletResponse response);
+	public AuthenticatedUser authenticate(HttpServletRequest request, HttpServletResponse response);
 
 	/**
 	 * @return jsonobject containing information for servlet when authentification fails or is necessary

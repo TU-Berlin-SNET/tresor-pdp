@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.Configuration;
 import org.snet.tresor.pdp.Helper;
-import org.snet.tresor.pdp.policystore.PolicyStoreManager;
+import org.snet.tresor.pdp.policystore.PolicyStore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.balana.AbstractPolicy;
@@ -24,24 +24,25 @@ import org.wso2.balana.finder.PolicyFinderModule;
 import org.wso2.balana.finder.PolicyFinderResult;
 
 /**
- * PolicyFinderModule which uses the PolicyStoreManager interface to retrieve
+ * PolicyFinderModule which uses the PolicyStore interface to retrieve
  * policies from the Policy Store
  * @author malik
  */
-public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
-	private static Log log = LogFactory.getLog(PolicyStorePolicyFinderModule.class);
+public class PolicyStorePolicyFinderModule extends PolicyFinderModule{	
+	private static final Logger log = LoggerFactory.getLogger(PolicyStorePolicyFinderModule.class);
 	
 	private ParserPool parser;
 	private PolicyFinder finder;
-	private PolicyStoreManager policyStoreManager;	
-	
-	public PolicyStorePolicyFinderModule() { }
+	private PolicyStore policyStore;
 
+	public PolicyStorePolicyFinderModule(PolicyStore policyStore) {
+		this.policyStore = policyStore;
+	}
+	
 	@Override
 	public void init(PolicyFinder finder) {
 		this.finder = finder;
-		this.parser = new BasicParserPool();
-		this.policyStoreManager = Configuration.getInstance().getPolicyStoreManager();
+		this.parser = new BasicParserPool();		
 	}
 	
     @Override
@@ -62,11 +63,10 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 													 FinderConstants.CATEGORY_RESOURCE_URI, 
 													 context);
 		
-		
 		// get & load policy
 		AbstractPolicy policy = null;
 		if (domain != null && service != null) {
-			String policyString = this.policyStoreManager.getPolicy(domain, service);
+			String policyString = this.policyStore.getPolicy(domain, service);
 			policy = loadPolicy(policyString, this.finder);
 		}
 		
@@ -79,7 +79,7 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 			
 			if (match.getResult() == MatchResult.MATCH) {
 				return new PolicyFinderResult(policy);
-			}			
+			}
 		}
 		
 		if (log.isDebugEnabled())

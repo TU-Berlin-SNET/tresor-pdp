@@ -5,15 +5,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule;
@@ -25,8 +27,8 @@ import org.wso2.balana.ctx.EvaluationCtx;
  * Helper class containing miscellaneous helper methods
  * @author malik
  */
-public class Helper {
-	private static Log log = LogFactory.getLog(Helper.class);
+public class Helper {	
+	private static final Logger log = LoggerFactory.getLogger(Helper.class);
 
 	/**
 	 * Searches in given EvaluationContext for an attribute
@@ -49,7 +51,7 @@ public class Helper {
 				if (!val.isBag() && val.getType().equals(attributeType)) {
 					value = val.encode();
 					break;
-				}				
+				}
 			}
 		}
 
@@ -62,7 +64,7 @@ public class Helper {
 	 * @return InputStream of request wrapped in a reader with character encoding
 	 * @throws IOException
 	 */
-	public static Reader getRequestInputStreamReader(HttpServletRequest request) throws IOException {		
+	public static Reader getRequestInputStreamReader(HttpServletRequest request) throws IOException {
 		// try to get the charset from request
 		String charset = request.getCharacterEncoding();
 		
@@ -78,7 +80,7 @@ public class Helper {
 	 * @return parsed JSONObject from HTTP body
 	 */
     public static JSONObject getJSONFromBody(HttpServletRequest request) {
-    	JSONObject out = null;    	
+    	JSONObject out = null;
     	try {
     		Reader reader = Helper.getRequestInputStreamReader(request);
     		JSONTokener tok = new JSONTokener(reader);
@@ -209,6 +211,35 @@ public class Helper {
     		try { writer.close(); }
     		catch (Exception e) { }
     	}
+    }
+    
+    public static <T> void createInstances(JSONArray classes, Collection<T> output, Class<T> cls) throws Exception {    	
+    	for (int i = 0; i < classes.length(); i++) {
+    		JSONObject classConfig = classes.getJSONObject(i);
+    		output.add(Helper.createInstance(classConfig, cls));
+    	}    	
+    }
+    
+    public static <T> T createInstance(JSONObject config, Class<T> cls) throws Exception {
+    	Class<?> c = Helper.class.getClassLoader().loadClass(config.getString("classname"));
+    	Object instance;
+    	    	
+    	if (config.has("parameters")) {
+    		
+    		JSONArray paramsJSON = config.getJSONArray("parameters");
+    		String[] params = new String[paramsJSON.length()];
+    		for (int i = 0; i < paramsJSON.length(); i++) {
+    			params[i] = paramsJSON.getString(i);
+    		}
+    		
+    		Object[] wrappedParams = { params };
+    		
+    		instance = c.getConstructor(String[].class).newInstance(wrappedParams);
+    	}    		
+    	else
+    		instance = c.newInstance();
+    	
+    	return cls.cast(instance);    	
     }
     
     /**

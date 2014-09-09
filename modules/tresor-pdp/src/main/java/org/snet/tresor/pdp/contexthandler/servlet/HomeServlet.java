@@ -4,8 +4,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.snet.tresor.pdp.Configuration;
 import org.snet.tresor.pdp.Helper;
+import org.snet.tresor.pdp.contexthandler.ContextHandler;
 
 /**
  * A simple Servlet which responds to GET-requests as is specified in
@@ -24,7 +24,7 @@ public class HomeServlet extends HttpServlet {
 	
 	@Override
 	public void init() {
-		Configuration.getInstance().initConfiguration();
+		ContextHandler.getInstance().initialize();
 	}
 	
 }

@@ -3,27 +3,22 @@
         <Appenders>
             <Console name="stdout" target="SYSTEM_OUT">
                 <PatternLayout>
-                    <pattern>{"priority":"%p","timestamp":"%d{UNIX}", "logger":"%c",message":"%enc{%m}","exception":"%enc{%throwable{5}}"}%n</pattern>
+                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m}%enc{%rEx{short}}","tresor-component":"%enc{%X{tresor-component}}","category":"%enc{%X{category}}","client-id":"%enc{%X{client-id}}","subject-id":"%enc{%X{subject-id}}","thread":"%t"}%n</pattern>
                 </PatternLayout>
             </Console>
-            <Socket name="socket" host="localhost" port="9500">
-                <SSL>
-                    <KeyStore location="/opt/Netbeans/TRESOR/balana/.ssh/keystore/4/client.jks" password="tresor"/>
-                    <TrustStore location="/opt/Netbeans/TRESOR/balana/.ssh/keystore/3/server2.jks" password="tresor"/>
-                </SSL>
+            <Socket name="socket" host="xacml.snet.tu-berlin.de" port="9400">
                 <PatternLayout>
-                    <pattern>{"priority":"%p","timestamp":"%d{UNIX}", "logger":"%c","message":"%enc{%m}","exception":"%enc{%throwable{5}}","thread":"%t"}%n</pattern>
+                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m}%enc{%rEx{short}}","tresor-component":"%enc{%X{tresor-component}}","category":"%enc{%X{category}}","client-id":"%enc{%X{client-id}}","subject-id":"%enc{%X{subject-id}}","thread":"%t"}%n</pattern>
                 </PatternLayout>
             </Socket>
             <Async name="async">
                 <AppenderRef ref="socket" />
+                <AppenderRef ref="stdout" />
             </Async>
         </Appenders>
         <Loggers>
             <Root level="INFO">
-                <AppenderRef ref="stdout" />
                 <AppenderRef ref="async" />
-                <AppenderRef ref="socket" />
             </Root>
         </Loggers>
     </Configuration>

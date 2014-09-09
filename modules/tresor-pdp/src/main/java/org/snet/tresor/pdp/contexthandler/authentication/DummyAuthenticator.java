@@ -1,4 +1,4 @@
-package org.snet.tresor.pdp.contexthandler.auth;
+package org.snet.tresor.pdp.contexthandler.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,11 +10,11 @@ import org.snet.tresor.pdp.contexthandler.handler.Handler;
  * Dummy auth implementation
  * @author malik
  */
-public class DummyAuth implements TresorAuth {
+public class DummyAuthenticator implements Authenticator {
 
-	public AuthUser authenticate(HttpServletRequest request,
+	public AuthenticatedUser authenticate(HttpServletRequest request,
 			HttpServletResponse response) {
-		return new DummyAuthUser();
+		return new DummyAuthenticatedUser();
 	}
 
 	public JSONObject getErrorResponseJSON() {

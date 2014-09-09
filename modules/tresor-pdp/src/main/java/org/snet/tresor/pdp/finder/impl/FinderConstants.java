@@ -50,8 +50,10 @@ public class FinderConstants {
 			DATATYPE_STRING_URI = new URI("http://www.w3.org/2001/XMLSchema#string");
 			ID_SUBJECT_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
 			ID_DEVICE_URI = new URI("org:snet:tresor:attribute:device-id");
-			ID_DOMAIN_URI = new URI("org:snet:tresor:attribute:domain-id");
-			ID_SERVICE_URI = new URI("org:snet:tresor:attribute:service-id");
+//			ID_DOMAIN_URI = new URI("org:snet:tresor:attribute:domain-id");
+//			ID_SERVICE_URI = new URI("org:snet:tresor:attribute:service-id");
+			ID_DOMAIN_URI = new URI("http://schemas.tresor.com/claims/2014/04/organization");
+			ID_SERVICE_URI = new URI("http://schemas.tresor.com/request/2014/04/service-uuid");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

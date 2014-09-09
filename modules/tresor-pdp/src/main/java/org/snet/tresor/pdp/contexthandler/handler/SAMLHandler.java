@@ -7,6 +7,8 @@ import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 
 import org.opensaml.xml.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.contexthandler.saml.SAMLUtility;
 import org.w3c.dom.Element;
 
@@ -15,8 +17,9 @@ import org.w3c.dom.Element;
  *
  * @author zequeira
  */
-public class SAMLHandler {
-    
+public class SAMLHandler {    
+	private static final Logger log = LoggerFactory.getLogger(SAMLHandler.class);
+	
     SAMLUtility samlUtility = null;
     
         public SAMLHandler() throws ConfigurationException, NoSuchAlgorithmException, NoSuchProviderException, IOException, FileNotFoundException, InvalidKeySpecException {
