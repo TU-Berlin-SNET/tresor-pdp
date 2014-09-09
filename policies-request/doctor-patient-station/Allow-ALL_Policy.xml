@@ -82,7 +82,7 @@
                                 DataType="http://www.w3.org/2001/XMLSchema#string" 
                                 MustBePresent="true"/>
                             <AttributeDesignator
-                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
                                 AttributeId="org:snet:tresor:attribute:patient-station"
                                 DataType="http://www.w3.org/2001/XMLSchema#string" 
                                 MustBePresent="true"/>
@@ -96,7 +96,7 @@
                                 DataType="http://www.w3.org/2001/XMLSchema#string" 
                                 MustBePresent="true"/>
                             <AttributeDesignator
-                                Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+                                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
                                 AttributeId="org:snet:tresor:attribute:patient-role"
                                 DataType="http://www.w3.org/2001/XMLSchema#string" 
                                 MustBePresent="true"/>

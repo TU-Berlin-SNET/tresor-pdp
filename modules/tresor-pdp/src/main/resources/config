@@ -8,11 +8,11 @@
                                                                    "org:snet:tresor:attribute:current-bluetooth-location", "http://localhost:3000/wifiPIP",
                                                                    "org:snet:tresor:attribute:current-nfc-location",       "http://localhost:3000/wifiPIP"] 
                                     },
-                                    { "classname": "org.snet.tresor.pdp.finder.impl.StationAttributeFinderModule",
-                                                    "parameters": [ "org:snet:tresor:attribute:doctor-station",             "http://localhost:3300/doctor",
-                                                                    "org:snet:tresor:attribute:doctor-role",                "http://localhost:3300/doctor",
-                                                                    "org:snet:tresor:attribute:patient-station",            "http://localhost:3300/patient",
-                                                                    "org:snet:tresor:attribute:patient-role",               "http://localhost:3300/patient"] 
+                                    { "classname": "org.snet.tresor.pdp.finder.impl.StationAttributeFinderModule",      
+                                                    "parameters": [ "org:snet:tresor:attribute:doctor-station",             "http://xacml.snet.tu-berlin.de:3300/doctor",
+                                                                    "org:snet:tresor:attribute:doctor-role",                "http://xacml.snet.tu-berlin.de:3300/doctor",
+                                                                    "org:snet:tresor:attribute:patient-station",            "http://xacml.snet.tu-berlin.de:3300/patient",
+                                                                    "org:snet:tresor:attribute:patient-role",               "http://xacml.snet.tu-berlin.de:3300/patient"] 
                                     }
                                           ],
 	"policyfindermodules"		: [ { "classname": "org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule" } ],
