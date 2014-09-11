@@ -32,6 +32,10 @@ public interface Handler {
 	 */
 	public JSONObject handle(HttpServletRequest request, HttpServletResponse response);
 	
+	public static final String RESOURCE_PDP = "PDP";
+	
+	public static final String RESOURCE_POLICYSTORE = "POLICYSTORE";
+	
 	/**
 	 * array containing possible keys for additional possible header information in jsonobject
 	 */

@@ -15,7 +15,7 @@ public class ServletConstants {
 	public static final String CONTENTTYPE_TEXTHTML = "text/html";
 	public static final String CONTENTTYPE_TEXTPLAIN = "text/plain";
         
-	public static final String CONTENTTYPE_XACMLXML = "application/xacml+xml";
+	public static final String CONTENTTYPE_XACML = "application/xacml+xml";
 	public static final String CONTENTTYPE_XACMLSAML = "application/samlassertion+xml";	
 	
 	public static final String HEADER_ACCEPT = "Accept";
@@ -25,5 +25,7 @@ public class ServletConstants {
 											+ "<resource rel='http://docs.oasis-open.org/ns/xacml/relation/pdp'>"
 											+ "<atom:link href='/pdp' />"
 											+ "</resource></resources>";
+	
+	public static final int SC_UNPROCESSABLE_ENTITY = 422;
 	
 }
