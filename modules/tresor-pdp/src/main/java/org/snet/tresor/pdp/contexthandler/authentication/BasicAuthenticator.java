@@ -9,6 +9,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 
@@ -41,43 +42,66 @@ public class BasicAuthenticator implements Authenticator {
 			this.users.put(params[i], params[i+1]);		
 	}
 	
-	public AuthenticatedUser authenticate(HttpServletRequest request, HttpServletResponse response) {		
-		String auth = request.getHeader(ServletConstants.HEADER_AUTHORIZATION);
-		AuthenticatedUser authUser = null;
+	public AuthenticatedUser authenticate(HttpServletRequest request, HttpServletResponse response) {
+		String authHeader = request.getHeader(ServletConstants.HEADER_AUTHORIZATION);
 		
-		// check if it is HTTP Basic Auth
-		if (auth != null && auth.toUpperCase().startsWith("BASIC ")) {
-			String userPass = new String(Base64.decodeBase64(auth.substring(6)));
-			
-			// check if user:password is in known users
-			if (users.containsKey(userPass)) {
-				// create authUser
-				String username = userPass.split(":")[0];
-				String userdomain = users.get(userPass);
-
-				authUser = new BasicAuthenticatedUser(username, userdomain);
-			}
+		if (authHeader == null || !authHeader.toUpperCase().startsWith("BASIC ") || authHeader.length() < 6) {
+			// TODO log missing authentication header
+			// TODO ask for authentication
+			response.setHeader("WWW-Authenticate", "BASIC realm=\"policystore\"");
+			response.setContentType(ServletConstants.CONTENTTYPE_TEXTHTML);
+			Helper.respondHTTP(true, HttpServletResponse.SC_UNAUTHORIZED, response);
+			return null;
 		}
 		
-		// if auth failed
-		if (authUser == null) {
-			if (auth == null)
-				log.error("No Auth header available");
-			else if (auth != null && !auth.toUpperCase().startsWith("BASIC "))
-				log.error("Wrong Auth header type");
-			else
-				log.error("Auth failed");
+		String userPass = new String(Base64.decodeBase64(authHeader.substring(6)));
+		
+		if (userPass != null && users.containsKey(userPass)) {
+			String username = userPass.split(":")[0];
+			String clientID = users.get(userPass);
+			return new BasicAuthenticatedUser(username, clientID);
 		}
 		
-		return authUser;
+		return null;
 	}
 	
-	public JSONObject getErrorResponseJSON() {	
-		return new JSONObject()
-					.put(Handler.KEYJSON_ERROR, true)
-					.put(Handler.KEYJSON_STATUSCODE, HttpServletResponse.SC_UNAUTHORIZED)
-					.put("WWW-Authenticate", "BASIC realm=\"policystore\"")
-					.put(Handler.KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_TEXTHTML);
-	}
+//	public AuthenticatedUser getAuthenticatedUser(HttpServletRequest request, HttpServletResponse response) {		
+//		String auth = request.getHeader(ServletConstants.HEADER_AUTHORIZATION);
+//		AuthenticatedUser authUser = null;
+//		
+//		// check if it is HTTP Basic Auth
+//		if (auth != null && auth.toUpperCase().startsWith("BASIC ")) {
+//			String userPass = new String(Base64.decodeBase64(auth.substring(6)));
+//			
+//			// check if user:password is in known users
+//			if (users.containsKey(userPass)) {
+//				// create authUser
+//				String username = userPass.split(":")[0];
+//				String userdomain = users.get(userPass);
+//
+//				authUser = new BasicAuthenticatedUser(username, userdomain);
+//			}
+//		}
+//		
+//		// if auth failed
+//		if (authUser == null) {
+//			if (auth == null)
+//				log.error("No Auth header available");
+//			else if (auth != null && !auth.toUpperCase().startsWith("BASIC "))
+//				log.error("Wrong Auth header type");
+//			else
+//				log.error("Auth failed");
+//		}
+//		
+//		return authUser;
+//	}
+	
+//	public JSONObject getNoAuthenticationResponse() {	
+//		return new JSONObject()
+//					.put(Handler.KEYJSON_ERROR, true)
+//					.put(Handler.KEYJSON_STATUSCODE, HttpServletResponse.SC_UNAUTHORIZED)
+//					.put("WWW-Authenticate", "BASIC realm=\"policystore\"")
+//					.put(Handler.KEYJSON_CONTENTTYPE, ServletConstants.CONTENTTYPE_TEXTHTML);
+//	}
 
 }

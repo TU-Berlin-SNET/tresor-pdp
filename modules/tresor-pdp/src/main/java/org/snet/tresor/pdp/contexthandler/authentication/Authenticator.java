@@ -8,16 +8,11 @@ import org.json.JSONObject;
 public interface Authenticator {
 
 	/**
-	 * Handle authentication procedure and communication with client
+	 * Handle authentication procedure
 	 * @param request the httpservlet request
 	 * @param response the httpservlet response
-	 * @return an AuthUser or null if auth failed
+	 * @return an authenticatedUser or null if authentication failed or is missing
 	 */
 	public AuthenticatedUser authenticate(HttpServletRequest request, HttpServletResponse response);
-
-	/**
-	 * @return jsonobject containing information for servlet when authentification fails or is necessary
-	 */
-	public JSONObject getErrorResponseJSON();
 	
 }

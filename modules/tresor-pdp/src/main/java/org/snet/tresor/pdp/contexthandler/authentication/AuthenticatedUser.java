@@ -19,18 +19,27 @@ public interface AuthenticatedUser {
 	/**
 	 * @return client-id this user belongs to
 	 */
-	public String getClientID();	
+	public String getClientID();
 	
 	/**
 	 * @param request the httpservlet request
-	 * @return whether the user is authorized to do given request
+	 * @return true if authorized, false otherwise
 	 */
 	public boolean isAuthorizedTo(HttpServletRequest request);
 	
 	/**
-	 * @param request the httpservlet request
-	 * @param reqBody the body inside the request, parsed
-	 * @return whether the user is authorized to do given request
+	 * @param action the action to be taken
+	 * @param clientID the resource's clientID
+	 * @return true if authorized, false otherwise
 	 */
-	public boolean isAuthorizedTo(HttpServletRequest request, JSONObject reqBody);
+	public boolean isAuthorizedTo(String action, String clientID);
+	
+	/**
+	 * @param action the action to be taken
+	 * @param clientID the resource's clientID
+	 * @param serviceID the resource's serviceID
+	 * @return true if authorized, false otherwise
+	 */
+	public boolean isAuthorizedTo(String action, String clientID, String serviceID);
+	
 }

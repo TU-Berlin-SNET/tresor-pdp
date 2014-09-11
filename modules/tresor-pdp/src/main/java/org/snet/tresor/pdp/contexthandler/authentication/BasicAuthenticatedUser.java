@@ -2,6 +2,7 @@ package org.snet.tresor.pdp.contexthandler.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +18,6 @@ public class BasicAuthenticatedUser implements AuthenticatedUser{
 	private String clientID;
 
 	public BasicAuthenticatedUser(String name, String clientID) {
-		// TODO investigate why
-//		this.name = name.toLowerCase();
-//		this.clientID = clientID.toLowerCase();
 		this.name = name;
 		this.clientID = clientID;
 	}
@@ -33,18 +31,15 @@ public class BasicAuthenticatedUser implements AuthenticatedUser{
 	}
 
 	public boolean isAuthorizedTo(HttpServletRequest request) {
-		// every user is allowed to act however it wants to on resources in its own domain
-		return true;
+		throw new NotImplementedException();
 	}
 
-	public boolean isAuthorizedTo(HttpServletRequest request, JSONObject reqBody) {
-		// only broker is allowed to act on behalf of other domains
-		// TODO can still be made better
-		if (reqBody.has("client-id") || reqBody.has("domain"))
-			return (this.name.equalsIgnoreCase("broker") || this.clientID.equalsIgnoreCase(reqBody.optString("client-id"))
-					 || this.clientID.equalsIgnoreCase(reqBody.optString("domain")));
-		
-		return true;
+	public boolean isAuthorizedTo(String action, String clientID) {
+		return (this.clientID.equalsIgnoreCase(clientID) || this.name.equalsIgnoreCase("broker"));
+	}
+
+	public boolean isAuthorizedTo(String action, String clientID, String serviceID) {
+		return this.isAuthorizedTo(action, clientID);
 	}
 
 }

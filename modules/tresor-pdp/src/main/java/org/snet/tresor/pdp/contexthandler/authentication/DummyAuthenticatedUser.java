@@ -22,9 +22,12 @@ public class DummyAuthenticatedUser implements AuthenticatedUser {
 		return true;
 	}
 
-	public boolean isAuthorizedTo(HttpServletRequest request, JSONObject reqBody) {
+	public boolean isAuthorizedTo(String action, String clientID) {
 		return true;
 	}
 
-	
+	public boolean isAuthorizedTo(String action, String clientID, String serviceID) {
+		return true;
+	}
+
 }
