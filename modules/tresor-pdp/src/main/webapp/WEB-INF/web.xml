@@ -15,8 +15,8 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>PolicyHandlerServlet</servlet-name>
-		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.PolicyHandlerServlet</servlet-class>
+		<servlet-name>PolicyStoreServlet</servlet-name>
+		<servlet-class>org.snet.tresor.pdp.contexthandler.servlet.PolicyStoreServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -31,12 +31,8 @@
 		<servlet-name>PDPServlet</servlet-name>
 		<url-pattern>/pdp/</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>PolicyHandlerServlet</servlet-name>
-		<url-pattern>/policy</url-pattern>
-	</servlet-mapping>
-        <servlet-mapping>
-		<servlet-name>PolicyHandlerServlet</servlet-name>
+    <servlet-mapping>
+		<servlet-name>PolicyStoreServlet</servlet-name>
 		<url-pattern>/policy/*</url-pattern>
 	</servlet-mapping>
 </web-app>

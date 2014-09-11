@@ -1,37 +1,33 @@
 {
-
-
     "tresor-pdp": { "policystore"           :   { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStore", "parameters": [ "webapps/root/policies" ] },
                     "attributefindermodules": [ { "classname": "org.wso2.balana.finder.impl.SelectorModule" }, 
                                                 { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" },
                                                 { "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",
-                                                   "parameters": [ "org:snet:tresor:attribute:current-wifi",                "http://localhost:3000/wifiPIP",
+                                                  "parameters": [ "org:snet:tresor:attribute:current-wifi",                "http://localhost:3000/wifiPIP",
                                                                    "org:snet:tresor:attribute:current-geolocation",         "http://localhost:3000/wifiPIP",
                                                                    "org:snet:tresor:attribute:timestamp-geo",               "http://localhost:3000/wifiPIP",
                                                                    "org:snet:tresor:attribute:current-bluetooth-location",  "http://localhost:3000/wifiPIP",
-                                                                   "org:snet:tresor:attribute:current-nfc-location",        "http://localhost:3000/wifiPIP"] 
+                                                                   "org:snet:tresor:attribute:current-nfc-location",        "http://localhost:3000/wifiPIP"
+                                                                ] 
                                                 },
                                                 { "classname": "org.snet.tresor.pdp.finder.impl.StationAttributeFinderModule",
                                                   "parameters": [   "org:snet:tresor:attribute:doctor-station",             "http://localhost:3300/doctor",
                                                                     "org:snet:tresor:attribute:doctor-role",                "http://localhost:3300/doctor",
                                                                     "org:snet:tresor:attribute:patient-station",            "http://localhost:3300/patient",
-                                                                    "org:snet:tresor:attribute:patient-role",               "http://localhost:3300/patient" ]
+                                                                    "org:snet:tresor:attribute:patient-role",               "http://localhost:3300/patient" 
+                                                                ]
                                                 } 
                                               ],
                     "resourcefindermodules": [ ]
                   },
-
-    "contexthandler": { "handlers": [ { "classname" : "org.snet.tresor.pdp.contexthandler.handler.PDPHandler" },
-                                      { "classname" : "org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler" } ]
-                      },
-
 	"authenticator": { "classname": "org.snet.tresor.pdp.contexthandler.authentication.BasicAuthenticator",
-                                    "parameters": [ "username:password", "exampledomain",
-                                                    "broker:broker", "broker", 
-                                                    "admin:admin", "HERZ",
-                                                    "doctor:12345", "healthcare",
-                                                    "user:user", "userdomain",
-                                                    "Doctor2:12345", "Hospital2",
-                                                    "Doctor1:12345", "Hospital1" ]
+                       "parameters": [ "username:password", "exampledomain",
+                                       "broker:broker", "broker", 
+                                       "admin:admin", "HERZ",
+                                       "doctor:12345", "healthcare",
+                                       "user:user", "userdomain",
+                                       "Doctor2:12345", "Hospital2",
+                                       "Doctor1:12345", "Hospital1" 
+                                     ]
                         }
 }
