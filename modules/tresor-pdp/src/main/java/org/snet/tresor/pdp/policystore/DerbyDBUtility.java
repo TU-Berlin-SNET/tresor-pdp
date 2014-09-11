@@ -61,7 +61,7 @@ public class DerbyDBUtility implements PolicyStore{
         }
     }
     
-    public Map<String, String> getAll(String domain) {
+    public Map<String, String> get(String domain) {
         try {
             //to prevent the error getting a policy that already was deleted
             this.statement = connection.createStatement(this.resultSet.TYPE_SCROLL_INSENSITIVE, this.resultSet.CONCUR_UPDATABLE);
@@ -80,7 +80,7 @@ public class DerbyDBUtility implements PolicyStore{
         }
     }
     
-    public String getPolicy(String domain, String service) {
+    public String get(String domain, String service) {
         try {
             //to prevent the error getting a policy that already was deleted
             this.statement = connection.createStatement(this.resultSet.TYPE_SCROLL_INSENSITIVE, this.resultSet.CONCUR_UPDATABLE);
@@ -99,7 +99,7 @@ public class DerbyDBUtility implements PolicyStore{
         }
     }
     
-    public String addPolicy(String domain, String service, String policy) {
+    public String put(String domain, String service, String policy) {
         try {
             this.psInsert = connection.prepareStatement("insert into "+dbTable+" (domain, service, policy) values (?, ?, ?)");
             
@@ -116,7 +116,7 @@ public class DerbyDBUtility implements PolicyStore{
         }
     }
     
-    public int deletePolicy(String domain, String service) {
+    public int delete(String domain, String service) {
         try {
             this.psUpdate = connection.prepareStatement("DELETE FROM "+dbTable+" WHERE domain='"+domain+"' and service='"+service+"'");
             int result = this.psUpdate.executeUpdate();

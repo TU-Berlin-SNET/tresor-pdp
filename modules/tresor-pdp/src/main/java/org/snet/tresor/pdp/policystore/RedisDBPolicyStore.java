@@ -28,7 +28,7 @@ public class RedisDBPolicyStore implements PolicyStore {
 		this.redisPool = new JedisPool(new JedisPoolConfig(), params[0]);
 	}
 
-	public Map<String, String> getAll(String domain) {
+	public Map<String, String> get(String domain) {
 		// get client from pool
 		Jedis redis = this.redisPool.getResource();
 		
@@ -42,14 +42,14 @@ public class RedisDBPolicyStore implements PolicyStore {
 		return result;
 	}
 
-	public String getPolicy(String domain, String service) {
+	public String get(String domain, String service) {
 		Jedis redis = this.redisPool.getResource();
 		String result = redis.hget(domain, service);
 		this.redisPool.returnResource(redis);
 		return result;
 	}
 
-	public String addPolicy(String domain, String service, String policy) {
+	public String put(String domain, String service, String policy) {
 		Jedis redis = this.redisPool.getResource();
 		long result = redis.hset(domain, service, policy);
 		this.redisPool.returnResource(redis);
@@ -60,7 +60,7 @@ public class RedisDBPolicyStore implements PolicyStore {
 			return service;
 	}
 
-	public int deletePolicy(String domain, String service) {
+	public int delete(String domain, String service) {
 		Jedis redis = this.redisPool.getResource();		
 		long result = redis.hdel(domain, service);
 		this.redisPool.returnResource(redis);

@@ -41,7 +41,7 @@ public class FileBasedPolicyStore implements PolicyStore {
 		this(directoryPath[0]);
 	}
 	
-	public Map<String, String> getAll(String domain) {
+	public Map<String, String> get(String domain) {
 		Map<String, String> policyMap = new HashMap<String, String>();
 		File file = new File(this.baseDirectory + File.separator + domain);
 
@@ -52,7 +52,7 @@ public class FileBasedPolicyStore implements PolicyStore {
 		return policyMap;
 	}
 
-	public String getPolicy(String domain, String service) {
+	public String get(String domain, String service) {
 		String policy = null;
 		
 		File file = new File(this.baseDirectory + File.separator + domain + File.separator + service);
@@ -62,7 +62,7 @@ public class FileBasedPolicyStore implements PolicyStore {
 		return policy;
 	}
 
-	public String addPolicy(String domain, String service, String policy) {
+	public String put(String domain, String service, String policy) {
 		String response = null;
 		
 		try {
@@ -83,7 +83,7 @@ public class FileBasedPolicyStore implements PolicyStore {
 		return response;
 	}
 
-	public int deletePolicy(String domain, String service) {
+	public int delete(String domain, String service) {
 		int response = 0;
 				
 		File file = new File(this.baseDirectory + File.separator + domain + File.separator + service);

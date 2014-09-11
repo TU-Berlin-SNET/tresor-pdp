@@ -5,36 +5,36 @@ import java.util.Map;
 public interface PolicyStore {
 	
 	/**
-	 * Retrieves all policies belonging to the given domain as a Map
-	 * @param domain customer domain
+	 * Retrieves all policies belonging to the given clientID as a Map
+	 * @param clientID client identifier
 	 * @return Map with the serviceIds as keys and the policy strings as values
 	 */
-	public Map<String, String> getAll(String domain);
+	public Map<String, String> get(String clientID);
 	
 	/**
 	 * Retrieves the corresponding policy 
-	 * @param domain customer domain of policy
-	 * @param service service the policy is valid for (also in our case: id)
+	 * @param clientID client identifier
+	 * @param serviceID service identifier
 	 * @return policy or null if there is none
 	 */
-	public String getPolicy(String domain, String service);
+	public String get(String clientID, String serviceID);
 	
 	/**
-	 * Adds a Policy to the PolicyStore
-	 * @param domain domain the policy is applicable for
-	 * @param service service the policy is applicable for (also in our case: id)
+	 * Puts a Policy to the PolicyStore
+	 * @param clientID client identifier
+	 * @param serviceID service identifier
 	 * @param policy the policy as string
 	 * @return id of the new policy or null if failed
 	 */
-	public String addPolicy(String domain, String service, String policy);
+	public String put(String clientID, String serviceID, String policy);
 	
 	/**
-	 * Deletes Policy which corresponds to given domain/service combination
-	 * @param domain domain the policy is applicable for
-	 * @param service service the policy is applicable for (also in our case: id)
+	 * Deletes Policy which corresponds to given clientID/serviceID combination
+	 * @param clientID client identifier
+	 * @param serviceID service identifier
 	 * @return 1 if successful, 0 if failed
 	 */
-	public int deletePolicy(String domain, String service);
+	public int delete(String clientID, String serviceID);
 	
 	/**
 	 * Disconnect from PolicyStore and/or close PolicyStore
