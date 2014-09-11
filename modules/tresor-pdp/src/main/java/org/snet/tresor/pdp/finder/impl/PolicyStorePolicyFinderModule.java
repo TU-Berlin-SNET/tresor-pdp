@@ -66,7 +66,7 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 		// get & load policy
 		AbstractPolicy policy = null;
 		if (domain != null && service != null) {
-			String policyString = this.policyStore.getPolicy(domain, service);
+			String policyString = this.policyStore.get(domain, service);
 			policy = loadPolicy(policyString, this.finder);
 		}
 		

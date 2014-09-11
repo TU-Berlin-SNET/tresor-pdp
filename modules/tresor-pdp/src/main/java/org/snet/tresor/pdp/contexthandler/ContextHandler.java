@@ -18,6 +18,8 @@ import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.TresorPDP;
 import org.snet.tresor.pdp.contexthandler.authentication.Authenticator;
 import org.snet.tresor.pdp.contexthandler.handler.Handler;
+import org.snet.tresor.pdp.contexthandler.handler.PDPHandler;
+import org.snet.tresor.pdp.contexthandler.handler.PolicyStoreHandler;
 
 /**
  * Class for initializing ContextHandler system, API,  
@@ -26,12 +28,14 @@ import org.snet.tresor.pdp.contexthandler.handler.Handler;
 public class ContextHandler {
 	private static final Logger log = LoggerFactory.getLogger(ContextHandler.class);
 	
-	private static ContextHandler INSTANCE;
+	private TresorPDP tresorPDP;
+	private Authenticator authenticator;
 	
-	private Map<String, Handler> handlers;
-	
+	private PDPHandler pdpHandler;
+	private PolicyStoreHandler policyStoreHandler;	
 	private boolean initialized;
 	
+	private static ContextHandler INSTANCE;
 	public static synchronized ContextHandler getInstance() {
 		if (INSTANCE == null)
 			INSTANCE = new ContextHandler();
@@ -40,81 +44,45 @@ public class ContextHandler {
 	
 	private ContextHandler() {
 		this.initialized = false;
-		this.handlers = new HashMap<String, Handler>();
 	}
 	
-	private void setHandlers(Map<String, Handler> handlers) {
-		this.handlers = handlers;
-	}
-
-	/**
-	 * Pass request to corresponding handler
-	 * @param request the httpservlet request
-	 * @param response the httpservlet response
-	 */
-	public JSONObject handle(HttpServletRequest request, HttpServletResponse response) {
-		String[] params = request.getRequestURI().split("/");
-		JSONObject responseJSON = null;
-		
-		// minimum two parameters (first is usually blank, second is resource)
-		if (params.length > 1) {
-			String resource = params[1].toLowerCase();
-			Handler handler = this.handlers.get(resource);
-			
-			if (handler != null) {
-				responseJSON = handler.handle(request, response);
-			} else {
-				log.info("No handler found for resource: " + resource);
-				responseJSON = Helper.createResponseJSON(true, HttpServletResponse.SC_NOT_FOUND);
-			}
-		}
-
-		return responseJSON;
+	public PDPHandler getPDPHandler() {
+		return this.pdpHandler;
 	}
 	
-	public synchronized void initialize() {
-		
-		if (this.initialized)
+	public PolicyStoreHandler getPolicyStoreHandler() {
+		return this.policyStoreHandler;
+	}
+	
+	public TresorPDP getTresorPDP() {
+		return this.tresorPDP;
+	}
+	
+	public Authenticator getAuthenticator() {
+		return this.authenticator;
+	}
+	
+	public synchronized void initialize() throws IOException, Exception {	
+		if (this.initialized) {
+			log.debug("ContextHandler already initialized");
 			return;
-		
-		try {
-			log.info("begin contexthandler initialization");
-			Configuration conf = Configuration.getInstance();
-			
-			TresorPDP tresorPDP = new TresorPDP(conf.getConfig("tresor-pdp"));
-			Authenticator authenticator = Helper.createInstance(conf.getConfig("authenticator"), Authenticator.class);
-			
-			JSONObject ctxConf = conf.getConfig("contexthandler");						
-			List<Handler> handlerList = new ArrayList<Handler>(); 
-			Helper.createInstances(ctxConf.getJSONArray("handlers"), handlerList, Handler.class);
-			
-			Map<String, Handler> handlers = new HashMap<String, Handler>();
-			for (Handler h : handlerList) {
-				if (h.getResourceName().equalsIgnoreCase("pdp")) {
-					h.setComponent("pdp", tresorPDP.getPDP());
-				}
-				
-				if (h.getResourceName().equalsIgnoreCase("policy")) {
-					h.setComponent("policy", tresorPDP.getPolicyStore());
-					h.setComponent("authenticator", authenticator);
-				}
-				
-				log.info("Registering new handler for resource {}", h.getResourceName());
-				handlers.put(h.getResourceName(), h);
-			}
-						
-			this.setHandlers(handlers);
-			
-		} catch (IOException e) {
-			// TODO log
-			log.info("IOException happened.", e);
-		} catch (JSONException e) {			
-			// TODO log
-			log.info("JSONException happened.", e);
-		} catch (Exception e) {
-			// TODO log
-			log.info("Exception happened.", e);
 		}
+		
+		log.debug("Initializing ContextHandler");
+		
+		Configuration conf = Configuration.getInstance();
+		
+		// Create the PDP
+		this.tresorPDP = new TresorPDP(conf.getConfig("tresor-pdp"));		
+		
+		// Create the authenticator
+		this.authenticator = Helper.createInstance(conf.getConfig("authenticator"), Authenticator.class);				
+		
+		// Create Handlers
+		this.pdpHandler = new PDPHandler(this.tresorPDP.getPDP(), this.tresorPDP.getPDPConfig());
+		this.policyStoreHandler = new PolicyStoreHandler(this.tresorPDP.getPolicyStore(), this.authenticator);
+		
+		log.info("Initialized ContextHandler successfully");
 		
 		this.initialized = true;
 	}
