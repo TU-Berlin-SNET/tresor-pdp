@@ -2,8 +2,6 @@ package org.snet.tresor.pdp.contexthandler.authentication;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.json.JSONObject;
-
 /**
  * Dummy Auth User implementation
  * @author malik

@@ -3,8 +3,6 @@ package org.snet.tresor.pdp.contexthandler.authentication;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONObject;
-
 public interface Authenticator {
 
 	/**
@@ -14,5 +12,5 @@ public interface Authenticator {
 	 * @return an authenticatedUser or null if authentication failed or is missing
 	 */
 	public AuthenticatedUser authenticate(HttpServletRequest request, HttpServletResponse response);
-	
+
 }

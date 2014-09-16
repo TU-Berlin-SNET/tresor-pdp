@@ -3,17 +3,13 @@ package org.snet.tresor.pdp.contexthandler.authentication;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Representation of a user containing required information for further processing after auth procedure 
+ * Representation of a user containing required information for further processing after auth procedure
  * @author malik
  */
 public class BasicAuthenticatedUser implements AuthenticatedUser{
-	private static final Logger log = LoggerFactory.getLogger(BasicAuthenticatedUser.class);
-	
+
 	private String name;
 	private String clientID;
 
@@ -25,7 +21,7 @@ public class BasicAuthenticatedUser implements AuthenticatedUser{
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public String getClientID() {
 		return this.clientID;
 	}
@@ -35,7 +31,7 @@ public class BasicAuthenticatedUser implements AuthenticatedUser{
 	}
 
 	public boolean isAuthorizedTo(String action, String clientID) {
-		return (this.clientID.equalsIgnoreCase(clientID) || this.name.equalsIgnoreCase("broker"));
+		return (this.clientID.equals(clientID) || this.name.equals("broker"));
 	}
 
 	public boolean isAuthorizedTo(String action, String clientID, String serviceID) {
