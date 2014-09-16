@@ -8,29 +8,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * PolicyStore for file based policy store, NOT THREAD SAFE
  * @author malik
  */
-public class FileBasedPolicyStore implements PolicyStore {	
-	private static final Logger log = LoggerFactory.getLogger(FileBasedPolicyStore.class);
+public class FileBasedPolicyStore implements PolicyStore {
 	private File baseDirectory;
-	
+
 	/**
 	 * Create new FileBasedPolicyStore pointing to given directoryPath
 	 * (directory is created if it does not exists)
 	 * @param directoryPath path to the directory which is designated to hold the policies
 	 */
-	public FileBasedPolicyStore(String directoryPath) {		
+	public FileBasedPolicyStore(String directoryPath) {
 		this.baseDirectory = new File(directoryPath);
-		
+
 		if (!this.baseDirectory.isDirectory())
 			this.baseDirectory.mkdirs();
 	}
-	
+
 	/**
 	 * Create new FileBasedPolicyStore pointing to given directoryPath
 	 * (directory is created if it does not exists)
@@ -40,7 +36,7 @@ public class FileBasedPolicyStore implements PolicyStore {
 	public FileBasedPolicyStore(String... directoryPath) {
 		this(directoryPath[0]);
 	}
-	
+
 	public Map<String, String> get(String domain) {
 		Map<String, String> policyMap = new HashMap<String, String>();
 		File file = new File(this.baseDirectory + File.separator + domain);
@@ -48,67 +44,67 @@ public class FileBasedPolicyStore implements PolicyStore {
 		if (file.isDirectory()) {
 			putPolicies(file, policyMap);
 		}
-		
+
 		return policyMap;
 	}
 
 	public String get(String domain, String service) {
 		String policy = null;
-		
+
 		File file = new File(this.baseDirectory + File.separator + domain + File.separator + service);
 		if (file.isFile())
 			policy = readFile(file);
-		
+
 		return policy;
 	}
 
 	public String put(String domain, String service, String policy) {
 		String response = null;
-		
+
 		try {
 			File dir = new File(this.baseDirectory + File.separator + domain);
-			
+
 			if (!dir.isDirectory())
 				dir.mkdir();
-			
-			File file = new File(this.baseDirectory + File.separator + domain + File.separator + service);			
-			
+
+			File file = new File(this.baseDirectory + File.separator + domain + File.separator + service);
+
 			if (!file.isFile())
 				file.createNewFile();
-			
+
 			writeFile(file, policy);
 			response = service;
 		} catch (IOException e) { }
-		
+
 		return response;
 	}
 
 	public int delete(String domain, String service) {
 		int response = 0;
-				
+
 		File file = new File(this.baseDirectory + File.separator + domain + File.separator + service);
 		if (file.isFile())
 			response = (file.delete()) ? 1 : 0;
-			
+
 		return response;
 	}
 
 	public void close() { }
-	
+
 	/**
 	 * Loads all files in a given directory to given policyMap as String
 	 * (expects to only find policies in the directory)
-	 * 
+	 *
 	 * @param dir file directory containing policies
 	 * @param policyMap Map to save loaded policies
 	 */
 	private void putPolicies(File dir, Map<String, String> policyMap) {
-		for (File f : dir.listFiles()) {			
+		for (File f : dir.listFiles()) {
 			if (f.isFile())
 				policyMap.put(f.getName(), readFile(f));
 		}
 	}
-	
+
 	/**
 	 * Reads given file into string
 	 * @param f the file to read
@@ -116,17 +112,17 @@ public class FileBasedPolicyStore implements PolicyStore {
 	 */
 	private String readFile(File f) {
 		String policy = null;
-				
+
 		try {
 			Scanner scanner = new Scanner(f);
 			scanner.useDelimiter("\\A");
 			policy = scanner.next();
-			scanner.close();			
+			scanner.close();
 		} catch (FileNotFoundException e) {	}
-		
+
 		return policy;
 	}
-	
+
 	/**
 	 * Writes given string to file
 	 * @param f the file to write

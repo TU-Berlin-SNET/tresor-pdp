@@ -22,9 +22,9 @@ public class ServletConstants {
 	public static final String HEADER_AUTHORIZATION = "Authorization";
 		
 	public static final String HOME_DISCOVERY_XML = "<resources xmlns='http://ietf.org/ns/home-documents'	xmlns:atom='http://www.w3.org/2005/Atom'>"
-											+ "<resource rel='http://docs.oasis-open.org/ns/xacml/relation/pdp'>"
-											+ "<atom:link href='/pdp' />"
-											+ "</resource></resources>";
+													+ "<resource rel='http://docs.oasis-open.org/ns/xacml/relation/pdp'>"
+														+ "<atom:link href='/pdp' />"
+													+ "</resource></resources>";
 	
 	public static final int SC_UNPROCESSABLE_ENTITY = 422;
 	

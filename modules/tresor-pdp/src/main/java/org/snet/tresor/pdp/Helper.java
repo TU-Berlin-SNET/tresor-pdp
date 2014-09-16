@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,8 +16,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.snet.tresor.pdp.contexthandler.handler.Handler;
 import org.snet.tresor.pdp.contexthandler.servlet.ServletConstants;
 import org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule;
 import org.wso2.balana.attr.AttributeValue;
@@ -29,8 +26,53 @@ import org.wso2.balana.ctx.EvaluationCtx;
  * Helper class containing miscellaneous helper methods
  * @author malik
  */
-public class Helper {	
+public class Helper {
 	private static final Logger log = LoggerFactory.getLogger(Helper.class);
+
+	/**
+	 * Creates multiple instances of given class and puts into given collection
+	 * @param classes JSONArray containing configuration information for classes
+	 * @param output Collection to output to
+	 * @param cls the class of created instances, used for casting
+	 * @throws Exception
+	 */
+    public static <T> void createInstances(JSONArray classes, Collection<T> output, Class<T> cls) throws Exception {
+    	log.debug("Creating instances of class {}", cls.toString());
+    	for (int i = 0; i < classes.length(); i++) {
+    		JSONObject classConfig = classes.getJSONObject(i);
+    		output.add(Helper.createInstance(classConfig, cls));
+    	}
+    }
+
+    /**
+     * Creates an instance of given class with given config
+     * @param config JSONObject containing configuration for instance
+     * @param cls class to cast to
+     * @return created instance
+     * @throws Exception
+     */
+    public static <T> T createInstance(JSONObject config, Class<T> cls) throws Exception {
+    	Class<?> c = Helper.class.getClassLoader().loadClass(config.getString("classname"));
+    	log.debug("Creating instance of class {} with classname {}", cls.toString(), config.getString("classname"));
+
+    	Object instance;
+
+    	if (config.has("parameters")) {
+    		JSONArray paramsJSON = config.getJSONArray("parameters");
+
+    		String[] params = new String[paramsJSON.length()];
+    		for (int i = 0; i < paramsJSON.length(); i++) {
+    			params[i] = paramsJSON.getString(i);
+    		}
+
+    		Object[] wrappedParams = { params };
+    		instance = c.getConstructor(String[].class).newInstance(wrappedParams);
+    	}
+    	else
+    		instance = c.newInstance();
+
+    	return cls.cast(instance);
+    }
 
 	/**
 	 * Searches in given EvaluationContext for an attribute
@@ -59,7 +101,7 @@ public class Helper {
 
 		return value;
 	}
-		
+
 	/**
 	 * Gets the InputStream from the request, handles character encoding issues, wraps into Reader and returns
 	 * @param request the httpservlet request
@@ -69,14 +111,16 @@ public class Helper {
 	public static Reader getRequestInputStreamReader(HttpServletRequest request) throws IOException {
 		// try to get the charset from request
 		String charset = request.getCharacterEncoding();
-		
+
+		log.debug("Request charset is {}", charset);
+
 		// if none is given, default to UTF-8
 		if (charset == null)
 			charset = ServletConstants.CHARSET_UTF8;
-		
+
 		return new InputStreamReader(request.getInputStream(), charset);
 	}
-	
+
 	/**
 	 * @param request the httpservlet request
 	 * @return parsed JSONObject from HTTP body
@@ -88,63 +132,12 @@ public class Helper {
     		JSONTokener tok = new JSONTokener(reader);
     		out = new JSONObject(tok);
     	} catch (IOException e) {
-    		log.error("Error getting JSONObject from request body", e);
+    		log.error("Failed to retrieve JSONObject from request body", e);
     	}
-    	
+
     	return out;
     }
-    
-//    /**
-//     * Create response json
-//     * @param error whether an error happened
-//     * @param httpcode the http code
-//     * @return json object containing response details
-//     */
-//    public static JSONObject createResponseJSON(boolean error, int httpcode) {
-//		return new JSONObject().put(Handler.KEYJSON_ERROR, error)
-//				.put(Handler.KEYJSON_STATUSCODE, httpcode);
-//    }
-//    
-//    /**
-//     * Create response json
-//     * @param error whether an error happened
-//     * @param httpcode the http code
-//     * @param contenttype the contenttype
-//     * @param content the actual content
-//     * @return json object containing response details
-//     */
-//    public static JSONObject createResponseJSON(boolean error, int httpcode, String contenttype, String content) {
-//		return new JSONObject().put(Handler.KEYJSON_ERROR, error)
-//				.put(Handler.KEYJSON_STATUSCODE, httpcode)
-//				.put(Handler.KEYJSON_CONTENTTYPE, contenttype)
-//				.put(Handler.KEYJSON_CONTENT, content);
-//    }
-    
-    /**
-     * Responds with information given in the JSON, expects a specific structure
-     * @param responseJSON jsonobject containing response information
-     * @param response the httpservlet response
-     */
-//    public static void respondHTTP(JSONObject responseJSON, HttpServletResponse response) {
-//    	if (responseJSON != null) {
-//    		// add additional, optional headers
-//    		addHeaders(responseJSON, response, Handler.KEYJSON_HEADER);
-//
-//        	boolean error = responseJSON.optBoolean(Handler.KEYJSON_ERROR, true);
-//        	int statuscode = responseJSON.optInt(Handler.KEYJSON_STATUSCODE, 500);
-//        	
-//        	if (responseJSON.has(Handler.KEYJSON_CONTENTTYPE) && responseJSON.has(Handler.KEYJSON_CONTENT)) {        		
-//        		respondHTTP(error, statuscode, responseJSON.getString(Handler.KEYJSON_CONTENTTYPE), 
-//        				responseJSON.getString(Handler.KEYJSON_CONTENT), response);        		
-//        	} else {
-//        		respondHTTP(error, statuscode, response);
-//        	}
-//        
-//    	} else {    		
-//    		respondHTTP(true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response);
-//    	}    	    	
-//    }
-    
+
     /**
      * Respond with given information
      * @param error boolean value indicating whether an error happened
@@ -160,12 +153,10 @@ public class Helper {
 				response.flushBuffer();
 			}
 		} catch (IOException e) {
-			// TODO logging
-		} catch (Exception e) {
-			// TODO logging
+			log.error("Failed writing http response to stream", e);
 		}
 	}
-    
+
     /**
      * Respond with given Information
      * @param error boolean value indicating whether an error happened
@@ -178,20 +169,18 @@ public class Helper {
     	try {
         	response.setContentType(contenttype);
         	response.setCharacterEncoding(ServletConstants.CHARSET_UTF8);
-        	
+
         	if (error) {
         		response.sendError(statuscode, content);
         	} else {
         		response.setStatus(statuscode);
-        		Helper.printResponse(content, response);    		
-        	}        	
+        		Helper.printResponse(content, response);
+        	}
     	} catch (IOException e) {
-			// TODO logging
-		} catch (Exception e) {
-			// TODO logging
+    		log.error("Failed to write http response to stream", e);
 		}
     }
-    
+
     /**
      * Prints given string response to servlet response outputstream and closes stream afterwards
      * @param str the string to print
@@ -209,41 +198,13 @@ public class Helper {
     		catch (Exception e) { }
     	}
     }
-    
-    public static <T> void createInstances(JSONArray classes, Collection<T> output, Class<T> cls) throws Exception {    	
-    	for (int i = 0; i < classes.length(); i++) {
-    		JSONObject classConfig = classes.getJSONObject(i);
-    		output.add(Helper.createInstance(classConfig, cls));
-    	}    	
-    }
-    
-    public static <T> T createInstance(JSONObject config, Class<T> cls) throws Exception {
-    	Class<?> c = Helper.class.getClassLoader().loadClass(config.getString("classname"));
-    	Object instance;
-    	    	
-    	if (config.has("parameters")) {
-    		
-    		JSONArray paramsJSON = config.getJSONArray("parameters");
-    		String[] params = new String[paramsJSON.length()];
-    		for (int i = 0; i < paramsJSON.length(); i++) {
-    			params[i] = paramsJSON.getString(i);
-    		}
-    		
-    		Object[] wrappedParams = { params };
-    		
-    		instance = c.getConstructor(String[].class).newInstance(wrappedParams);
-    	}    		
-    	else
-    		instance = c.newInstance();
-    	
-    	return cls.cast(instance);    	
-    }
-    
+
     /**
      * Clear potentially cached data
      */
     public static void clearPDPCaches() {
+    	log.debug("Clearing PDP caches");
     	LocationAttributeFinderModule.clearThreadCache();
     }
-    
+
 }

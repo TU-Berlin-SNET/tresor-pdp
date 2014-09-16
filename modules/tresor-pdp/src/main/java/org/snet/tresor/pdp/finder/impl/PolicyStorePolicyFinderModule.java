@@ -8,7 +8,6 @@ import org.opensaml.xml.parse.BasicParserPool;
 import org.opensaml.xml.parse.ParserPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.snet.tresor.pdp.Configuration;
 import org.snet.tresor.pdp.Helper;
 import org.snet.tresor.pdp.policystore.PolicyStore;
 import org.w3c.dom.Document;
@@ -28,9 +27,9 @@ import org.wso2.balana.finder.PolicyFinderResult;
  * policies from the Policy Store
  * @author malik
  */
-public class PolicyStorePolicyFinderModule extends PolicyFinderModule{	
+public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 	private static final Logger log = LoggerFactory.getLogger(PolicyStorePolicyFinderModule.class);
-	
+
 	private ParserPool parser;
 	private PolicyFinder finder;
 	private PolicyStore policyStore;
@@ -38,56 +37,56 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 	public PolicyStorePolicyFinderModule(PolicyStore policyStore) {
 		this.policyStore = policyStore;
 	}
-	
+
 	@Override
 	public void init(PolicyFinder finder) {
 		this.finder = finder;
-		this.parser = new BasicParserPool();		
+		this.parser = new BasicParserPool();
 	}
-	
+
     @Override
     public boolean isRequestSupported() {
         return true;
     }
-	
+
 	@Override
 	public PolicyFinderResult findPolicy(EvaluationCtx context) {
 		// get necessary values
-		String domain = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
-													FinderConstants.ID_DOMAIN_URI, null, 
-													FinderConstants.CATEGORY_SUBJECT_URI, 
+		String client = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI,
+													FinderConstants.ID_DOMAIN_URI, null,
+													FinderConstants.CATEGORY_SUBJECT_URI,
 													context);
-		
-		String service = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI, 
-													 FinderConstants.ID_SERVICE_URI, null, 
-													 FinderConstants.CATEGORY_RESOURCE_URI, 
+
+		String service = Helper.getAttributeAsString(FinderConstants.DATATYPE_STRING_URI,
+													 FinderConstants.ID_SERVICE_URI, null,
+													 FinderConstants.CATEGORY_RESOURCE_URI,
 													 context);
-		
+
+		log.info("Retrieving policy for client {} and service {}", client, service);
+
 		// get & load policy
 		AbstractPolicy policy = null;
-		if (domain != null && service != null) {
-			String policyString = this.policyStore.get(domain, service);
+		if (client != null && service != null) {
+			String policyString = this.policyStore.get(client, service);
 			policy = loadPolicy(policyString, this.finder);
 		}
-		
+
 		// if policy was successfully loaded, evaluate
 		if (policy != null) {
 			MatchResult match = policy.match(context);
-			
+
 			if (match.getResult() == MatchResult.INDETERMINATE)
 				return new PolicyFinderResult(match.getStatus());
-			
+
 			if (match.getResult() == MatchResult.MATCH) {
 				return new PolicyFinderResult(policy);
 			}
 		}
-		
-		if (log.isDebugEnabled())
-			log.debug("No matching XACML policy found");
-		
+
+		log.info("No matching policy found for client {} and service {}", client, service);
 		return new PolicyFinderResult();
 	}
-	
+
     /**
      * Private helper that tries to load the given policy
      *
@@ -107,7 +106,7 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 
                 // handle the policy, if it's a known type
                 Element root = doc.getDocumentElement();
-                String name = DOMHelper.getLocalName(root);   
+                String name = DOMHelper.getLocalName(root);
 
                 if (name.equals("Policy")) {
                 	policy = Policy.getInstance(root);
@@ -122,13 +121,13 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        log.error("Error while closing input reader");
-                    }                
+                        log.warn("Error while closing input reader");
+                    }
                 }
-            }        	
+            }
         }
 
         return policy;
     }
-	
+
 }

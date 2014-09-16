@@ -1,7 +1,5 @@
 package org.snet.tresor.pdp.contexthandler.servlet;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,15 +32,16 @@ public class HomeServlet extends HttpServlet {
 		try {
 			ctxHandler.initialize();
 		} catch (Exception e) {
-			MDC.put("tresor-component", "PDP");
+			MDC.put("tresor-component", "ContextHandler");
 			MDC.put("category", "Initialization");
-			
+
 			// log and exit
 			log.error("Initialization failed, shutting down!", e);
 			
 			MDC.clear();
 			System.exit(1);
 		}
+		log.info("HomeServlet initialized");
 	}
 	
 }
