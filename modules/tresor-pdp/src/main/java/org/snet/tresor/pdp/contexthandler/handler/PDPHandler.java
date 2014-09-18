@@ -90,7 +90,7 @@ public class PDPHandler {
 		String client = Helper.getAttributeAsString(
 				FinderConstants.DATATYPE_STRING_URI,
 				FinderConstants.ID_DOMAIN_URI, null,
-				FinderConstants.CATEGORY_RESOURCE_URI, evalCtx);
+				FinderConstants.CATEGORY_SUBJECT_URI, evalCtx);
 
 		String service = Helper.getAttributeAsString(
 				FinderConstants.DATATYPE_STRING_URI,
@@ -106,7 +106,7 @@ public class PDPHandler {
 
 		// TODO do other stuff with response, e.g. logging
 		for (AbstractResult result : response.getResults())
-			log.info("Decision for access to service {} is {}", service, AbstractResult.DECISIONS[result.getDecision()]);
+			log.info("Decision for access to service {} of client {} is {}", service, client, AbstractResult.DECISIONS[result.getDecision()]);
 
 		return response.encode();
 	}
