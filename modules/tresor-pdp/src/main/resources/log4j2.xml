@@ -3,12 +3,12 @@
         <Appenders>
             <Console name="stdout" target="SYSTEM_OUT">
                 <PatternLayout charset="UTF-8" alwaysWriteExceptions="false">
-                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m}%enc{%rEx{short}}","tresor-component":"%enc{%X{tresor-component}}","category":"%enc{%X{category}}","client-id":"%enc{%X{client-id}}","subject-id":"%enc{%X{subject-id}}","thread":"%t"}%n</pattern>
+                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m}%enc{%rEx{short}}","tresor-component":"%X{tresor-component}","category":"%X{category}","client-id":"%X{client-id}","subject-id":"%X{subject-id}","thread":"%t"}%n</pattern>
                 </PatternLayout>
             </Console>
             <Socket name="socket" host="xacml.snet.tu-berlin.de" port="9400">
                 <PatternLayout charset="UTF-8" alwaysWriteExceptions="false">
-                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m}%enc{%rEx{short}}","tresor-component":"%enc{%X{tresor-component}}","category":"%enc{%X{category}}","client-id":"%enc{%X{client-id}}","subject-id":"%enc{%X{subject-id}}","thread":"%t"}%n</pattern>
+                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m}%enc{%rEx{short}}","tresor-component":"%X{tresor-component}","category":"%X{category}","client-id":"%X{client-id}","subject-id":"%X{subject-id}","thread":"%t"}%n</pattern>
                 </PatternLayout>
             </Socket>
             <Async name="async">
