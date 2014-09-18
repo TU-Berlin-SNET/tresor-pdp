@@ -32,6 +32,7 @@ public class PDPServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 		MDC.clear();
 		MDC.put("tresor-component", "PDP");
+		MDC.put("category", "Request Validation");
 
 		// check if contenttype is invalid
 		String contenttype = request.getContentType().toLowerCase();
@@ -40,7 +41,7 @@ public class PDPServlet extends HttpServlet {
 		else if (contenttype.contains(ServletConstants.CONTENTTYPE_XACMLSAML))
 			MDC.put("category", "XACML-SAML decision request");
 		else {
-			log.debug("Contenttype {} is unsupported", contenttype);
+			log.info("Rejected invalid request, unsupported content-type: {}", contenttype);
 			// respond with http 415 and return
 			Helper.respondHTTP(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, ServletConstants.CONTENTTYPE_TEXTPLAIN,
 					this.acceptContentTypes, response);
@@ -76,7 +77,6 @@ public class PDPServlet extends HttpServlet {
 		} finally {
 			try { reader.close(); }
 			catch (IOException e) {}
-			log.debug("Clearing PDP caches");
 			Helper.clearPDPCaches();
 		}
 

@@ -9,6 +9,7 @@ import org.geotools.xacml.geoxacml.config.GeoXACML;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.snet.tresor.pdp.contexthandler.saml.SAMLConfig;
 import org.snet.tresor.pdp.finder.impl.PolicyStorePolicyFinderModule;
 import org.snet.tresor.pdp.policystore.DummyPolicyStore;
@@ -39,11 +40,16 @@ public class TresorPDP {
 	 * @throws Exception
 	 */
 	public TresorPDP() throws Exception {
+		String temp = MDC.get("tresor-component");
+		MDC.put("tresor-component", "PDP");
+
 		GeoXACML.initialize();
 		SAMLConfig.InitSAML();
 		this.pdp = new PDP(Balana.getInstance().getPdpConfig());
 		this.policyStore = new DummyPolicyStore();
+
 		log.info("TresorPDP initialized without configuration");
+		MDC.put("tresor-component", temp);
 	}
 
 	/**
@@ -52,10 +58,15 @@ public class TresorPDP {
 	 * @throws Exception
 	 */
 	public TresorPDP(JSONObject pdpConfig) throws Exception {
+		String temp = MDC.get("tresor-component");
+		MDC.put("tresor-component", "PDP");
+
 		GeoXACML.initialize();
 		SAMLConfig.InitSAML();
 		this.configure(pdpConfig);
+
 		log.info("TresorPDP initialized with configuration");
+		MDC.put("tresor-component", temp);
 	}
 
 	/**
@@ -85,7 +96,6 @@ public class TresorPDP {
 	 * @throws Exception
 	 */
 	public void configure(JSONObject configJSON) throws Exception {
-		log.debug("Configuring TresorPDP");
 		this.policyStore = this.parsePolicyStore(configJSON);
 		this.pdp = this.parsePDP(configJSON);
 	}
@@ -99,6 +109,8 @@ public class TresorPDP {
 	private PolicyStore parsePolicyStore(JSONObject configJSON) throws Exception {
 		JSONObject policyStoreConfig = configJSON.getJSONObject("policystore");
 		PolicyStore policyStore = Helper.createInstance(policyStoreConfig, PolicyStore.class);
+
+		log.debug("Created PolicyStore");
 
 		return policyStore;
 	}
@@ -118,16 +130,26 @@ public class TresorPDP {
 		AttributeFinder attributeFinder = new AttributeFinder();
 		attributeFinder.setModules(attributeFinderModules);
 
+		log.debug("Created AttributeFinder");
+
 		policyFinderModules.add(new PolicyStorePolicyFinderModule(this.policyStore));
 		PolicyFinder policyFinder = new PolicyFinder();
 		policyFinder.setModules(policyFinderModules);
+
+		log.debug("Created PolicyFinder");
 
 		Helper.createInstances(configJSON.getJSONArray("resourcefindermodules"), resourceFinderModules, ResourceFinderModule.class);
 		ResourceFinder resourceFinder = new ResourceFinder();
 		resourceFinder.setModules(resourceFinderModules);
 
+		log.debug("Created ResourceFinder");
+
 		this.pdpConfig = new PDPConfig(attributeFinder, policyFinder, resourceFinder);
-		return new PDP(this.pdpConfig);
+		PDP pdp = new PDP(this.pdpConfig);
+
+		log.debug("Created PDP");
+
+		return pdp;
 	}
 
 }

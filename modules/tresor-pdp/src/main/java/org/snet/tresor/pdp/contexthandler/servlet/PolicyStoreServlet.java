@@ -34,6 +34,7 @@ public class PolicyStoreServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 		MDC.clear();
 		MDC.put("tresor-component", "PolicyStore");
+		MDC.put("category", "Request Validation");
 
 		// get parameters from request path
 		String[] params = this.getPathParams(request);
@@ -73,6 +74,7 @@ public class PolicyStoreServlet extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) {
 		MDC.clear();
 		MDC.put("tresor-component", "PolicyStore");
+		MDC.put("category", "Request Validation");
 
 		// get parameters from request path
 		String[] params = this.getPathParams(request);
@@ -115,6 +117,7 @@ public class PolicyStoreServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
 		MDC.clear();
 		MDC.put("tresor-component", "PolicyStore");
+		MDC.put("category", "Request Validation");
 
 		// get parameters from request path
 		String[] params = this.getPathParams(request);
@@ -144,22 +147,6 @@ public class PolicyStoreServlet extends HttpServlet {
 
 	private boolean isRequestValid(HttpServletRequest request, HttpServletResponse response, String[] params) {
 
-		// check authentication
-		AuthenticatedUser user = this.authenticator.authenticate(request, response);
-		if (user == null) {
-			MDC.put("category", "Authentication/Authorization");
-			log.info("Authentication failed");
-			// 401 already returned from authenticator so just return
-			return false;
-		}
-
-		log.debug("Authentication successful");
-
-		// add information for logging purposes
-		MDC.put("client-id", user.getClientID());
-		MDC.put("subject-id", user.getName());
-		log.debug("Client-ID and Subject-ID now available");
-
 		// check if request is Get, important for url params validation
 		String method = request.getMethod();
 		boolean isGet = method.equalsIgnoreCase(ServletConstants.HTTP_GET);
@@ -171,7 +158,38 @@ public class PolicyStoreServlet extends HttpServlet {
 			return false;
 		}
 
+		MDC.put("client-id", params[0]);
+		log.debug("Client-ID: {} now available", params[0]);
 		log.debug("Url Parameters are valid");
+
+		// if put request, check validity of contenttype
+		boolean isPut = method.equalsIgnoreCase(ServletConstants.HTTP_PUT);
+		if (isPut) {
+			log.debug("Request is put");
+			String contenttype = request.getContentType().toLowerCase();
+			if (contenttype == null || !contenttype.contains(ServletConstants.CONTENTTYPE_XACML)) {
+				log.debug("Contenttype is invalid");
+				Helper.respondHTTP(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,	ServletConstants.CONTENTTYPE_TEXTPLAIN,
+						this.acceptContentTypes, response);
+				return false;
+			}
+		}
+
+		// check authentication
+		AuthenticatedUser user = this.authenticator.authenticate(request, response);
+		if (user == null) {
+			MDC.put("category", "Authentication/Authorization");
+			log.info("Authentication failed");
+			// 401 already returned from authenticator so just return
+			return false;
+		}
+
+		log.debug("Authentication successful");
+
+		// add information for logging purposes, combine with userClientID to be compliant with the format used in requests
+		String subjectId = user.getName() + "@" + user.getClientID();
+		MDC.put("subject-id", subjectId);
+		log.debug("Subject-ID: {} now available", subjectId);
 
 		// check authorization
 		boolean isAuthorized = (params.length == 1) ? user.isAuthorizedTo(method, params[0]) : user.isAuthorizedTo(method, params[0], params[1]);
@@ -184,19 +202,6 @@ public class PolicyStoreServlet extends HttpServlet {
 		}
 
 		log.debug("Authorization successful");
-
-		// if put request, check validity of contenttype
-		boolean isPut = method.equalsIgnoreCase(ServletConstants.HTTP_PUT);
-		if (isPut) {
-			log.debug("Request is put");
-			String contenttype = request.getContentType();
-			if (contenttype == null || !contenttype.contains(ServletConstants.CONTENTTYPE_XACML)) {
-				log.debug("Contenttype is invalid");
-				Helper.respondHTTP(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,	ServletConstants.CONTENTTYPE_TEXTPLAIN,
-						this.acceptContentTypes, response);
-				return false;
-			}
-		}
 
 		log.debug("Request is valid");
 

@@ -2,6 +2,7 @@ package org.snet.tresor.pdp.contexthandler;
 
 import java.io.IOException;
 
+import org.apache.log4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.Configuration;
@@ -57,7 +58,10 @@ public class ContextHandler {
 			return;
 		}
 
-		log.debug("Initializing ContextHandler");
+		MDC.put("tresor-component", "PDP/ContextHandler");
+		MDC.put("category", "Initialization");
+
+		log.debug("Initializing PDP/ContextHandler");
 
 		Configuration conf = Configuration.getInstance();
 
