@@ -195,7 +195,7 @@ public class LocationAttributeFinderModule extends AttributeFinderModule {
 		PostMethod query = new PostMethod(pipUrl);
 		try {
 			query.setRequestHeader("Content-Type", "application/json");
-			// TODO hardcoded authorization is ugly, find a way around it
+			// TODO hardcoded authorization is ugly and only valid for our locationpip
 			query.setRequestHeader("Authorization", "Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm");
 
 			JSONObject jsonData = new JSONObject();
