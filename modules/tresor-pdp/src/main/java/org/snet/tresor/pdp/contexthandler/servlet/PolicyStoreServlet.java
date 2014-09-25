@@ -50,14 +50,14 @@ public class PolicyStoreServlet extends HttpServlet {
 
 		// e.g. request in this form: /policy/:clientID
 		if (params.length == 1) {
-			log.info("Accepted valid GET request for client {}", params[0]);
+			log.debug("Accepted valid GET request for client {}", params[0]);
 			contenttype = ServletConstants.CONTENTTYPE_JSON;
 			content = this.policyStoreHandler.retrieve(params[0]);
 		}
 
 		// e.g. request in this form: /policy/:clientID/:serviceID
 		if (params.length == 2) {
-			log.info("Accepted valid GET request for client {} and service {}", params[0], params[1]);
+			log.debug("Accepted valid GET request for client {} and service {}", params[0], params[1]);
 			contenttype = ServletConstants.CONTENTTYPE_XACML;
 			content = this.policyStoreHandler.retrieve(params[0], params[1]);
 		}
@@ -84,7 +84,7 @@ public class PolicyStoreServlet extends HttpServlet {
 			return;
 
 		MDC.put("category", "Policy Insertion");
-		log.info("Accepted valid PUT request for client {} and service {}", params[0], params[1]);
+		log.debug("Accepted valid PUT request for client {} and service {}", params[0], params[1]);
 
 		Reader reader = null;
 		try {
@@ -99,15 +99,15 @@ public class PolicyStoreServlet extends HttpServlet {
 
 		} catch (IOException e) {
 			// TODO http 400
-			log.warn("Failed to retrieve Reader for request", e);
+			log.warn("Error while returning response", e);
 			Helper.respondHTTP(true, HttpServletResponse.SC_BAD_REQUEST, response);
 		} catch (XMLParserException e) {
 			// TODO http 400
-			log.debug("Malformed XML, parsing failed", e);
+			log.info("Rejected request due to malformed XML", e);
 			Helper.respondHTTP(true, HttpServletResponse.SC_BAD_REQUEST, response);
 		} catch (ParsingException e) {
 			// TODO http 422
-			log.debug("Malformed XACML, processing failed", e);
+			log.info("Rejected request due to malformed XACML", e);
 			Helper.respondHTTP(true, ServletConstants.SC_UNPROCESSABLE_ENTITY, response);
 		}
 
@@ -127,7 +127,7 @@ public class PolicyStoreServlet extends HttpServlet {
 			return;
 
 		MDC.put("category", "Policy Deletion");
-		log.info("Accepted valid DELETE request for client {} and service {}", params[0], params[1]);
+		log.debug("Accepted valid DELETE request for client {} and service {}", params[0], params[1]);
 
 		// check whether policy exists
 		String policy = this.policyStoreHandler.retrieve(params[0], params[1]);
@@ -157,6 +157,8 @@ public class PolicyStoreServlet extends HttpServlet {
 			Helper.respondHTTP(true, HttpServletResponse.SC_BAD_REQUEST, response);
 			return false;
 		}
+		// INFO lowercase the client-id as it is supposed to be case insensitive
+		params[0] = params[0].toLowerCase();
 
 		MDC.put("client-id", params[0]);
 		log.debug("Client-ID: {} now available", params[0]);

@@ -67,6 +67,8 @@ public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 		// get & load policy
 		AbstractPolicy policy = null;
 		if (client != null && service != null) {
+			// INFO client-ids case-insensitive
+			client = client.toLowerCase();
 			String policyString = this.policyStore.get(client, service);
 			policy = loadPolicy(policyString, this.finder);
 		}

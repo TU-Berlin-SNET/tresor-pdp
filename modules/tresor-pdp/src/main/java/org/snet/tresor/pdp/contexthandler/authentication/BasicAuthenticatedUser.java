@@ -31,7 +31,8 @@ public class BasicAuthenticatedUser implements AuthenticatedUser{
 	}
 
 	public boolean isAuthorizedTo(String action, String clientID) {
-		return (this.clientID.equals(clientID) || this.name.equals("broker"));
+		//return (this.clientID.equals(clientID) || this.name.equals("broker"));
+		return (this.clientID.equalsIgnoreCase(clientID) || this.name.equalsIgnoreCase("broker"));
 	}
 
 	public boolean isAuthorizedTo(String action, String clientID, String serviceID) {
