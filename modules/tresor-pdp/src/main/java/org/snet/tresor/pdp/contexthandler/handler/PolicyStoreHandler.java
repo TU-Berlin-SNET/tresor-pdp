@@ -47,9 +47,6 @@ public class PolicyStoreHandler {
 
 		log.debug("Creating JSONObject containing retrieved policies");
 		JSONObject j = new JSONObject(policies);
-//		JSONObject j = new JSONObject();
-//		for (String key : policies.keySet())
-//			j.put(key, policies.get(key));
 
 		log.debug("Returning retrieved policies");
 		return j.toString();

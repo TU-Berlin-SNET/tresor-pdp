@@ -21,9 +21,11 @@
                     "resourcefindermodules": [ ]
                   },
 	"authenticator": { "classname": "org.snet.tresor.pdp.contexthandler.authentication.BasicAuthenticator",
-                       "parameters": [ "username:password", "exampledomain",
+                       "parameters": [ "username:password", "user",
                                        "broker:broker", "broker", 
-                                       "admin:admin", "HERZ",
+                                       "admin:admin", "herz",
+                                       "herz:herz", "herz",
+                                       "mms:mms", "mms",
                                        "doctor:12345", "healthcare",
                                        "user:user", "userdomain",
                                        "Doctor2:12345", "Hospital2",

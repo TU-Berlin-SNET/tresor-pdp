@@ -41,14 +41,14 @@ public class PDPServlet extends HttpServlet {
 		else if (contenttype.contains(ServletConstants.CONTENTTYPE_XACMLSAML))
 			MDC.put("category", "XACML-SAML decision request");
 		else {
-			log.info("Rejected invalid request, unsupported content-type: {}", contenttype);
+			log.info("Rejected request because of unsupported content of type {}", contenttype);
 			// respond with http 415 and return
 			Helper.respondHTTP(true, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, ServletConstants.CONTENTTYPE_TEXTPLAIN,
 					this.acceptContentTypes, response);
 			return;
 		}
 
-		log.info("Accepted valid POST request with contenttype {}", contenttype);
+		log.debug("Accepted valid POST request with contenttype {}", contenttype);
 
 		// go on with processing
 		String decision = null;
@@ -60,19 +60,19 @@ public class PDPServlet extends HttpServlet {
 			Helper.respondHTTP(false, HttpServletResponse.SC_OK, contenttype, decision, response);
 		} catch (IOException e) {
 			// TODO return http error 400
-			log.warn("Failed to retrieve Reader for request", e);
+			log.warn("Rejected request due to failure while retrieving input", e);
 			Helper.respondHTTP(true, HttpServletResponse.SC_BAD_REQUEST, response);
 		} catch (XMLParserException e) {
 			// TODO return http error 400
-			log.debug("Malformed XML, parsing failed", e);
+			log.info("Rejected request due to malformed XML", e);
 			Helper.respondHTTP(true, HttpServletResponse.SC_BAD_REQUEST, response);
 		} catch (ParsingException e) {
 			// TODO return http error 422 Unprocessable entity, indicates semantic errors in xacml
-			log.debug("Malformed XACML, processing failed", e);
+			log.info("Rejected request due to malformed XACML", e);
 			Helper.respondHTTP(true, ServletConstants.SC_UNPROCESSABLE_ENTITY, response);
 		} catch (Exception e) {
 			// TODO return http error 500
-			log.error("Processing failed due to an unexpected error");
+			log.error("Rejected request due to an unexpected error while processing", e);
 			Helper.respondHTTP(true, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response);
 		} finally {
 			try { reader.close(); }
