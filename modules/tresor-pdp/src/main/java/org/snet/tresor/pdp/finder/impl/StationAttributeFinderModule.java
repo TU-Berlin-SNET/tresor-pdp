@@ -15,6 +15,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.wso2.balana.Balana;
@@ -28,6 +29,7 @@ import org.wso2.balana.finder.AttributeFinderModule;
 
 /**
  * StationAttributeFinderModule for querying the stations a Doctor or a Patient belongs to.
+ * Also for asking the Doctor's role on its stations.
  * @author Zequeira
  */
 public class StationAttributeFinderModule extends AttributeFinderModule {
@@ -38,7 +40,7 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
 	private static URI STRING_DATATYPE;
 	private static URI SUBJECT_ID;
 	private static URI DEVICE_ID;
-    private static URI SERVICE_ID;
+        private static URI SERVICE_ID;
 
 	/**
 	 * Static Initializer for URIs to catch possible early Exceptions
@@ -46,11 +48,11 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
 	static {
 		try {
 			SUBJECT_CATEGORY = new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
-            RESOURCE_CATEGORY = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
+                        RESOURCE_CATEGORY = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
 			STRING_DATATYPE = new URI("http://www.w3.org/2001/XMLSchema#string");
 			SUBJECT_ID = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
 			DEVICE_ID = new URI("org:snet:tresor:attribute:device-id");
-            SERVICE_ID = new URI("org:snet:tresor:attribute:service-id");
+                        SERVICE_ID = new URI("org:snet:tresor:attribute:service-id");
 		} catch (Exception e) {
 			earlyException = new IllegalArgumentException();
 			earlyException.initCause(e);
@@ -159,16 +161,14 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
                 if (subjectID != null && serviceID != null) {
                     GetMethod query = null;
                     if (attributeId.toString().equals("org:snet:tresor:attribute:doctor-station")) {
-                        query = new GetMethod(pipUrl+"/"+subjectID+"?station=*");
+                        query = new GetMethod(pipUrl+"/"+subjectID+"?station=*&pdp=on");
                     } else if (attributeId.toString().equals("org:snet:tresor:attribute:patient-station")) {
-                        query = new GetMethod(pipUrl+"/"+serviceID+"?station=*");
+                        query = new GetMethod(pipUrl+"/"+serviceID+"?station=*&pdp=on");
                     } else if (attributeId.toString().equals("org:snet:tresor:attribute:doctor-role")) {
                         query = new GetMethod(pipUrl+"/"+subjectID+"?role=*");
                     } else if (attributeId.toString().equals("org:snet:tresor:attribute:patient-role")) {
                         query = new GetMethod(pipUrl+"/"+serviceID+"?role=*");
                     }
-                        
-                    
                     
                     try {
                         // fire query
@@ -177,25 +177,11 @@ public class StationAttributeFinderModule extends AttributeFinderModule {
                         // if query was successful...
                         if (query.getStatusCode() == 200) {
                             
-                            // ...parse the response Body...
-                            //JSONTokener tokener = new JSONTokener(new InputStreamReader(query.getResponseBodyAsStream()));
-                            //response = new JSONObject(tokener);
-                            
-                            String resp = query.getResponseBodyAsString();
-                            String jsonString = resp.replace("[", "").replace("]", "");
-                            
-                            String[] jsonArray = jsonString.split(",");
-                            response = new String[jsonArray.length];
-                            
-                            for (int i=0; i<jsonArray.length; i++) {
-                                JSONObject jsonResponse = new JSONObject(jsonArray[i]);
-                                response[i] = jsonResponse.getString("station");
+                            JSONArray jsArray = new JSONArray(query.getResponseBodyAsString());
+                            response = new String[jsArray.length()];
+                            for (int i = 0; i < jsArray.length(); i++) {
+                                response[i] = jsArray.getString(i);
                             }
-                            
-                            /*for (String item : jsonArray) {
-                                JSONObject jsonResponse = new JSONObject(item);
-                                response.push() jsonResponse.getString("station");
-                            }*/
                         }
 
                     }
