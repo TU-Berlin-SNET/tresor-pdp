@@ -52,8 +52,8 @@ public class FinderConstants {
 			ID_DEVICE_URI = new URI("org:snet:tresor:attribute:device-id");
 //			ID_DOMAIN_URI = new URI("org:snet:tresor:attribute:domain-id");
 //			ID_SERVICE_URI = new URI("org:snet:tresor:attribute:service-id");
-			ID_DOMAIN_URI = new URI("http://schemas.tresor.com/claims/2014/04/organization");
-			ID_SERVICE_URI = new URI("http://schemas.tresor.com/request/2014/04/service-uuid");
+			ID_DOMAIN_URI = new URI("http://schemas.cloud-tresor.com/request/2014/09/tresor-organization-uuid");
+			ID_SERVICE_URI = new URI("http://schemas.cloud-tresor.com/request/2014/04/service-uuid");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
