@@ -1,5 +1,5 @@
 {
-    "tresor-pdp": { "policystore"           :   { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStore", "parameters": [ "webapps/root/policies" ] },
+    "tresor-pdp": { "policystore"           :   { "classname": "org.snet.tresor.pdp.policystore.FileBasedPolicyStore", "parameters": [ "policies" ] },
                     "attributefindermodules": [ { "classname": "org.wso2.balana.finder.impl.SelectorModule" }, 
                                                 { "classname": "org.snet.tresor.pdp.finder.impl.TimeAttributeFinderModule" },
                                                 { "classname": "org.snet.tresor.pdp.finder.impl.LocationAttributeFinderModule",

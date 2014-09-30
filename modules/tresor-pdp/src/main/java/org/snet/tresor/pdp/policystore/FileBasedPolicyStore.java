@@ -24,7 +24,9 @@ public class FileBasedPolicyStore implements PolicyStore {
 		this.baseDirectory = new File(directoryPath);
 
 		if (!this.baseDirectory.isDirectory())
-			this.baseDirectory.mkdirs();
+			if (!this.baseDirectory.mkdirs()) {
+                throw new RuntimeException("Cannot create policy store directory '" + directoryPath + "'");
+            }
 	}
 
 	/**
@@ -74,7 +76,9 @@ public class FileBasedPolicyStore implements PolicyStore {
 
 			writeFile(file, policy);
 			response = service;
-		} catch (IOException e) { }
+		} catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 		return response;
 	}
