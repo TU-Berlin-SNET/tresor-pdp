@@ -8,7 +8,7 @@
  *
  *   1. Redistribution of source code must retain the above copyright notice,
  *      this list of conditions and the following disclaimer.
- * 
+ *
  *   2. Redistribution in binary form must reproduce the above copyright
  *      notice, this list of conditions and the following disclaimer in the
  *      documentation and/or other materials provided with the distribution.
@@ -16,7 +16,7 @@
  * Neither the name of Sun Microsystems, Inc. or the names of contributors may
  * be used to endorse or promote products derived from this software without
  * specific prior written permission.
- * 
+ *
  * This software is provided "AS IS," without a warranty of any kind. ALL
  * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,6 @@
 package org.wso2.balana.cond;
 
 import org.wso2.balana.ctx.EvaluationCtx;
-import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.BagAttribute;
@@ -52,7 +51,7 @@ import java.util.Set;
 /**
  * Specific <code>SetFunction</code> class that supports all of the condition set functions:
  * type-at-least-one-member-of, type-subset, and type-set-equals.
- * 
+ *
  * @since 1.2
  * @author Seth Proctor
  */
@@ -69,7 +68,7 @@ public class ConditionSetFunction extends SetFunction {
 
 	// the actual supported ids
 	private static Set<String> supportedIds;
-        
+
 	/**
 	 * Static initializer that sets up the paramater info for all the supported functions.
 	 */
@@ -117,9 +116,9 @@ public class ConditionSetFunction extends SetFunction {
 	 * supplied must be one of the standard XACML functions supported by this class, including the
 	 * full namespace, otherwise an exception is thrown. Look in <code>SetFunction</code> for
 	 * details about the supported names.
-	 * 
+	 *
 	 * @param functionName the name of the function to create
-	 * 
+	 *
 	 * @throws IllegalArgumentException if the function is unknown
 	 */
 	public ConditionSetFunction(String functionName) {
@@ -131,7 +130,7 @@ public class ConditionSetFunction extends SetFunction {
 	 * Constructor that is used to create instances of condition set functions for new
 	 * (non-standard) datatypes. This is equivalent to using the <code>getInstance</code> methods in
 	 * <code>SetFunction</code> and is generally only used by the run-time configuration code.
-	 * 
+	 *
 	 * @param functionName the name of the new function
 	 * @param datatype the full identifier for the supported datatype
 	 * @param functionType which kind of Set function, based on the <code>NAME_BASE_*</code> fields
@@ -140,16 +139,16 @@ public class ConditionSetFunction extends SetFunction {
          * Original code
          */
 	public ConditionSetFunction(String functionName, String datatype, String functionType) {
-		super(functionName, getId(functionName), datatype, BooleanAttribute.identifier, false);      
+		super(functionName, getId(functionName), datatype, BooleanAttribute.identifier, false);
 	}
         /* Rafael Zequeira
          * Temporary solution to support some new function from GeoXACML, the same constructor with one more parameter
          * to be able to call "getId(functionType)" and no "getId(functionName)"
-         */ 
+         */
         public ConditionSetFunction(String functionName, String datatype, String functionType, Boolean geo) {
 		super(functionName, getId(functionType), datatype, BooleanAttribute.identifier, false);
 	}
-        
+
 	/**
 	 * Private helper that returns the internal identifier used for the given standard function.
 	 */
@@ -158,7 +157,7 @@ public class ConditionSetFunction extends SetFunction {
 
 		if (id == null)
 			throw new IllegalArgumentException("unknown set function " + functionName);
-                
+
 		return id.intValue();
 	}
 
@@ -173,7 +172,7 @@ public class ConditionSetFunction extends SetFunction {
 
 	/**
 	 * Returns a <code>Set</code> containing all the function identifiers supported by this class.
-	 * 
+	 *
 	 * @return a <code>Set</code> of <code>String</code>s
 	 */
 	public static Set getSupportedIdentifiers() {
@@ -182,7 +181,7 @@ public class ConditionSetFunction extends SetFunction {
 
 	/**
 	 * Evaluates the function, using the specified parameters.
-	 * 
+	 *
 	 * @param inputs a <code>List</code> of <code>Evaluatable</code> objects representing the
 	 *            arguments passed to the function
 	 * @param context an <code>EvaluationCtx</code> so that the <code>Evaluatable</code> objects can

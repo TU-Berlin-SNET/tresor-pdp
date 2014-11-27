@@ -31,7 +31,7 @@
     <groupId>org.wso2.balana</groupId>
     <artifactId>org.wso2.balana</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Balana Core_Basic_OK</name>
+    <name>WSO2 Balana Core</name>
     <version>1.0.0-SNAPSHOT</version>
     <description>
     This is the pom file that defines the build process for the WSO2 Balana Core. Balana is XACML
@@ -71,31 +71,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
-            <version>1.13</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-api</artifactId>
-            <version>10.2</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.hudson.pxeboot</groupId>
-            <artifactId>pxe-boot-manager</artifactId>
-            <version>1.3</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.11.1</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
     </dependencies>
 
     <build>
@@ -130,14 +105,15 @@
                     <instructions>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
  			<Bundle-Name>${pom.artifactId}</Bundle-Name>
-                        <Export-Package>org.geotools.xacml.extensions,org.geotools.xacml.geoxacml.attr,org.geotools.xacml.geoxacml.attr.proxy,org.geotools.xacml.geoxacml.cond,org.geotools.xacml.geoxacml.config,org.snet.tresor.finder.impl,org.wso2.balana.*</Export-Package>
+                        <Export-Package>
+                            org.wso2.balana.*,
+                        </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Private-Package>org.geotools.xacml.extensions.*,org.geotools.xacml.geoxacml.attr.*,org.geotools.xacml.geoxacml.cond.*,org.geotools.xacml.geoxacml.config.*,org.snet.tresor.finder.impl.*,org.wso2.balana.*,pdpTest.*</Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -159,11 +135,6 @@
             <name>Maven Repository Switchboard</name>
             <url>http://repo1.maven.org/maven2</url>
         </repository>
-        <repository>
-            <id>osgeo</id>
-            <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
-        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -173,5 +144,5 @@
 	    <url>http://download.java.net/maven/2/</url> 
 	    <layout>default</layout> 
 	</pluginRepository>
-    </pluginRepositories> 
+    </pluginRepositories>  
 </project>

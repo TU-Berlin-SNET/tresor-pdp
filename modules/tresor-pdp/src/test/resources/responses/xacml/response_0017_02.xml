@@ -1,3 +1,0 @@
-<Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"><Result><Decision>Indeterminate</Decision><Status><StatusCode Value="urn:oasis:names:tc:xacml:1.0:status:missing-attribute"/><StatusMessage>Couldn't find EnvironmentAttributeDesignator attribute</StatusMessage><StatusDetail>
-<MissingAttributeDetail AttributeId="now" DataType="http://www.w3.org/2001/XMLSchema#integer" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment" ></MissingAttributeDetail>
-</StatusDetail></Status></Result></Response>
