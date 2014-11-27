@@ -6,13 +6,13 @@
                     <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "message":"%m %rEx", "logger":"%c","tresor-component":"%X{tresor-component}","category":"%X{category}","client-id":"%X{client-id}","subject-id":"%X{subject-id}"}%n</pattern>
                 </PatternLayout> -->
             </Console>
-            <!-- <Socket name="LOGSTASH" host="xacml.snet.tu-berlin.de" port="9400">
+            <Socket name="LOGSTASH" host="xacml.snet.tu-berlin.de" port="9400">
                 <PatternLayout charset="UTF-8" alwaysWriteExceptions="false">
-                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%enc{%m} %enc{%rEx{short}}","tresor-component":"%X{tresor-component}","category":"%X{category}","client-id":"%X{client-id}","subject-id":"%X{subject-id}"}%n</pattern>
+                    <pattern>{"priority":"%p","timestamp":"%d{UNIX_MILLIS}", "logger":"%c","message":"%m %enc{%rEx{short}}","tresor-component":"%X{tresor-component}","category":"%X{category}","client-id":"%X{client-id}","subject-id":"%X{subject-id}"}%n</pattern>
                 </PatternLayout>
-            </Socket>  -->
+            </Socket>
             <Async name="ASYNC" blocking="false">
-                <!--<AppenderRef ref="LOGSTASH" />-->
+                <AppenderRef ref="LOGSTASH" />
                 <AppenderRef ref="CONSOLE" />
             </Async>
         </Appenders>

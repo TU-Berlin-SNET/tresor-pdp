@@ -2,6 +2,7 @@ package org.snet.tresor.pdp.contexthandler;
 
 import javax.inject.Inject;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 
 @Configuration
+@ComponentScan
 @EnableWebSecurity
 @EnableWebMvcSecurity
 @EnableGlobalMethodSecurity(prePostEnabled=true)
