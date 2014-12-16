@@ -47,10 +47,10 @@ public class RequestCtxFactory {
     /**
      *  the logger we'll use for all messages
      */
-    private static Log log = LogFactory.getLog(RequestCtxFactory.class);    
+    private static Log log = LogFactory.getLog(RequestCtxFactory.class);
 
     /**
-     *  Returns instance of <code>AbstractRequestCtx</code> based one the XACML version. 
+     *  Returns instance of <code>AbstractRequestCtx</code> based one the XACML version.
      *
      * @param root  the node to parse for the <code>AbstractRequestCtx</code>
      * @return <code>AbstractRequestCtx</code> object
@@ -111,7 +111,7 @@ public class RequestCtxFactory {
      * the data yourself, and then providing the root node to the other <code>getInstance</code>
      * method. If you use this convenience method, you probably want to turn on validation by
      * setting the context schema file (see the programmer guide for more information on this).
-     * 
+     *
      * @param input input a stream providing the XML data
      * @return <code>AbstractRequestCtx</code> object
      * @throws ParsingException  if the DOM node is invalid
@@ -166,8 +166,8 @@ public class RequestCtxFactory {
      */
     public Element getXacmlRequest(String request) throws ParsingException {
 
-        ByteArrayInputStream inputStream;
         Document doc;
+        ByteArrayInputStream inputStream;
 
         inputStream = new ByteArrayInputStream(request.getBytes());
         DocumentBuilderFactory  builder = Balana.getInstance().getBuilder();
@@ -184,9 +184,10 @@ public class RequestCtxFactory {
             try {
                 inputStream.close();
             } catch (IOException e) {
-               log.error("Error in closing input stream of XACML request");
+                    log.error("Error in closing input stream of XACML request");
             }
         }
+
         return doc.getDocumentElement();
     }
 }

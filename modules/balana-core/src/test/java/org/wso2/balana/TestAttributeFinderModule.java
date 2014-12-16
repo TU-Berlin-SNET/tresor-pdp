@@ -37,6 +37,7 @@
 package org.wso2.balana;
 
 
+import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.AttributeFinderModule;
 import org.wso2.balana.attr.BagAttribute;
@@ -49,10 +50,7 @@ import org.wso2.balana.ctx.Status;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -168,7 +166,7 @@ public class TestAttributeFinderModule extends AttributeFinderModule
         while (it.hasNext()) {
             StringAttribute attr = (StringAttribute)(it.next());
             if (attr.getValue().equals("Julius Hibbert")) {
-                Set set = new HashSet();
+                List<AttributeValue> set = new ArrayList<AttributeValue>();
                 set.add(new StringAttribute("Physician"));
                 returnBag = new BagAttribute(attributeType, set);
                 break;

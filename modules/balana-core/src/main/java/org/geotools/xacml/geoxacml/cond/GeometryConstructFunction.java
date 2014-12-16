@@ -18,7 +18,9 @@
 package org.geotools.xacml.geoxacml.cond;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
@@ -65,9 +67,9 @@ public abstract class GeometryConstructFunction extends GeoXACMLFunctionBase {
         } catch (URISyntaxException e) {
             // should not happen
         }
-        Set<AttributeValue> set = new HashSet<AttributeValue>();
-        set.add(resultGeomAttr);
-        BagAttribute bag = new BagAttribute(resultGeomAttr.getType(), set);
+        List<AttributeValue> list = new ArrayList<AttributeValue>();
+        list.add(resultGeomAttr);
+        BagAttribute bag = new BagAttribute(resultGeomAttr.getType(), list);
         return new EvaluationResult(bag);
     }
 }

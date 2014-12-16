@@ -100,13 +100,11 @@ public class AnyOfSelection {
 
         // there are specific matching elements, so prepare to iterate
         // through the list
-        Iterator it = allOfSelections.iterator();
         Status firstIndeterminateStatus = null;
 
         // in order for this section to match, one of the groups must match
-        while (it.hasNext()) {
+        for (AllOfSelection group : allOfSelections) {
             // get the next group and try matching it
-            AllOfSelection group = (AllOfSelection)(it.next());
             MatchResult result = group.match(context);
 
             // we only need one match, so if this matched, then we're done

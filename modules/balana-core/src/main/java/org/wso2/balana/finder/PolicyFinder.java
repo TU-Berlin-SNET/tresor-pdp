@@ -170,7 +170,7 @@ public class PolicyFinder {
 
             // if there was an error, we stop right away
             if (newResult.indeterminate()) {
-                logger.info("An error occured while trying to find a "
+                logger.error("An error occured while trying to find a "
                         + "single applicable policy for a request: "
                         + newResult.getStatus().getMessage());
 
@@ -181,7 +181,7 @@ public class PolicyFinder {
             if (!newResult.notApplicable()) {
                 // ...if we already had found a policy, this is an error...
                 if (result != null) {
-                    logger.info("More than one top-level applicable policy " + "for the request");
+                    logger.error("More than one top-level applicable policy " + "for the request");
 
                     ArrayList code = new ArrayList();
                     code.add(Status.STATUS_PROCESSING_ERROR);
@@ -199,7 +199,7 @@ public class PolicyFinder {
         if (result != null) {
             return result;
         } else {
-            logger.info("No applicable policies were found for the request");
+            logger.debug("No applicable policies were found for the request");
 
             return new PolicyFinderResult();
         }
@@ -238,7 +238,7 @@ public class PolicyFinder {
 
             // if there was an error, we stop right away
             if (newResult.indeterminate()) {
-                logger.info("An error occured while trying to find the " + "referenced policy "
+                logger.error("An error occured while trying to find the " + "referenced policy "
                         + idReference.toString() + ": " + newResult.getStatus().getMessage());
 
                 return newResult;
@@ -248,7 +248,7 @@ public class PolicyFinder {
             if (!newResult.notApplicable()) {
                 // ...if we already had found a policy, this is an error...
                 if (result != null) {
-                    logger.info("More than one policy applies for the " + "reference: "
+                    logger.error("More than one policy applies for the " + "reference: "
                             + idReference.toString());
                     ArrayList code = new ArrayList();
                     code.add(Status.STATUS_PROCESSING_ERROR);
@@ -266,7 +266,7 @@ public class PolicyFinder {
         if (result != null) {
             return result;
         } else {
-            logger.info("No policies were resolved for the reference: " + idReference.toString());
+            logger.debug("No policies were resolved for the reference: " + idReference.toString());
             return new PolicyFinderResult();
         }
     }

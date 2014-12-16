@@ -179,10 +179,10 @@ public class XPathFunction extends FunctionBase {
                 Node contextNode = null;
 
                 // this must be XACML 3
-                Set<Attributes> attributesSet = ((XACML3EvaluationCtx) context).getAttributes(category);
-                if(attributesSet != null){
+                List<Attributes> attributesSet = ((XACML3EvaluationCtx) context).getAttributes(category);
+                if(attributesSet != null && attributesSet.size() > 0){
                     // only one attributes can be there
-                    Attributes attributes = attributesSet.iterator().next();
+                    Attributes attributes = attributesSet.get(0);
                     contextNode = attributes.getContent();
                 }
 

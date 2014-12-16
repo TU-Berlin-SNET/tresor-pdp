@@ -8,7 +8,7 @@
  *
  *   1. Redistribution of source code must retain the above copyright notice,
  *      this list of conditions and the following disclaimer.
- *
+ * 
  *   2. Redistribution in binary form must reproduce the above copyright
  *      notice, this list of conditions and the following disclaimer in the
  *      documentation and/or other materials provided with the distribution.
@@ -16,7 +16,7 @@
  * Neither the name of Sun Microsystems, Inc. or the names of contributors may
  * be used to endorse or promote products derived from this software without
  * specific prior written permission.
- *
+ * 
  * This software is provided "AS IS," without a warranty of any kind. ALL
  * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
@@ -58,7 +58,7 @@ import java.util.Set;
 /**
  * Represents all of the Set functions, though the actual implementations are in two sub-classes
  * specific to the condition and general set functions.
- *
+ * 
  * @since 1.0
  * @author Seth Proctor
  */
@@ -100,12 +100,6 @@ public abstract class SetFunction extends FunctionBase {
     public static final String NAME_BASE_SET_EQUALS = "-set-equals";
 
     /**
-     * Rafael Zequeira
-     * Variable added to be able to call "ConditionSetFunction" with one more parameter, so use an especific construct for GeoXACML
-     */
-    public static boolean geo = false;
-
-    /**
      * A complete list of all the XACML datatypes supported by the Set functions in XACML 1.x
      */
     protected static String baseTypes[] = { StringAttribute.identifier,
@@ -143,10 +137,10 @@ public abstract class SetFunction extends FunctionBase {
      * support for any new attribute types and then the new <code>SetFunction</code> object should
      * be added to the factory (all set functions for the base types are already installed in the
      * factory).
-     *
+     * 
      * @param functionName the name of the function
      * @param argumentType the attribute type this function will work with
-     *
+     * 
      * @return a new <code>SetFunction</code> for the given type
      */
     public static SetFunction getIntersectionInstance(String functionName, String argumentType) {
@@ -158,32 +152,25 @@ public abstract class SetFunction extends FunctionBase {
      * create support for any new attribute types and then the new <code>SetFunction</code> object
      * should be added to the factory (all set functions for the base types are already installed in
      * the factory).
-     *
+     * 
      * @param functionName the name of the function
      * @param argumentType the attribute type this function will work with
-     *
+     * 
      * @return a new <code>SetFunction</code> for the given type
      */
     public static SetFunction getAtLeastOneInstance(String functionName, String argumentType) {
         return new ConditionSetFunction(functionName, argumentType,
                 NAME_BASE_AT_LEAST_ONE_MEMBER_OF);
     }
-    /* Rafael Zequeira
-     * Temporary solution to support some function from GeoXACML
-     */
-    public static SetFunction getAtLeastOneInstanceGeo(String functionName, String argumentType) {
-        return new ConditionSetFunction(functionName, argumentType,
-                NAME_BASE_AT_LEAST_ONE_MEMBER_OF, geo);
-    }
 
     /**
      * Creates a new instance of the union set function. This should be used to create support for
      * any new attribute types and then the new <code>SetFunction</code> object should be added to
      * the factory (all set functions for the base types are already installed in the factory).
-     *
+     * 
      * @param functionName the name of the function
      * @param argumentType the attribute type this function will work with
-     *
+     * 
      * @return a new <code>SetFunction</code> for the given type
      */
     public static SetFunction getUnionInstance(String functionName, String argumentType) {
@@ -194,47 +181,35 @@ public abstract class SetFunction extends FunctionBase {
      * Creates a new instance of the subset set function. This should be used to create support for
      * any new attribute types and then the new <code>SetFunction</code> object should be added to
      * the factory (all set functions for the base types are already installed in the factory).
-     *
+     * 
      * @param functionName the name of the function
      * @param argumentType the attribute type this function will work with
-     *
+     * 
      * @return a new <code>SetFunction</code> for the given type
      */
     public static SetFunction getSubsetInstance(String functionName, String argumentType) {
         return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SUBSET);
-    }
-    /* Rafael Zequeira
-     * Temporary solution to support some function from GeoXACML
-     */
-    public static SetFunction getSubsetInstanceGeo(String functionName, String argumentType) {
-        return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SUBSET, geo);
     }
 
     /**
      * Creates a new instance of the equals set function. This should be used to create support for
      * any new attribute types and then the new <code>SetFunction</code> object should be added to
      * the factory (all set functions for the base types are already installed in the factory).
-     *
+     * 
      * @param functionName the name of the function
      * @param argumentType the attribute type this function will work with
-     *
+     * 
      * @return a new <code>SetFunction</code> for the given type
      */
     public static SetFunction getSetEqualsInstance(String functionName, String argumentType) {
         return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SET_EQUALS);
-    }
-     /* Rafael Zequeira
-      * Temporary solution to support some function from GeoXACML
-      */
-    public static SetFunction getSetEqualsInstanceGeo(String functionName, String argumentType) {
-        return new ConditionSetFunction(functionName, argumentType, NAME_BASE_SET_EQUALS, geo);
     }
 
     /**
      * Protected constuctor used by the general and condition subclasses. If you need to create a
      * new <code>SetFunction</code> instance you should either use one of the
      * <code>getInstance</code> methods or construct one of the sub-classes directly.
-     *
+     * 
      * @param functionName the identitifer for the function
      * @param functionId an optional, internal numeric identifier
      * @param argumentType the datatype this function accepts
@@ -248,7 +223,7 @@ public abstract class SetFunction extends FunctionBase {
 
     /**
      * Returns a <code>Set</code> containing all the function identifiers supported by this class.
-     *
+     * 
      * @return a <code>Set</code> of <code>String</code>s
      */
     public static Set getSupportedIdentifiers() {

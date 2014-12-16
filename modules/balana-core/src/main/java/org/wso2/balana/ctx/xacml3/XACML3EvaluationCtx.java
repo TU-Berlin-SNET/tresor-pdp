@@ -71,7 +71,7 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
      *
      * Category  --> Attributes Set
      */
-    private Map<String, Set<Attributes>> mapAttributes;
+    private Map<String, List<Attributes>> mapAttributes;
 
     /**
      * XACML3 request
@@ -112,7 +112,7 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
         currentTime = null;
         currentDateTime = null;
 
-        mapAttributes = new HashMap<String, Set<Attributes>> ();
+        mapAttributes = new HashMap<String, List<Attributes>> ();
 
         attributesSet = requestCtx.getAttributesSet();
         this.pdpConfig = pdpConfig;
@@ -124,11 +124,12 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
     public EvaluationResult getAttribute(URI type, URI id, String issuer, URI category) {
 
         List<AttributeValue> attributeValues = new ArrayList<AttributeValue>();
-        Set<Attributes> attributesSet = mapAttributes.get(category.toString());
+        List<Attributes> attributesSet = mapAttributes.get(category.toString());
         if(attributesSet != null && attributesSet.size() > 0){
-            Set<Attribute> attributeSet  = attributesSet.iterator().next().getAttributes();
+            Set<Attribute> attributeSet  = attributesSet.get(0).getAttributes();
             for(Attribute attribute : attributeSet) {
-                if(attribute.getId().equals(id) && attribute.getType().equals(type)
+                if(attribute.getId().toString().equals(id.toString())
+                        && attribute.getType().toString().equals(type.toString())
                         && (issuer == null || issuer.equals(attribute.getIssuer()))
                         && attribute.getValue() != null){
                     List<AttributeValue> attributeValueList = attribute.getValues();
@@ -157,14 +158,14 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
             return new EvaluationResult(BagAttribute.createEmptyBag(type));
         }
 
-        Set<Attributes> attributesSet = null;
+        List<Attributes> attributesSet = null;
 
         if(category != null){
             attributesSet = mapAttributes.get(category.toString());
         }
 
         if(attributesSet != null && attributesSet.size() > 0){
-            Attributes attributes  = attributesSet.iterator().next();
+            Attributes attributes  = attributesSet.get(0);
             Object content = attributes.getContent();
             if(content instanceof Node){
                 Node root = (Node) content;
@@ -211,7 +212,7 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
      * @return
      */
     private void setupAttributes(Set<Attributes> attributeSet, Map<String,
-                                            Set<Attributes>> mapAttributes)  {
+                                            List<Attributes>> mapAttributes)  {
         for (Attributes attributes : attributeSet) {
             String category = attributes.getCategory().toString();
             for(Attribute attribute : attributes.getAttributes()){
@@ -248,11 +249,11 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
             }
 
             if (mapAttributes.containsKey(category)) {
-                Set<Attributes> set = mapAttributes.get(category);
+                List<Attributes> set = mapAttributes.get(category);
                 set.add(attributes);
                 multipleAttributes = true;
              } else {
-                Set<Attributes> set = new HashSet<Attributes>();
+                List<Attributes> set = new ArrayList<Attributes>();
                 set.add(attributes);
                 mapAttributes.put(category, set);
             }
@@ -408,12 +409,12 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
 
         Set<EvaluationCtx> children = new HashSet<EvaluationCtx>();
 
-        Map<String, Set<Attributes>> mapAttributes = evaluationCtx.getMapAttributes();
+        Map<String, List<Attributes>> mapAttributes = evaluationCtx.getMapAttributes();
 
         Set<Set<Attributes>> tempRequestAttributes =
                     new HashSet<Set<Attributes>>(Arrays.asList(evaluationCtx.getAttributesSet()));
 
-        for(Map.Entry<String, Set<Attributes>> mapAttributesEntry : mapAttributes.entrySet()){
+        for(Map.Entry<String, List<Attributes>> mapAttributesEntry : mapAttributes.entrySet()){
             if(mapAttributesEntry.getValue().size() > 1){
                 Set<Set<Attributes>> temp = new HashSet<Set<Attributes>>();
                 for(Attributes attributesElement :  mapAttributesEntry.getValue()){
@@ -471,10 +472,8 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
         } else {
             for (AttributeValue resource : resourceResult.getResources()) {
                 Set<Attributes> newSet = new HashSet<Attributes>(evaluationCtx.getAttributesSet());
-                Iterator iterator = newSet.iterator();
                 Attributes resourceAttributes = null;
-                while(iterator.hasNext()){
-                    Attributes attributes = (Attributes) iterator.next();
+                for(Attributes attributes : newSet){
                     if(XACMLConstants.RESOURCE_CATEGORY.equals(attributes.getCategory().toString())){
                         Set<Attribute> attributeSet = new HashSet<Attribute>(attributes.getAttributes());
                         attributeSet.remove(resourceScopeAttribute);
@@ -721,7 +720,7 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
      * @param category
      * @return
      */
-    public Set<Attributes> getAttributes(String category){        
+    public List<Attributes> getAttributes(String category){
         return mapAttributes.get(category);
     }
 
@@ -729,7 +728,7 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
         return multipleContentSelectors;
     }
 
-    public Map<String, Set<Attributes>> getMapAttributes() {
+    public Map<String, List<Attributes>> getMapAttributes() {
         return mapAttributes;
     }
 

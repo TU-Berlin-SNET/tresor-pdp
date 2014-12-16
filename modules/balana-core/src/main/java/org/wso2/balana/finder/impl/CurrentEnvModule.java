@@ -54,6 +54,7 @@ import java.net.URI;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -192,7 +193,7 @@ public class CurrentEnvModule extends AttributeFinderModule {
      * Private helper that makes a bag containing only the given attribute.
      */
     private EvaluationResult makeBag(AttributeValue attribute) {
-        Set set = new HashSet();
+        List<AttributeValue> set = new ArrayList<AttributeValue>();
         set.add(attribute);
 
         BagAttribute bag = new BagAttribute(attribute.getType(), set);

@@ -36,6 +36,7 @@
 package org.wso2.balana.cond;
 
 import org.wso2.balana.DOMHelper;
+import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.Indenter;
 import org.wso2.balana.ParsingException;
@@ -249,7 +250,7 @@ class MapFunction implements Function {
         // is ultimately returned
 
         Iterator it = bag.iterator();
-        List outputs = new ArrayList();
+        List<AttributeValue> outputs = new ArrayList<AttributeValue>();
 
         while (it.hasNext()) {
             List params = new ArrayList();

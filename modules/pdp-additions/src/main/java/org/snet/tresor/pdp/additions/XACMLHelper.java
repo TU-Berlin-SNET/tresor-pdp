@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -136,10 +134,10 @@ public class XACMLHelper {
 
 		if (values != null) {
 			try {
-				Set<AttributeValue> set = new HashSet<AttributeValue>();
+				List<AttributeValue> list = new ArrayList<AttributeValue>();
 				for (int i = 0; i < values.length; i++)
-					set.add(Balana.getInstance().getAttributeFactory().createValue(type, values[i]));
-				return new BagAttribute(type, set);
+					list.add(Balana.getInstance().getAttributeFactory().createValue(type, values[i]));
+				return new BagAttribute(type, list);
 			} catch (UnknownIdentifierException e) {
 				log.warn("Unknown DataType {}", type, e);
 			} catch (ParsingException e) {
