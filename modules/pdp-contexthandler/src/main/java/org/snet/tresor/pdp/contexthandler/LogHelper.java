@@ -27,13 +27,12 @@ public class LogHelper {
 	 */
 	public static final String SUBJECT_ID = "subject-id";
 
-	public static void putMDCs(String tresorComponent, String category) {
-		MDC.put(TRESOR_COMPONENT, tresorComponent);
-		MDC.put(CATEGORY, category);
+	public static void putMDCs(String clientId, String subjectId) {
+		MDC.put(CLIENT_ID, clientId);
+		MDC.put(SUBJECT_ID, subjectId);
 	}
 
-	public static void putMDCs(String tresorComponent, String category, String clientId, String subjectId) {
-		MDC.put(TRESOR_COMPONENT, tresorComponent);
+	public static void putMDCs(String category, String clientId, String subjectId) {
 		MDC.put(CATEGORY, category);
 		MDC.put(CLIENT_ID, clientId);
 		MDC.put(SUBJECT_ID, subjectId);

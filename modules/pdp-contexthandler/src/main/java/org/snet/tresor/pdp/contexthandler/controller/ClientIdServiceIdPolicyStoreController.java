@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.snet.tresor.pdp.additions.XACMLHelper;
-import org.snet.tresor.pdp.additions.policystore.TwoKeyValuePolicyStore;
+import org.snet.tresor.pdp.additions.policystore.AbstractClientIdServiceIdPolicyStore;
 import org.snet.tresor.pdp.contexthandler.LogHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,35 +25,32 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Controller class for the policystore API
+ * Controller class for the PolicyStore API
  */
 @RestController
 @RequestMapping("/policy")
+@PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_'.concat(#clientId), 'ROLE_BROKER', 'ROLE_PAP')")
 public class ClientIdServiceIdPolicyStoreController {
 	private static final Logger log = LoggerFactory.getLogger(ClientIdServiceIdPolicyStoreController.class);
-	private static final String COMPONENT = "Policystore";
-	private static final String CAT_RETRIEVAL = "Retrieval";
-	private static final String CAT_INSERION = "Creation/Insertion";
-	private static final String CAT_DELETION = "Deletion";
 
-	private TwoKeyValuePolicyStore store;
+	private AbstractClientIdServiceIdPolicyStore store;
 	private ObjectMapper mapper;
 
 	@Inject
-	public ClientIdServiceIdPolicyStoreController(TwoKeyValuePolicyStore store, ObjectMapper mapper) {
+	public ClientIdServiceIdPolicyStoreController(AbstractClientIdServiceIdPolicyStore store, ObjectMapper mapper) {
 		this.store = store;
 		this.mapper = mapper;
 	}
 
 	private String getSubjectId(UserDetails user) {
-		return user.getUsername()+"@"+user.getAuthorities().iterator().next().getAuthority().substring(5);
+		return user.getUsername()+"\\\\"+user.getAuthorities().iterator().next().getAuthority().substring(5);
 	}
 
 	@RequestMapping(value="/{clientId}", method=RequestMethod.GET, produces="application/json")
-	@PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_'.concat(#clientId), 'ROLE_broker')")
 	public ResponseEntity<String> getPolicies(@PathVariable String clientId,
 			@AuthenticationPrincipal UserDetails user) throws JsonProcessingException {
-		LogHelper.putMDCs(COMPONENT, CAT_RETRIEVAL, clientId, this.getSubjectId(user));
+
+		LogHelper.putMDCs("Policy Retrieval", clientId, this.getSubjectId(user));
 		log.info("Retrieving all policies of {}", clientId);
 
 		Map<String, String> values = this.store.get(clientId);
@@ -72,10 +69,10 @@ public class ClientIdServiceIdPolicyStoreController {
 	}
 
 	@RequestMapping(value="/{clientId}/{serviceId}", method=RequestMethod.GET, produces="application/xacml+xml")
-	@PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_'.concat(#clientId), 'ROLE_broker')")
 	public ResponseEntity<String> getPolicy(@PathVariable String clientId, @PathVariable String serviceId,
 			@AuthenticationPrincipal UserDetails user) {
-		LogHelper.putMDCs(COMPONENT, CAT_RETRIEVAL, clientId, this.getSubjectId(user));
+
+		LogHelper.putMDCs("Policy Retrieval", clientId, this.getSubjectId(user));
 		log.info("Retrieving policy of client {} for service {}", clientId, serviceId);
 
 		String policy = this.store.get(clientId, serviceId);
@@ -93,10 +90,10 @@ public class ClientIdServiceIdPolicyStoreController {
 
 
 	@RequestMapping(value="/{clientId}/{serviceId}", method=RequestMethod.PUT, consumes="application/xacml+xml")
-	@PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_'.concat(#clientId), 'ROLE_broker')")
 	public ResponseEntity<String> putPolicy(@PathVariable String clientId, @PathVariable String serviceId,
 			@RequestBody String policy, @AuthenticationPrincipal UserDetails user) {
-		LogHelper.putMDCs(COMPONENT, CAT_INSERION, clientId, this.getSubjectId(user));
+
+		LogHelper.putMDCs("Policy Insertion", clientId, this.getSubjectId(user));
 		log.info("Inserting policy for client {} and service {}", clientId, serviceId);
 
 		try {
@@ -118,10 +115,10 @@ public class ClientIdServiceIdPolicyStoreController {
 
 
 	@RequestMapping(value="/{clientId}/{serviceId}", method=RequestMethod.DELETE)
-	@PreAuthorize("isAuthenticated() and hasAnyRole('ROLE_'.concat(#clientId), 'ROLE_broker')")
 	public ResponseEntity<String> deletePolicy(@PathVariable String clientId, @PathVariable String serviceId,
 			@AuthenticationPrincipal UserDetails user) {
-		LogHelper.putMDCs(COMPONENT, CAT_DELETION, clientId, this.getSubjectId(user));
+
+		LogHelper.putMDCs("Policy Deletion", clientId, this.getSubjectId(user));
 		log.info("Deleting policy of client {} for service {}", clientId, serviceId);
 
 		ResponseEntity<String> result = null;

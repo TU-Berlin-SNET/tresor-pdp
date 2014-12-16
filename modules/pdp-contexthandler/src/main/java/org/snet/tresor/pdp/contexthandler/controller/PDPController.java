@@ -1,8 +1,16 @@
 package org.snet.tresor.pdp.contexthandler.controller;
 
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 import org.apache.log4j.MDC;
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.additions.XACMLHelper;
@@ -37,19 +45,39 @@ public class PDPController {
 	private PDPConfig pdpConfig;
 	private RequestCtxFactory reqFactory;
 	private EvaluationCtxFactory evalFactory;
+	private ThreadLocal<Map<String, String>> cache;
+	private Stopwatch stopwatch;
 
 	@Inject
-	public PDPController(PDP pdp, PDPConfig config, RequestCtxFactory reqFac, EvaluationCtxFactory evalFac) {
+	public PDPController(PDP pdp, PDPConfig config, RequestCtxFactory reqFac, EvaluationCtxFactory evalFac,
+			ThreadLocal<Map<String, String>> cache) {
 		this.pdp = pdp;
 		this.pdpConfig = config;
 		this.reqFactory = reqFac;
 		this.evalFactory = evalFac;
+		this.cache = cache;
+
+		// TODO remove if not necessary anymore
+		this.stopwatch = SimonManager.getStopwatch("PDP");
+		Timer t = new Timer();
+		t.scheduleAtFixedRate(new TimerTask() {
+
+			@Override
+			public void run() {
+				MDC.put(LogHelper.CATEGORY, "metrics");
+				log.info(stopwatch.toString());
+				MDC.clear();
+			}
+
+		}, 0, TimeUnit.HOURS.toMillis(1));
+
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes="application/xacml+xml", produces="application/xacml+xml")
 	public ResponseEntity<String> getXACMLDecision(@RequestBody String req) {
-		LogHelper.putMDCs("PDP", "DecisionRequest-XACML");
+		MDC.put(LogHelper.CATEGORY, "XACML");
 		log.trace("New XACML decision request");
+		Split split = this.stopwatch.start();
 
 		try {
 			String result = this.processXACMLDecisionRequest(req);
@@ -58,13 +86,15 @@ public class PDPController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} finally {
 			MDC.clear();
-			// TODO clear caches
+			// TODO a more robust solution
+			this.cache.get().clear();
+			split.stop();
 		}
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes="application/samlassertion+xml", produces="application/samlassertion+xml")
 	public ResponseEntity<String> getXACMLSAMLDecision(@RequestBody String req) {
-		LogHelper.putMDCs("PDP", "DecisionRequest-XACMLSAML");
+		MDC.put(LogHelper.CATEGORY, "XACMLSAML");
 		log.trace("New XACMLSAML decision request");
 
 		try {
@@ -82,11 +112,12 @@ public class PDPController {
 		} catch (ParsingException e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
-			// TODO
+			// TODO logging
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			MDC.clear();
-			// TODO clear caches
+			// TODO a more robust solution
+			this.cache.get().clear();
 		}
 	}
 
@@ -109,20 +140,15 @@ public class PDPController {
 		String clientId = XACMLHelper.getClientID(evalCtx);
 		String serviceId = XACMLHelper.getServiceID(evalCtx);
 
-		MDC.put(LogHelper.CLIENT_ID, clientId);
-		MDC.put(LogHelper.SUBJECT_ID, subjectId);
+		// escape the backslash
+		subjectId = (subjectId != null) ?  subjectId.replace("\\", "\\\\") : subjectId;
+		LogHelper.putMDCs(clientId, subjectId);
 
 		ResponseCtx result = this.pdp.evaluate(evalCtx);
 
-		// TODO remove after reason for failure is absolutely clear
-		// reason: ArrayIndexOutOfBounds, documentation in AbstractResult class is wrong
-		try {
-			for (AbstractResult r : result.getResults())
+		for (AbstractResult r : result.getResults())
 				log.info("Decision for subject {} to access service {} of client {} is {}",
 						subjectId, serviceId, clientId, AbstractResult.DECISIONS[r.getDecision()]);
-		} catch (Exception e) {
-			log.info("Failed to log decision", e);
-		}
 
 		return result.encode();
 	}

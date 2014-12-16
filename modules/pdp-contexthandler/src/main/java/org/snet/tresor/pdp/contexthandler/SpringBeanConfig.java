@@ -1,19 +1,24 @@
 package org.snet.tresor.pdp.contexthandler;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
-import org.snet.tresor.pdp.additions.PDPAdditions;
+import org.snet.tresor.pdp.additions.finder.impl.LocationAttributeFinderModule;
 import org.snet.tresor.pdp.additions.finder.impl.PolicyStorePolicyFinderModule;
 import org.snet.tresor.pdp.additions.finder.impl.StationAttributeFinderModule;
+import org.snet.tresor.pdp.additions.finder.impl.WeekdayAttributeFinderModule;
+import org.snet.tresor.pdp.additions.policystore.AbstractClientIdServiceIdPolicyStore;
 import org.snet.tresor.pdp.additions.policystore.FileBasedClientIdServiceIdPolicyStore;
 import org.snet.tresor.pdp.additions.policystore.PolicyStore;
-import org.snet.tresor.pdp.additions.policystore.TwoKeyValuePolicyStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -39,17 +44,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class SpringBeanConfig {
 
 	@Bean
-	TwoKeyValuePolicyStore getTwoKeyValuePolicyStore() {
-		return new FileBasedClientIdServiceIdPolicyStore("/home/student/policies/", new ReentrantReadWriteLock());
+	AbstractClientIdServiceIdPolicyStore getClientIdServiceIdPolicyStore() throws IOException {
+		return new FileBasedClientIdServiceIdPolicyStore(new File(".").getCanonicalPath() + "/policies/",
+				new ReentrantReadWriteLock());
+	}
+
+	@Bean
+	ThreadLocal<Map<String, String>> getCache() {
+		return new ThreadLocal<Map<String,String>>() {
+			protected synchronized Map<String, String> initialValue() {
+				return new HashMap<String, String>();
+			}
+		};
 	}
 
 	@Bean
 	@Inject
-	AttributeFinder getAttributeFinder(ObjectMapper objectMapper) {
+	AttributeFinder getAttributeFinder(ObjectMapper objectMapper, ThreadLocal<Map<String, String>> cache) {
 		List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
 		attributeFinderModules.add(new CurrentEnvModule());
 		attributeFinderModules.add(new SelectorModule());
+		attributeFinderModules.add(new WeekdayAttributeFinderModule());
 		attributeFinderModules.add(new StationAttributeFinderModule("http://localhost:3300", objectMapper));
+		attributeFinderModules.add(new LocationAttributeFinderModule(
+				"http://ls.snet.tu-berlin.de:8080/pe/api/v2/pdp",
+				"Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm",
+				objectMapper, cache));
 
 		AttributeFinder attributeFinder = new AttributeFinder();
 		attributeFinder.setModules(attributeFinderModules);
@@ -89,7 +109,7 @@ public class SpringBeanConfig {
 	@Bean
 	@Inject
 	PDP getPDP(PDPConfig pdpConfig) {
-		return PDPAdditions.getExtendedPDP(pdpConfig);
+		return new PDP(pdpConfig);
 	}
 
 
