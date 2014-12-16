@@ -11,16 +11,12 @@ import java.util.concurrent.locks.ReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.snet.tresor.pdp.additions.XACMLHelper;
-import org.wso2.balana.AbstractPolicy;
-import org.wso2.balana.ctx.EvaluationCtx;
-import org.wso2.balana.finder.PolicyFinder;
 
 /**
  * Thread-safe file-based two-key-value policy store implementation
  * Key1: ClientId, Key2: ServiceId
  */
-public class FileBasedClientIdServiceIdPolicyStore implements TwoKeyValuePolicyStore {
+public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServiceIdPolicyStore {
 	private static final Logger log = LoggerFactory.getLogger(FileBasedClientIdServiceIdPolicyStore.class);
 	private File baseDirectory;
 	private ReadWriteLock lock;
@@ -59,19 +55,6 @@ public class FileBasedClientIdServiceIdPolicyStore implements TwoKeyValuePolicyS
 		} finally {
 			this.lock.readLock().unlock();
 		}
-	}
-
-	public AbstractPolicy get(EvaluationCtx ctx, PolicyFinder finder) {
-		String clientId = XACMLHelper.getClientID(ctx);
-		String serviceId = XACMLHelper.getServiceID(ctx);
-		String policy = this.get(clientId, serviceId);
-		try {
-			if (policy != null)
-				return XACMLHelper.loadPolicyOrPolicySet(policy, finder);
-		} catch (Exception e) {
-			log.error("Found corresponding policy for client {} and service {} but failed to load it", clientId, serviceId, e);
-		}
-		return null;
 	}
 
 	public Map<String, String> get(String clientId) {
