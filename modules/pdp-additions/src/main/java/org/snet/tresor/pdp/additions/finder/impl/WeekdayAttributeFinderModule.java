@@ -14,6 +14,11 @@ import org.wso2.balana.cond.EvaluationResult;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.AttributeFinderModule;
 
+/**
+ * AttributeFinderModule providing a number which indicates the day of the week,
+ * attributeId is org:snet:tresor:attribute:weekday,
+ * dataType is integer
+ */
 public class WeekdayAttributeFinderModule extends AttributeFinderModule {
 	private static final Logger log = LoggerFactory.getLogger(WeekdayAttributeFinderModule.class);
 

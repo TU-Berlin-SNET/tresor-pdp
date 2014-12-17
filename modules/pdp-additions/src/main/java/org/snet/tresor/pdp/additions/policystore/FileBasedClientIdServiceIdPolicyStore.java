@@ -13,8 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread-safe file-based two-key-value policy store implementation
- * Key1: ClientId, Key2: ServiceId
+ * Thread-safe file-based cliendId-serviceId policy store implementation
  */
 public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServiceIdPolicyStore {
 	private static final Logger log = LoggerFactory.getLogger(FileBasedClientIdServiceIdPolicyStore.class);

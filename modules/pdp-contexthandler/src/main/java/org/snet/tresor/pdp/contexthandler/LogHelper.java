@@ -3,7 +3,7 @@ package org.snet.tresor.pdp.contexthandler;
 import org.slf4j.MDC;
 
 /**
- * Class containing some constant values related to logging
+ * Class containing some constants and methods related to logging
  */
 public class LogHelper {
 

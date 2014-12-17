@@ -13,7 +13,6 @@ import org.wso2.balana.finder.PolicyFinderResult;
 /**
  * PolicyFinderModule which uses the PolicyStore interface to retrieve
  * policies from the Policy Store
- * @author malik
  */
 public class PolicyStorePolicyFinderModule extends PolicyFinderModule{
 	private static final Logger log = LoggerFactory.getLogger(PolicyStorePolicyFinderModule.class);

@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
- * Class containing constants for Finders
- * @author malik
+ * Constants for some (Policy-/Attribute-)Finders
  */
 public class FinderConstants {
 

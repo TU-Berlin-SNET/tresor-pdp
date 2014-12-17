@@ -7,6 +7,13 @@ import org.wso2.balana.AbstractPolicy;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.PolicyFinder;
 
+/**
+ * Abstract implementation of a TwoKeyValuePolicyStore.
+ * key1 is the tresor-organization-uuid denoted by the
+ * attributeId http://schemas.cloud-tresor.com/request/2014/09/tresor-organization-uuid,
+ * key2 is the tresor service-uuid denoted by the
+ * attributeId http://schemas.cloud-tresor.com/request/2014/04/service-uuid
+ */
 public abstract class AbstractClientIdServiceIdPolicyStore implements TwoKeyValuePolicyStore {
 	private static final Logger log = LoggerFactory.getLogger(AbstractClientIdServiceIdPolicyStore.class);
 

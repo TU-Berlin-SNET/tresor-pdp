@@ -37,12 +37,11 @@ package org.wso2.balana.attr;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
-import org.geotools.xacml.geoxacml.attr.proxy.GeometryAttributeProxy;
 import org.wso2.balana.UnknownIdentifierException;
-
 import org.wso2.balana.XACMLConstants;
+import org.wso2.balana.attr.geoxacml.GeometryAttribute;
 import org.wso2.balana.attr.proxy.*;
+import org.wso2.balana.attr.proxy.geoxacml.GeometryAttributeProxy;
 import org.wso2.balana.attr.proxy.xacml3.XPathAttributeProxy;
 import org.wso2.balana.attr.xacml3.XPathAttribute;
 

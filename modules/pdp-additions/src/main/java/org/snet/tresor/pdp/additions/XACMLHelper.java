@@ -32,7 +32,6 @@ import org.xml.sax.SAXException;
 
 /**
  * XACMLHelper class containing miscellaneous helper methods
- * @author malik
  */
 public class XACMLHelper {
 	private static final Logger log = LoggerFactory.getLogger(XACMLHelper.class);
