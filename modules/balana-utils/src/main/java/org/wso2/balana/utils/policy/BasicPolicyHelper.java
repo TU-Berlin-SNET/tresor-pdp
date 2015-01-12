@@ -322,7 +322,7 @@ public class BasicPolicyHelper {
             } else if(Arrays.asList(PolicyConstants.Functions.advanceRuleFunctions).contains(functionOnSubjects)){
 
                 AttributeDesignatorDTO designatorDTO = new AttributeDesignatorDTO();
-                designatorDTO.setCategory(PolicyConstants.ACTION_CATEGORY_URI);
+                designatorDTO.setCategory(PolicyConstants.SUBJECT_CATEGORY_URI);
                 designatorDTO.setAttributeId(subjectId);
                 designatorDTO.setDataType(subjectDataType);
                 designatorDTO.setMustBePresent("true");
@@ -864,9 +864,9 @@ public class BasicPolicyHelper {
 
             AttributeDesignatorDTO attributeDesignatorDTO = new AttributeDesignatorDTO();
             if(dataType != null && dataType.trim().length() > 0){
-                attributeValueElementDTO.setAttributeDataType(dataType);
+                attributeDesignatorDTO.setDataType(dataType);
             } else {
-                attributeValueElementDTO.setAttributeDataType(PolicyConstants.STRING_DATA_TYPE);
+                attributeDesignatorDTO.setDataType(PolicyConstants.STRING_DATA_TYPE);
             }
             attributeDesignatorDTO.setAttributeId(attributeDesignatorId);
             attributeDesignatorDTO.setCategory(category);
@@ -904,9 +904,9 @@ public class BasicPolicyHelper {
 
             AttributeDesignatorDTO attributeDesignatorDTO = new AttributeDesignatorDTO();
             if(dataType != null && dataType.trim().length() > 0){
-                attributeValueElementDTO.setAttributeDataType(dataType);
+                attributeDesignatorDTO.setDataType(dataType);
             } else {
-                attributeValueElementDTO.setAttributeDataType(PolicyConstants.STRING_DATA_TYPE);
+                attributeDesignatorDTO.setDataType(PolicyConstants.STRING_DATA_TYPE);
             }
             attributeDesignatorDTO.setAttributeId(attributeId);
             attributeDesignatorDTO.setCategory(category);

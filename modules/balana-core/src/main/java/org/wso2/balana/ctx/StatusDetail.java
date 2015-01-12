@@ -149,7 +149,6 @@ public class StatusDetail {
             byte[] bytes = (text + encoded).getBytes();
             DocumentBuilder db = Balana.getInstance().getBuilder().newDocumentBuilder();
             Document doc = db.parse(new ByteArrayInputStream(bytes));
-
             return doc.getDocumentElement();
         } catch (ParserConfigurationException e) {
             throw new ParsingException("invalid XML for status detail");

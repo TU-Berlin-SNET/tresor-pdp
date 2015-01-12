@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <Configuration status="INFO">
+        <Appenders>
+            <Console name="CONSOLE" target="SYSTEM_OUT" />
+            <Socket name="LOGSTASH" host="xacml.snet.tu-berlin.de" port="9400">
+            	<PatternLayout charset="UTF-8" alwaysWriteExceptions="false" >
+            		<pattern>
+            			{"priority":"%p", "timestamp":"%d{UNIX_MILLIS}", "logger":"%c", "message":"%enc{%msg} %enc{%rException{short}}", "tresor-component":"PDP", "category":"%mdc{category}", "client-id":"%mdc{client-id}", "subject-id":"%mdc{subject-id}"}%n
+            		</pattern>
+            	</PatternLayout>
+            </Socket>
+            <Async name="ASYNC" blocking="false">
+                <AppenderRef ref="LOGSTASH" />
+                <AppenderRef ref="CONSOLE" />
+            </Async>
+        </Appenders>
+        <Loggers>
+            <Root level="INFO">
+                <AppenderRef ref="ASYNC" />
+            </Root>
+        </Loggers>
+    </Configuration>

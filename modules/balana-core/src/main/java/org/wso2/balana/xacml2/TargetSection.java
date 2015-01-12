@@ -64,7 +64,7 @@ public class TargetSection
 {
 
     // the list of match groups
-    private List matchGroups;
+    private List<TargetMatchGroup> matchGroups;
 
     // the match type contained in this group
     private int matchType;
@@ -81,12 +81,12 @@ public class TargetSection
      * @param matchType the type as defined in <code>TargetMatch</code>
      * @param xacmlVersion the version XACML being used
      */
-    public TargetSection(List matchGroups, int matchType, int xacmlVersion) {
+    public TargetSection(List<TargetMatchGroup> matchGroups, int matchType, int xacmlVersion) {
         if (matchGroups == null)
-            this.matchGroups = Collections.unmodifiableList(new ArrayList());
+            this.matchGroups = Collections.unmodifiableList(new ArrayList<TargetMatchGroup>());
         else
             this.matchGroups = Collections.
-                unmodifiableList(new ArrayList(matchGroups));
+                unmodifiableList(new ArrayList<TargetMatchGroup>(matchGroups));
         this.matchType = matchType;
         this.xacmlVersion = xacmlVersion;
     }
@@ -106,7 +106,7 @@ public class TargetSection
                                             PolicyMetaData metaData)
         throws ParsingException
     {
-        List groups = new ArrayList();
+        List<TargetMatchGroup> groups = new ArrayList<TargetMatchGroup>();
         NodeList children = root.getChildNodes();
 
         for (int i = 0; i < children.getLength(); i++) {
@@ -164,13 +164,11 @@ public class TargetSection
 
         // there are specific matching elements, so prepare to iterate
         // through the list
-        Iterator it = matchGroups.iterator();
         Status firstIndeterminateStatus = null;
 
         // in order for this section to match, one of the groups must match 
-        while (it.hasNext()) {
+        for (TargetMatchGroup  group : matchGroups) {
             // get the next group and try matching it
-            TargetMatchGroup group = (TargetMatchGroup)(it.next());
             MatchResult result = group.match(context);
 
             // we only need one match, so if this matched, then we're done
@@ -231,10 +229,7 @@ public class TargetSection
         } else {
             // this has specific rules, so we can now encode them
             builder.append("<").append(name).append("s>\n");
-
-            Iterator it = matchGroups.iterator();
-            while (it.hasNext()) {
-                TargetMatchGroup group = (TargetMatchGroup)(it.next());
+            for (TargetMatchGroup group : matchGroups) {
                 group.encode(builder);
             }
             builder.append("</").append(name).append("s>\n");

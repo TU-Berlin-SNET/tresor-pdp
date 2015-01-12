@@ -60,7 +60,7 @@ public class FileBasedPolicyFinderModule extends PolicyFinderModule{
     public static final String POLICY_DIR_PROPERTY = "org.wso2.balana.PolicyDirectory";
 
     public FileBasedPolicyFinderModule() {
-        policies = new LinkedHashMap<URI, AbstractPolicy>();
+        policies = new HashMap<URI, AbstractPolicy>();
         if(System.getProperty(POLICY_DIR_PROPERTY) != null){
             policyLocations = new HashSet<String>();
             policyLocations.add(System.getProperty(POLICY_DIR_PROPERTY));            

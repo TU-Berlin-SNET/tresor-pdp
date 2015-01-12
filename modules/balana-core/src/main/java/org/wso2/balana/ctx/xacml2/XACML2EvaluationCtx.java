@@ -397,7 +397,7 @@ public class XACML2EvaluationCtx extends BasicEvaluationCtx {
         }
 
         // now go through each, considering each Attribute object
-        List attributes = new ArrayList();
+        List<AttributeValue> attributes = new ArrayList<AttributeValue>();
         Iterator it = attrSet.iterator();
 
         while (it.hasNext()) {
@@ -406,7 +406,7 @@ public class XACML2EvaluationCtx extends BasicEvaluationCtx {
             // make sure the type and issuer are correct
             if ((attr.getType().equals(type))
                     && ((issuer == null) || ((attr.getIssuer() != null) && (attr.getIssuer()
-                    .equals(issuer.toString()))))) {
+                    .equals(issuer))))) {
 
                 // if we got here, then we found a match, so we want to pull
                 // out the values and put them in out list

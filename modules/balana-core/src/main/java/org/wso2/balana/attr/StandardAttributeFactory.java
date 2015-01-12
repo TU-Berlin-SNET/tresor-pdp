@@ -38,9 +38,10 @@ package org.wso2.balana.attr;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.balana.UnknownIdentifierException;
-
 import org.wso2.balana.XACMLConstants;
+import org.wso2.balana.attr.geoxacml.GeometryAttribute;
 import org.wso2.balana.attr.proxy.*;
+import org.wso2.balana.attr.proxy.geoxacml.GeometryAttributeProxy;
 import org.wso2.balana.attr.proxy.xacml3.XPathAttributeProxy;
 import org.wso2.balana.attr.xacml3.XPathAttribute;
 
@@ -96,6 +97,9 @@ public class StandardAttributeFactory extends BaseAttributeFactory {
         }
 
         supportedDatatypes = new HashMap();
+
+        // the geoXACML datatype
+        supportedDatatypes.put(GeometryAttribute.identifier, new GeometryAttributeProxy());
 
         // the 1.x datatypes
         supportedDatatypes.put(BooleanAttribute.identifier, new BooleanAttributeProxy());

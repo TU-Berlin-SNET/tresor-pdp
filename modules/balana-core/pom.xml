@@ -25,14 +25,12 @@
     <parent>
         <groupId>org.wso2.balana</groupId>
         <artifactId>balana</artifactId>
-  	<version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0.wso2v8-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <groupId>org.wso2.balana</groupId>
     <artifactId>org.wso2.balana</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Balana Core_Basic_OK</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <name>WSO2 Balana Core</name>
     <description>
     This is the pom file that defines the build process for the WSO2 Balana Core. Balana is XACML
     open source project which is based on the sunxacml http://sunxacml.sourceforge.net/ under the license 
@@ -71,30 +69,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- additional dependencies for geoXACML support -->
         <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
             <version>1.13</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-api</artifactId>
             <version>10.2</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.hudson.pxeboot</groupId>
-            <artifactId>pxe-boot-manager</artifactId>
-            <version>1.3</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.11.1</version>
-            <scope>test</scope>
-            <type>jar</type>
         </dependency>
     </dependencies>
 
@@ -129,15 +113,16 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
- 			<Bundle-Name>${pom.artifactId}</Bundle-Name>
-                        <Export-Package>org.geotools.xacml.extensions,org.geotools.xacml.geoxacml.attr,org.geotools.xacml.geoxacml.attr.proxy,org.geotools.xacml.geoxacml.cond,org.geotools.xacml.geoxacml.config,org.snet.tresor.finder.impl,org.wso2.balana.*</Export-Package>
+                        <Bundle-Name>${pom.artifactId}</Bundle-Name>
+                        <Export-Package>
+                            org.wso2.balana.*,
+                        </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             *;resolution:=optional,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Private-Package>org.geotools.xacml.extensions.*,org.geotools.xacml.geoxacml.attr.*,org.geotools.xacml.geoxacml.cond.*,org.geotools.xacml.geoxacml.config.*,org.snet.tresor.finder.impl.*,org.wso2.balana.*,pdpTest.*</Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -167,11 +152,11 @@
     </repositories>
 
     <pluginRepositories>
-	<pluginRepository> 
+        <pluginRepository> 
             <id>repository.dev.java.net-maven2</id>
-	    <name>Java.net Repository for Maven</name> 
-	    <url>http://download.java.net/maven/2/</url> 
-	    <layout>default</layout> 
-	</pluginRepository>
+            <name>Java.net Repository for Maven</name> 
+            <url>http://download.java.net/maven/2/</url> 
+            <layout>default</layout> 
+        </pluginRepository>
     </pluginRepositories> 
 </project>

@@ -60,7 +60,7 @@ import org.wso2.balana.ctx.EvaluationCtx;
 public class TargetMatchGroup {
 
     // the list of matches
-    private List matches;
+    private List<TargetMatch> matches;
 
     // the match type contained in this group
     private int matchType;
@@ -75,11 +75,11 @@ public class TargetMatchGroup {
      * @param matchElements a <code>List</code> of <code>TargetMatch</code>
      * @param matchType the match type as defined in <code>TargetMatch</code>
      */
-    public TargetMatchGroup(List matchElements, int matchType) {
+    public TargetMatchGroup(List<TargetMatch> matchElements, int matchType) {
         if (matchElements == null)
-            matches = Collections.unmodifiableList(new ArrayList());
+            matches = Collections.unmodifiableList(new ArrayList<TargetMatch>());
         else
-            matches = Collections.unmodifiableList(new ArrayList(matchElements));
+            matches = Collections.unmodifiableList(new ArrayList<TargetMatch>(matchElements));
         this.matchType = matchType;
     }
 
@@ -96,7 +96,7 @@ public class TargetMatchGroup {
      */
     public static TargetMatchGroup getInstance(Node root, int matchType, PolicyMetaData metaData)
             throws ParsingException {
-        List matches = new ArrayList();
+        List<TargetMatch> matches = new ArrayList<TargetMatch>();
         NodeList children = root.getChildNodes();
 
         for (int i = 0; i < children.getLength(); i++) {
@@ -120,12 +120,10 @@ public class TargetMatchGroup {
      * @return the result of trying to match the group with the context
      */
     public MatchResult match(EvaluationCtx context) {
-        Iterator it = matches.iterator();     //No false
         MatchResult result = null;
 
-        while (it.hasNext()) {
-            TargetMatch tm = (TargetMatch) (it.next());
-            result = tm.match(context);
+        for (TargetMatch targetMatch : matches) {
+            result = targetMatch.match(context);
             if (result.getResult() != MatchResult.MATCH)
                 break;
         }
@@ -152,14 +150,12 @@ public class TargetMatchGroup {
      */
     public void encode(StringBuilder builder) {
 
-        Iterator it = matches.iterator();
         String name = TargetMatch.NAMES[matchType];
 
         builder.append("<").append(name).append(">\n");
 
-        while (it.hasNext()) {
-            TargetMatch tm = (TargetMatch) (it.next());
-            tm.encode(builder);              
+        for (TargetMatch targetMatch : matches) {
+            targetMatch.encode(builder);
         }
 
         builder.append("</").append(name).append(">\n");

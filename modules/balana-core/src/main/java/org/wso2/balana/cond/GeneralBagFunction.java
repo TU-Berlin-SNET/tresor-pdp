@@ -268,7 +268,7 @@ public class GeneralBagFunction extends BagFunction {
             // *-bag takes any number of elements of baseType and
             // returns a bag containing those elements
         case ID_BASE_BAG: {
-            List argsList = Arrays.asList(argValues);
+            List<AttributeValue> argsList = Arrays.asList(argValues);
 
             attrResult = new BagAttribute(getReturnType(), argsList);
             break;

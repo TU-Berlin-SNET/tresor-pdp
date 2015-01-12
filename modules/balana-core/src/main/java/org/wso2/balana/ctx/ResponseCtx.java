@@ -177,8 +177,8 @@ public class ResponseCtx {
 
         builder.append("<Response");
 
-       if(version == XACMLConstants.XACML_VERSION_3_0){
-            builder.append(" xmlns=\"" + XACMLConstants.XACML_3_0_IDENTIFIER + "\"");
+        if(version == XACMLConstants.XACML_VERSION_3_0){
+            builder.append(" xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\"");
         }
 
         builder.append(">");

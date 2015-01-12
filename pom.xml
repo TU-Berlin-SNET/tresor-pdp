@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /*
 *  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -16,17 +17,13 @@
 * specific language governing permissions and limitations
 * under the License.
 */
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.balana</groupId>
     <artifactId>balana</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Balana Open source XACML implementation of WSO2</name>
-    <version>1.0.0-SNAPSHOT</version>
     <description>
     This is the pom file that defines the build process  for the WSO2 Balana. Balana is XACML
     open source project which is based on the sunxacml http://sunxacml.sourceforge.net/ under the license 
@@ -40,8 +37,11 @@
         <!-- <module>modules/balana-samples</module> -->
         <module>modules/balana-documentation</module>
         <module>modules/balana-distribution</module>
-        <module>modules/tresor-pdp</module>
-    </modules>
+        <module>modules/pdp-additions</module>
+        <module>modules/pdp-contexthandler</module>
+  </modules>
+    <version>1.0.0.wso2v8-SNAPSHOT</version>
+
   <build>
     <plugins>
       <plugin>
@@ -55,4 +55,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

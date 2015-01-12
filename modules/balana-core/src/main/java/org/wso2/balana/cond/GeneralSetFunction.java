@@ -40,12 +40,7 @@ import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.BagAttribute;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Specific <code>SetFunction</code> class that supports all of the general-purpose set functions:
@@ -178,7 +173,7 @@ public class GeneralSetFunction extends SetFunction {
 		bags[1] = (BagAttribute) (argValues[1]);
 
 		AttributeValue result = null;
-		Set set = new HashSet();
+		Set<AttributeValue> set = new HashSet<AttributeValue>();
 
 		switch (getFunctionId()) {
 
@@ -199,7 +194,7 @@ public class GeneralSetFunction extends SetFunction {
 				}
 			}
 
-			result = new BagAttribute(bags[0].getType(), set);
+			result = new BagAttribute(bags[0].getType(), Arrays.asList(set.toArray(new AttributeValue[set.size()])));
 
 			break;
 
@@ -213,17 +208,17 @@ public class GeneralSetFunction extends SetFunction {
 			while (it0.hasNext()) {
 				// first off, add all elements from the first bag...the set
 				// will ignore all duplicates
-				set.add(it0.next());
+				set.add((AttributeValue)it0.next());
 			}
 
 			Iterator it1 = bags[1].iterator();
 			while (it1.hasNext()) {
 				// now add all the elements from the second bag...again, all
 				// duplicates will be ignored by the set
-				set.add(it1.next());
+				set.add((AttributeValue)it1.next());
 			}
 
-			result = new BagAttribute(bags[0].getType(), set);
+			result = new BagAttribute(bags[0].getType(),  Arrays.asList(set.toArray(new AttributeValue[set.size()])));
 
 			break;
 		}

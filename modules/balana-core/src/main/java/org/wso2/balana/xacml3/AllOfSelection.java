@@ -89,12 +89,10 @@ public class AllOfSelection {
 
         // there are specific matching elements, so prepare to iterate
         // through the list
-        Iterator it = matches.iterator();
         Status firstIndeterminateStatus = null;
         MatchResult result;
 
-        while (it.hasNext()) {
-            TargetMatch targetMatch = (TargetMatch) (it.next());
+        for (TargetMatch targetMatch : matches ) {
             result = targetMatch.match(context);
             if (result.getResult() == MatchResult.NO_MATCH){
                 return result;

@@ -37,10 +37,7 @@ package org.wso2.balana.attr;
 
 import java.net.URI;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Represents a bag used in the XACML spec as return values from functions and designators/selectors
@@ -57,8 +54,8 @@ import java.util.NoSuchElementException;
  */
 public class BagAttribute extends AttributeValue {
 
-    // The Collection of AttributeValues that this object encapsulates
-    private Collection bag;
+    // The List of AttributeValues that this object encapsulates
+    private List<AttributeValue> bag;
 
     /**
      * Creates a new <code>BagAttribute</code> that represents the <code>Collection</code> of
@@ -66,9 +63,9 @@ public class BagAttribute extends AttributeValue {
      * empty.
      * 
      * @param type the data type of all the attributes in the set
-     * @param bag a <code>Collection</code> of <code>AttributeValue</code>s
+     * @param bag a <code>List</code> of <code>AttributeValue</code>s
      */
-    public BagAttribute(URI type, Collection bag) {
+    public BagAttribute(URI type, List<AttributeValue> bag) {
         super(type);
 
         if (type == null)
@@ -91,7 +88,7 @@ public class BagAttribute extends AttributeValue {
                     throw new IllegalArgumentException("bags cannot contain " + "other bags");
 
                 // make sure that they're all the same type
-                if (!type.equals(attr.getType()))
+                if (!type.toString().equals(attr.getType().toString()))
                     throw new IllegalArgumentException("Bag items must all be of "
                             + "the same type");
             }

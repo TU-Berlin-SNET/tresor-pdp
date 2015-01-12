@@ -92,11 +92,9 @@ public class Target extends AbstractTarget {
      */
     public MatchResult match(EvaluationCtx context) {
 
-        Iterator it = anyOfSelections.iterator();
         Status firstIndeterminateStatus = null;
 
-        while (it.hasNext()) {
-            AnyOfSelection anyOfSelection = (AnyOfSelection) (it.next());
+        for (AnyOfSelection anyOfSelection : anyOfSelections) {
             MatchResult result = anyOfSelection.match(context);
             if (result.getResult() == MatchResult.NO_MATCH){
                 return result;
