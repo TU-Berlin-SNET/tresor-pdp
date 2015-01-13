@@ -69,7 +69,7 @@ public class PDPController {
 				MDC.clear();
 			}
 
-		}, 0, TimeUnit.HOURS.toMillis(1));
+		}, 0, TimeUnit.HOURS.toMillis(24));
 
 	}
 

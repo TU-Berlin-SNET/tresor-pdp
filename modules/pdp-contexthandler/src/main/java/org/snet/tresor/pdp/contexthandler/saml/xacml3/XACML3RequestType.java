@@ -44,38 +44,27 @@ public class XACML3RequestType extends AbstractXACMLObject implements RequestTyp
 	}
 
 	public List<XMLObject> getOrderedChildren() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<SubjectType> getSubjects() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public List<ResourceType> getResources() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public ActionType getAction() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void setAction(ActionType newAction) {
-		// TODO Auto-generated method stub
-
-	}
+	public void setAction(ActionType newAction) { }
 
 	public EnvironmentType getEnvironment() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void setEnvironment(EnvironmentType environment) {
-		// TODO Auto-generated method stub
-
-	}
+	public void setEnvironment(EnvironmentType environment) { }
 
 }

@@ -44,18 +44,13 @@ public class XACML3ResponseType extends AbstractXACMLObject implements ResponseT
 	}
 
 	public List<XMLObject> getOrderedChildren() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public ResultType getResult() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void setResult(ResultType newResult) {
-		// TODO Auto-generated method stub
-
-	}
+	public void setResult(ResultType newResult) { }
 
 }
