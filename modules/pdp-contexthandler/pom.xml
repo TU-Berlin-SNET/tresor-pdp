@@ -63,6 +63,11 @@
     	<artifactId>log4j-slf4j-impl</artifactId>
     	<version>2.0.2</version>
     </dependency>
+	<dependency>
+		<groupId>com.lmax</groupId>
+		<artifactId>disruptor</artifactId>
+		<version>3.2.0</version>
+	</dependency>
     <dependency>
     	<groupId>org.snet.tresor</groupId>
     	<artifactId>pdp-additions</artifactId>

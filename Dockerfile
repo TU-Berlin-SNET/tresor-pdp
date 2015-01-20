@@ -1,5 +1,7 @@
 FROM dockerfile/ubuntu
 
+ENV Log4jContextSelector org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+
 RUN apt-get update &&\
     apt-get -y install openjdk-7-jdk maven
 
@@ -13,3 +15,6 @@ RUN mvn clean package &&\
 WORKDIR /opt
 
 ENTRYPOINT ["/usr/bin/java", "-jar", "pdp-contexthandler.jar"]
+
+EXPOSE 8080
+
