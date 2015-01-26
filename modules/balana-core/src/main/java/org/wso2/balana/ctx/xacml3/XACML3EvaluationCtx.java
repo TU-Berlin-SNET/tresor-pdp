@@ -138,11 +138,17 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
                     }
                 }
             }
-
-            if(attributeValues.size() < 1){
-                return callHelper(type, id, issuer, category);
-            }
         }
+
+        /*
+         * TODO: Moved from inside the if to here to ensure calling of the attributefinder  - Ömer
+         * the request didn't have the attribute and/or category
+         * try asking the attribute finder
+         */
+        if(attributeValues.size() < 1){
+            return callHelper(type, id, issuer, category);
+        }
+
         // if we got here, then we found at least one useful AttributeValue
         return new EvaluationResult(new BagAttribute(type, attributeValues));
     }
