@@ -8,9 +8,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import org.apache.log4j.MDC;
-import org.javasimon.SimonManager;
-import org.javasimon.Split;
-import org.javasimon.Stopwatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.additions.XACMLHelper;
@@ -46,7 +43,6 @@ public class PDPController {
 	private RequestCtxFactory reqFactory;
 	private EvaluationCtxFactory evalFactory;
 	private ThreadLocal<Map<String, String>> cache;
-	private Stopwatch stopwatch;
 
 	@Inject
 	public PDPController(PDP pdp, PDPConfig config, RequestCtxFactory reqFac, EvaluationCtxFactory evalFac,
@@ -56,28 +52,12 @@ public class PDPController {
 		this.reqFactory = reqFac;
 		this.evalFactory = evalFac;
 		this.cache = cache;
-
-		// TODO remove if not necessary anymore
-		this.stopwatch = SimonManager.getStopwatch("PDP");
-		Timer t = new Timer();
-		t.scheduleAtFixedRate(new TimerTask() {
-
-			@Override
-			public void run() {
-				MDC.put(LogHelper.CATEGORY, "metrics");
-				log.info(stopwatch.toString());
-				MDC.clear();
-			}
-
-		}, 0, TimeUnit.HOURS.toMillis(24));
-
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes="application/xacml+xml", produces="application/xacml+xml")
 	public ResponseEntity<String> getXACMLDecision(@RequestBody String req) {
 		MDC.put(LogHelper.CATEGORY, "XACML");
 		log.trace("New XACML decision request");
-		Split split = this.stopwatch.start();
 
 		try {
 			String result = this.processXACMLDecisionRequest(req);
@@ -88,7 +68,6 @@ public class PDPController {
 			MDC.clear();
 			// TODO a more robust solution
 			this.cache.get().clear();
-			split.stop();
 		}
 	}
 
