@@ -17,15 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.additions.finder.impl.FinderConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.wso2.balana.AbstractPolicy;
-import org.wso2.balana.Balana;
-import org.wso2.balana.DOMHelper;
-import org.wso2.balana.ParsingException;
-import org.wso2.balana.Policy;
-import org.wso2.balana.PolicySet;
-import org.wso2.balana.UnknownIdentifierException;
+import org.wso2.balana.*;
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.BagAttribute;
+import org.wso2.balana.ctx.Attribute;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.PolicyFinder;
 import org.xml.sax.SAXException;
@@ -42,8 +37,8 @@ public class XACMLHelper {
 	 * @return subjectID or null
 	 */
 	public static String getSubjectID(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.STRING_DATATYPE_URI, FinderConstants.SUBJECT_ID_URI,
-				null, FinderConstants.SUBJECT_CATEGORY_URI, ctx);
+		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_SUBJECT,
+				null, FinderConstants.CATEGORY_SUBJECT, ctx);
 	}
 
 	/**
@@ -52,8 +47,8 @@ public class XACMLHelper {
 	 * @return deviceID or null
 	 */
 	public static String getDeviceID(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.STRING_DATATYPE_URI, FinderConstants.DEVICE_ID_URI,
-				null, FinderConstants.SUBJECT_CATEGORY_URI, ctx);
+		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_DEVICE,
+				null, FinderConstants.CATEGORY_SUBJECT, ctx);
 	}
 
 	/**
@@ -62,8 +57,8 @@ public class XACMLHelper {
 	 * @return clientID or null
 	 */
 	public static String getClientID(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.STRING_DATATYPE_URI, FinderConstants.CLIENT_ID_URI,
-				null, FinderConstants.SUBJECT_CATEGORY_URI, ctx);
+		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_CLIENT,
+				null, FinderConstants.CATEGORY_SUBJECT, ctx);
 	}
 
 	/**
@@ -72,8 +67,8 @@ public class XACMLHelper {
 	 * @return serviceID or null
 	 */
 	public static String getServiceID(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.STRING_DATATYPE_URI, FinderConstants.SERVICE_ID_URI,
-				null, FinderConstants.RESOURCE_CATEGORY_URI, ctx);
+		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_SERVICE,
+				null, FinderConstants.CATEGORY_RESOURCE, ctx);
 	}
 
 	/**
@@ -111,18 +106,14 @@ public class XACMLHelper {
 	 * @return BagAttribute containing attributeValue or empty BagAttribute
 	 */
 	public static BagAttribute makeBagAttribute(URI type, String value) {
-
 		if (value != null) {
-			try {
-				AttributeValue attr = Balana.getInstance().getAttributeFactory().createValue(type, value);
-				List<AttributeValue> coll = new ArrayList<AttributeValue>(1);
-				coll.add(attr);
+			AttributeValue attributeValue = XACMLHelper.makeValue(type, value);
 
-				return new BagAttribute(type, coll);
-			} catch (UnknownIdentifierException e) {
-				log.warn("Unknown DataType {}", type, e);
-			} catch (ParsingException e) {
-				log.warn("Failed to create attribute from given String", e);
+			if (attributeValue != null) {
+				List<AttributeValue> attributeValueList = new ArrayList<AttributeValue>();
+				attributeValueList.add(attributeValue);
+
+				return new BagAttribute(type, attributeValueList);
 			}
 		}
 
@@ -130,23 +121,47 @@ public class XACMLHelper {
 	}
 
 	public static BagAttribute makeBagAttribute(URI type, String[] values) {
-
 		if (values != null) {
-			try {
-				List<AttributeValue> list = new ArrayList<AttributeValue>();
-				for (int i = 0; i < values.length; i++)
-					list.add(Balana.getInstance().getAttributeFactory().createValue(type, values[i]));
-				return new BagAttribute(type, list);
-			} catch (UnknownIdentifierException e) {
-				log.warn("Unknown DataType {}", type, e);
-			} catch (ParsingException e) {
-				log.warn("Failed to create attribute from given String", e);
+			AttributeValue attributeValue;
+			List<AttributeValue> attributeValueList = new ArrayList<AttributeValue>();
+
+			for (int i = 0; i < values.length; i++) {
+				attributeValue = XACMLHelper.makeValue(type, values[i]);
+
+				if (attributeValue != null)
+					attributeValueList.add(attributeValue);
 			}
+
+			return new BagAttribute(type, attributeValueList);
 		}
 
 		return BagAttribute.createEmptyBag(type);
 	}
 
+	public static Attribute makeAttribute(URI id, URI type, AttributeValue attributeValue, int xacmlVersion) {
+		if (id == null || type == null || attributeValue == null)
+			return null;
+
+		return new Attribute(id, null, null, attributeValue, xacmlVersion);
+	}
+
+	public static Attribute makeAttribute(URI id, URI type, String value, int xacmlVersion) {
+		AttributeValue attributeValue = XACMLHelper.makeValue(type, value);
+		return makeAttribute(id, type, attributeValue, xacmlVersion);
+	}
+
+	public static AttributeValue makeValue(URI type, String value) {
+		try {
+			AttributeValue attributeValue = Balana.getInstance().getAttributeFactory().createValue(type, value);
+			return attributeValue;
+		} catch (UnknownIdentifierException e) {
+			log.warn("Failed to parse attributeValue. Unknown DataType {}", type, e);
+		} catch (ParsingException e) {
+			log.warn("Failed to parse attributeValue of type {} from given String {}", type, value, e);
+		}
+
+		return null;
+	}
 
 	/**
 	 * Parses and loads given Policy

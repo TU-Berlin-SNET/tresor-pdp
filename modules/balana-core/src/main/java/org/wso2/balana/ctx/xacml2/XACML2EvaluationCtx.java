@@ -113,18 +113,22 @@ public class XACML2EvaluationCtx extends BasicEvaluationCtx {
         // get the subjects, make sure they're correct, and setup tables
         subjectMap = new HashMap();
         setupSubjects(requestCtx.getSubjects());
+        System.out.println("Subject: " + subjectMap.toString());
 
         // next look at the Resource data, which needs to be handled specially
         resourceMap = new HashMap();
         setupResource(requestCtx.getResource());
+        System.out.println("Resource: " + resourceMap.toString());
 
         // setup the action data, which is generic
         actionMap = new HashMap();
         mapAttributes(requestCtx.getAction(), actionMap);
+        System.out.println("Action: " + actionMap.toString());
 
         // finally, set up the environment data, which is also generic
         environmentMap = new HashMap();
         mapAttributes(requestCtx.getEnvironmentAttributes(), environmentMap);
+        System.out.println("Environment: " + environmentMap.toString());
 
     }
 
@@ -498,6 +502,51 @@ public class XACML2EvaluationCtx extends BasicEvaluationCtx {
 
         return new MultipleCtxResult(children, null, false);
 
+    }
+
+    public Map getAttributeMap(String category) {
+        if (category.equals(XACMLConstants.SUBJECT_CATEGORY))
+            return this.subjectMap;
+        if (category.equals(XACMLConstants.RESOURCE_CATEGORY))
+            return this.resourceMap;
+        if (category.equals(XACMLConstants.ACTION_CATEGORY))
+            return this.actionMap;
+        if (category.equals(XACMLConstants.ENT_CATEGORY))
+            return this.environmentMap;
+
+        return null;
+    }
+
+    /**
+     * CHANGE: Added method
+     * @return map containing corresponding attributes
+     */
+    public Map getSubjectMap() {
+        return this.subjectMap;
+    }
+
+    /**
+     * CHANGE: Added method
+     * @return map containing corresponding attributes
+     */
+    public Map getResourceMap() {
+        return this.resourceMap;
+    }
+
+    /**
+     * CHANGE: Added method
+     * @return map containing corresponding attributes
+     */
+    public Map getActionMap() {
+        return this.actionMap;
+    }
+
+    /**
+     * CHANGE: Added method
+     * @return map containing corresponding attributes
+     */
+    public Map getEnvironmentMap() {
+        return this.environmentMap;
     }
 
 }

@@ -1,10 +1,5 @@
 package org.snet.tresor.pdp.contexthandler.controller;
 
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 
 import org.apache.log4j.MDC;
@@ -42,16 +37,13 @@ public class PDPController {
 	private PDPConfig pdpConfig;
 	private RequestCtxFactory reqFactory;
 	private EvaluationCtxFactory evalFactory;
-	private ThreadLocal<Map<String, String>> cache;
 
 	@Inject
-	public PDPController(PDP pdp, PDPConfig config, RequestCtxFactory reqFac, EvaluationCtxFactory evalFac,
-			ThreadLocal<Map<String, String>> cache) {
+	public PDPController(PDP pdp, PDPConfig config, RequestCtxFactory reqFac, EvaluationCtxFactory evalFac) {
 		this.pdp = pdp;
 		this.pdpConfig = config;
 		this.reqFactory = reqFac;
 		this.evalFactory = evalFac;
-		this.cache = cache;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes="application/xacml+xml", produces="application/xacml+xml")
@@ -66,8 +58,6 @@ public class PDPController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} finally {
 			MDC.clear();
-			// TODO a more robust solution
-			this.cache.get().clear();
 		}
 	}
 
@@ -91,12 +81,10 @@ public class PDPController {
 		} catch (ParsingException e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		} catch (Exception e) {
-			// TODO logging
+			log.error("Failed to process request. Unexpected Error", e);
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
 			MDC.clear();
-			// TODO a more robust solution
-			this.cache.get().clear();
 		}
 	}
 

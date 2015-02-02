@@ -1,10 +1,9 @@
 package org.snet.tresor.pdp.additions.finder.impl;
 
-import java.net.URI;
-import java.util.Map;
+import org.wso2.balana.XACMLConstants;
+import org.wso2.balana.ctx.xacml2.Subject;
 
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.net.URI;
 
 /**
  * Constants for some (Policy-/Attribute-)Finders
@@ -12,75 +11,69 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 public class FinderConstants {
 
 	/**
-	 * MapType for a Map<String, String> when using the ObjectMapper
+	 * XACML Attribute Ids
 	 */
-	public static final MapType MAPTYPE_STRING = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class);
 
-	public static final String GEOLOCATION_ATTRIBUTEID = "org:snet:tresor:attribute:current-geolocation";
-	public static final String GEOLOCATION_TIMESTAMP_ATTRIBUTEID = "org:snet:tresor:attribute:timestamp-geolocation";
+	public static final URI ATTRIBUTE_ID_SUBJECT;
+	public static final URI ATTRIBUTE_ID_DEVICE;
+	public static final URI ATTRIBUTE_ID_CLIENT;
+	public static final URI ATTRIBUTE_ID_SERVICE;
 
-	public static final String WIFILOCATION_ATTRIBUTEID = "org:snet:tresor:attribute:current-wifi";
-	public static final String WIFILOCATION_TIMESTAMP_ATTRIBUTEID = "org:snet:tresor:attribute:timestamp-wifi";
+	public static final String ATTRIBUTE_ID_GEOLOCATION = "org:snet:tresor:attribute:current-geolocation";
+	public static final String ATTRIBUTE_ID_GEOLOCATION_TIMESTAMP = "org:snet:tresor:attribute:timestamp-geolocation";
 
-	public static final String WIFISSID_ATTRIBUTEID = "org:snet:tresor:attribute:current-wifi-ssid";
-	public static final String WIFISSID_TIMESTAMP_ATTRIBUTEID = "org:snet:tresor:attribute:timestamp-wifi-ssid";
+	public static final String ATTRIBUTE_ID_WIFILOCATION = "org:snet:tresor:attribute:current-wifi";
+	public static final String ATTRIBUTE_ID_WIFILOCATION_TIMESTAMP = "org:snet:tresor:attribute:timestamp-wifi";
 
-	public static final String BTLOCATION_ATTRIBUTEID = "org:snet:tresor:attribute:current-bluetooth-location";
-	public static final String BTLOCATION_TIMESTAMP_ATTRIBUTEID = "org:snet:tresor:attribute:timestamp-bluetooth-location";
+	public static final String ATTRIBUTE_ID_WIFISSID = "org:snet:tresor:attribute:current-wifi-ssid";
+	public static final String ATTRIBUTE_ID_WIFISSID_TIMESTAMP = "org:snet:tresor:attribute:timestamp-wifi-ssid";
 
-	public static final String CELLID_ATTRIBUTEID = "org:snet:tresor:attribute:current-cell-id";
-	public static final String CELLID_TIMESTAMP_ATTRIBUTEID = "org:snet:tresor:attribute:timestamp-cell-id";
+	public static final String ATTRIBUTE_ID_BTLOCATION = "org:snet:tresor:attribute:current-bluetooth-location";
+	public static final String ATTRIBUTE_ID_BTLOCATION_TIMESTAMP = "org:snet:tresor:attribute:timestamp-bluetooth-location";
 
-	public static final String DOCTOR_STATION_ATTRIBUTEID = "org:snet:tresor:attribute:doctor-station";
-	public static final String DOCTOR_ROLE_ATTRIBUTEID = "org:snet:tresor:attribute:doctor-role";
+	public static final String ATTRIBUTE_ID_CELLID = "org:snet:tresor:attribute:current-cell-id";
+	public static final String ATTRIBUTE_ID_CELLID_TIMESTAMP = "org:snet:tresor:attribute:timestamp-cell-id";
 
-	public static final String PATIENT_STATION_ATTRIBUTEID = "org:snet:tresor:attribute:patient-station";
-	public static final String PATIENT_ROLE_ATTRIBUTEID = "org:snet:tresor:attribute:patient-role";
+	public static final String ATTRIBUTE_ID_DOCTOR_STATION = "org:snet:tresor:attribute:doctor-station";
+	public static final String ATTRIBUTE_ID_DOCTOR_ROLE = "org:snet:tresor:attribute:doctor-role";
+
+	public static final String ATTRIBUTE_ID_PATIENT_STATION = "org:snet:tresor:attribute:patient-station";
+	public static final String ATTRIBUTE_ID_PATIENT_ROLE = "org:snet:tresor:attribute:patient-role";
+
 
 	/**
-	 * XACML URI denoting subject category
+	 * XACML Datatypes
 	 */
-	public static final URI SUBJECT_CATEGORY_URI;
+
+	public static final URI DATATYPE_STRING;
+	public static final URI DATATYPE_INTEGER;
+	public static final URI DATATYPE_GEO;
+
 
 	/**
-	 * XACML URI denoting resource category
+	 * XACML Categories
 	 */
-	public static final URI RESOURCE_CATEGORY_URI;
 
-	/**
-	 * XACML URI denoting string datatype
-	 */
-	public static final URI STRING_DATATYPE_URI;
+	public static final URI CATEGORY_SUBJECT;
+	public static final URI CATEGORY_RESOURCE;
+	public static final URI CATEGORY_ENVIRONMENT;
 
-	/**
-	 * XACML URI denoting subject id
-	 */
-	public static final URI SUBJECT_ID_URI;
-
-	/**
-	 * XACML URI denoting device id
-	 */
-	public static final URI DEVICE_ID_URI;
-
-	/**
-	 * XACML URI denoting domain id
-	 */
-	public static final URI CLIENT_ID_URI;
-
-	/**
-	 * XACML URI denoting service id
-	 */
-	public static final URI SERVICE_ID_URI;
 
 	static {
 		try {
-			SUBJECT_CATEGORY_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject-category:access-subject");
-			RESOURCE_CATEGORY_URI = new URI("urn:oasis:names:tc:xacml:3.0:attribute-category:resource");
-			STRING_DATATYPE_URI = new URI("http://www.w3.org/2001/XMLSchema#string");
-			SUBJECT_ID_URI = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
-			DEVICE_ID_URI = new URI("org:snet:tresor:attribute:device-id");
-			CLIENT_ID_URI = new URI("http://schemas.cloud-tresor.com/request/2014/09/tresor-organization-uuid");
-			SERVICE_ID_URI = new URI("http://schemas.cloud-tresor.com/request/2014/04/service-uuid");
+			ATTRIBUTE_ID_SUBJECT = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+			ATTRIBUTE_ID_DEVICE = new URI("org:snet:tresor:attribute:device-id");
+			ATTRIBUTE_ID_CLIENT = new URI("http://schemas.cloud-tresor.com/request/2014/09/tresor-organization-uuid");
+			ATTRIBUTE_ID_SERVICE = new URI("http://schemas.cloud-tresor.com/request/2014/04/service-uuid");
+
+			DATATYPE_STRING = new URI("http://www.w3.org/2001/XMLSchema#string");
+			DATATYPE_INTEGER = new URI("http://www.w3.org/2001/XMLSchema#integer");
+			DATATYPE_GEO = new URI("urn:ogc:def:dataType:geoxacml:1.0:geometry");
+
+			CATEGORY_SUBJECT = new URI(XACMLConstants.SUBJECT_CATEGORY);
+			CATEGORY_RESOURCE = new URI(XACMLConstants.RESOURCE_CATEGORY);
+			CATEGORY_ENVIRONMENT = new URI(XACMLConstants.ENT_CATEGORY);
+
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

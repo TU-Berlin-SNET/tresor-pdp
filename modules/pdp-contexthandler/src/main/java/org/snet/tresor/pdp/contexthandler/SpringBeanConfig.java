@@ -12,10 +12,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
-import org.snet.tresor.pdp.additions.finder.impl.LocationAttributeFinderModule;
-import org.snet.tresor.pdp.additions.finder.impl.PolicyStorePolicyFinderModule;
-import org.snet.tresor.pdp.additions.finder.impl.StationAttributeFinderModule;
-import org.snet.tresor.pdp.additions.finder.impl.WeekdayAttributeFinderModule;
+import org.snet.tresor.pdp.additions.finder.impl.*;
+import org.snet.tresor.pdp.additions.pip.PIP;
+import org.snet.tresor.pdp.additions.pip.impl.LocationPIP;
+import org.snet.tresor.pdp.additions.pip.impl.StationPIP;
+import org.snet.tresor.pdp.additions.pip.impl.WeekdayPIP;
 import org.snet.tresor.pdp.additions.policystore.AbstractClientIdServiceIdPolicyStore;
 import org.snet.tresor.pdp.additions.policystore.FileBasedClientIdServiceIdPolicyStore;
 import org.snet.tresor.pdp.additions.policystore.PolicyStore;
@@ -50,26 +51,25 @@ public class SpringBeanConfig {
 	}
 
 	@Bean
-	ThreadLocal<Map<String, String>> getCache() {
-		return new ThreadLocal<Map<String,String>>() {
-			protected synchronized Map<String, String> initialValue() {
-				return new HashMap<String, String>();
-			}
-		};
+	@Inject
+	PIPAttributeFinderModule getPIPAttributeFinderModule(ObjectMapper objectMapper) {
+		List<PIP> pips = new ArrayList<>();
+		pips.add(new WeekdayPIP());
+		pips.add(new StationPIP("http://localhost:3300", objectMapper));
+		pips.add(new LocationPIP("http://ls.snet.tu-berlin.de:8080/pe/api/v2/pdp",
+				"Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm",
+				objectMapper));
+
+		return new PIPAttributeFinderModule(pips);
 	}
 
 	@Bean
 	@Inject
-	AttributeFinder getAttributeFinder(ObjectMapper objectMapper, ThreadLocal<Map<String, String>> cache) {
+	AttributeFinder getAttributeFinder(ObjectMapper objectMapper, PIPAttributeFinderModule pipAttributeFinderModule) {
 		List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
 		attributeFinderModules.add(new CurrentEnvModule());
 		attributeFinderModules.add(new SelectorModule());
-		attributeFinderModules.add(new WeekdayAttributeFinderModule());
-		attributeFinderModules.add(new StationAttributeFinderModule("http://localhost:3300", objectMapper));
-		attributeFinderModules.add(new LocationAttributeFinderModule(
-				"http://ls.snet.tu-berlin.de:8080/pe/api/v2/pdp",
-				"Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm",
-				objectMapper, cache));
+		attributeFinderModules.add(pipAttributeFinderModule);
 
 		AttributeFinder attributeFinder = new AttributeFinder();
 		attributeFinder.setModules(attributeFinderModules);
@@ -101,8 +101,7 @@ public class SpringBeanConfig {
 
 	@Bean
 	@Inject
-	PDPConfig getPDPConfig(AttributeFinder attributeFinder, PolicyFinder policyFinder,
-			ResourceFinder resourceFinder) {
+	PDPConfig getPDPConfig(AttributeFinder attributeFinder, PolicyFinder policyFinder, ResourceFinder resourceFinder) {
 		return new PDPConfig(attributeFinder, policyFinder, resourceFinder);
 	}
 

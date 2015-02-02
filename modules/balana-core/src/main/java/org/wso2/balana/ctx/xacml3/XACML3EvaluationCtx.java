@@ -141,7 +141,7 @@ public class XACML3EvaluationCtx extends BasicEvaluationCtx {
         }
 
         /*
-         * TODO: Moved from inside the if to here to ensure calling of the attributefinder  - Ömer
+         * CHANGE: Moved from inside the if to here to ensure calling of the attributefinder  - Ömer
          * the request didn't have the attribute and/or category
          * try asking the attribute finder
          */

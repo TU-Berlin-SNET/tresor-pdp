@@ -27,11 +27,6 @@
     	<version>1.0.0.wso2v8-SNAPSHOT</version>
     </dependency>
     <dependency>
-    	<groupId>org.mongodb</groupId>
-    	<artifactId>mongo-java-driver</artifactId>
-    	<version>2.12.3</version>
-    </dependency>
-    <dependency>
     	<groupId>org.apache.httpcomponents</groupId>
     	<artifactId>fluent-hc</artifactId>
     	<version>4.3.5</version>
