@@ -38,10 +38,8 @@ package org.wso2.balana.cond;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.balana.UnknownIdentifierException;
-import org.wso2.balana.attr.geoxacml.GeometryAttribute;
 import org.wso2.balana.cond.cluster.*;
 import org.wso2.balana.cond.cluster.xacml3.*;
-import org.wso2.balana.cond.geoxacml.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -128,34 +126,6 @@ public class StandardFunctionFactory extends BaseFunctionFactory {
         // add MatchFunction
         targetFunctions.addAll((new MatchFunctionCluster()).getSupportedFunctions());
 
-        // add geoXACML functions
-        targetFunctions.addAll(new WildCardFunctionCluster().getSupportedFunctions());
-        targetFunctions.add(new GeometryEquals());
-        targetFunctions.add(new GeometryDisjoint());
-        targetFunctions.add(new GeometryTouches());
-        targetFunctions.add(new GeometryCrosses());
-        targetFunctions.add(new GeometryWithin());
-        targetFunctions.add(new GeometryContains());
-        targetFunctions.add(new GeometryOverlaps());
-        targetFunctions.add(new GeometryIntersects());
-        targetFunctions.add(new GeometryIsClosed());
-        targetFunctions.add(new GeometryIsValid());
-        targetFunctions.add(new GeometryIsSimple());
-        targetFunctions.add(new GeometryArea());
-        targetFunctions.add(new GeometryDistance());
-        targetFunctions.add(new GeometryIsWithinDistance());
-        targetFunctions.add(new GeometryLength());
-        targetFunctions.add(new GeometryBuffer());
-        targetFunctions.add(new GeometryUnion());
-        targetFunctions.add(new GeometryIntersection());
-        targetFunctions.add(new GeometryDifference());
-        targetFunctions.add(new GeometrySymDifference());
-        targetFunctions.add(new GeometryBoundary());
-        targetFunctions.add(new GeometryCentroid());
-        targetFunctions.add(new GeometryConvexHull());
-        targetFunctions.add(new ConvertToMetre());
-        targetFunctions.add(new ConvertToSquareMetre());
-
         targetAbstractFunctions = new HashMap();            // TODO ??
     }
 
@@ -180,23 +150,6 @@ public class StandardFunctionFactory extends BaseFunctionFactory {
         conditionFunctions.addAll((new ConditionSetFunctionCluster()).getSupportedFunctions());
         // add condition functions from HigherOrderFunction
         conditionFunctions.addAll((new HigherOrderFunctionCluster()).getSupportedFunctions());
-
-        // add geoXACML bag functions
-        String geometryPrefix = "urn:ogc:def:function:geoxacml:1.0:geometry";
-        conditionFunctions.add(BagFunction.getOneAndOnlyInstance(
-                geometryPrefix + BagFunction.NAME_BASE_ONE_AND_ONLY, GeometryAttribute.identifier));
-        conditionFunctions.add(BagFunction.getIsInInstance(
-                geometryPrefix + BagFunction.NAME_BASE_IS_IN, GeometryAttribute.identifier));
-        conditionFunctions.add(BagFunction.getBagSizeInstance(
-                geometryPrefix + BagFunction.NAME_BASE_BAG_SIZE, GeometryAttribute.identifier));
-        conditionFunctions.add(BagFunction.getBagInstance(
-                geometryPrefix + BagFunction.NAME_BASE_BAG, GeometryAttribute.identifier));
-
-        // add geoXACML condition functions
-        conditionFunctions.add(SetFunction.getAtLeastOneInstance(
-                geometryPrefix + SetFunction.NAME_BASE_AT_LEAST_ONE_MEMBER_OF, GeometryAttribute.identifier));
-        conditionFunctions.add(SetFunction.getSetEqualsInstance(
-                geometryPrefix + SetFunction.NAME_BASE_SET_EQUALS, GeometryAttribute.identifier));
 
         conditionAbstractFunctions = new HashMap<URI, FunctionProxy>(targetAbstractFunctions);// TODO ??
     }
@@ -252,15 +205,6 @@ public class StandardFunctionFactory extends BaseFunctionFactory {
         generalFunctions.addAll((new StringCreationFunctionCluster()).getSupportedFunctions());
         // add the XACML 3.0 start with functions
         generalFunctions.addAll((new XPathFunctionCluster()).getSupportedFunctions());
-
-        // add geoXACML general functions
-        String geometryBagPrefix = "urn:ogc:def:function:geoxacml:1.0:geometry-bag";
-        generalFunctions.add(SetFunction.getIntersectionInstance(
-                geometryBagPrefix+ SetFunction.NAME_BASE_INTERSECTION, GeometryAttribute.identifier));
-        generalFunctions.add(SetFunction.getSubsetInstance(
-                geometryBagPrefix + SetFunction.NAME_BASE_SUBSET, GeometryAttribute.identifier));
-        generalFunctions.add(SetFunction.getUnionInstance(
-                geometryBagPrefix + SetFunction.NAME_BASE_UNION, GeometryAttribute.identifier));
 
         generalAbstractFunctions = new HashMap<URI, FunctionProxy>(conditionAbstractFunctions); // TODO
 

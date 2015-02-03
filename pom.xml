@@ -39,6 +39,7 @@
         <module>modules/balana-distribution</module>
         <module>modules/pdp-additions</module>
         <module>modules/pdp-contexthandler</module>
+        <module>modules/geoxacml</module>
   </modules>
     <version>1.0.0.wso2v8-SNAPSHOT</version>
 

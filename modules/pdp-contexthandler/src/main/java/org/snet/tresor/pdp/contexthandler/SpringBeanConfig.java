@@ -12,6 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
+import org.snet.tresor.pdp.additions.GeoPDP;
 import org.snet.tresor.pdp.additions.finder.impl.*;
 import org.snet.tresor.pdp.additions.pip.PIP;
 import org.snet.tresor.pdp.additions.pip.impl.LocationPIP;
@@ -65,7 +66,7 @@ public class SpringBeanConfig {
 
 	@Bean
 	@Inject
-	AttributeFinder getAttributeFinder(ObjectMapper objectMapper, PIPAttributeFinderModule pipAttributeFinderModule) {
+	AttributeFinder getAttributeFinder(PIPAttributeFinderModule pipAttributeFinderModule) {
 		List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
 		attributeFinderModules.add(new CurrentEnvModule());
 		attributeFinderModules.add(new SelectorModule());
@@ -108,7 +109,7 @@ public class SpringBeanConfig {
 	@Bean
 	@Inject
 	PDP getPDP(PDPConfig pdpConfig) {
-		return new PDP(pdpConfig);
+		return GeoPDP.getGeoExtendedPDP(pdpConfig);
 	}
 
 
