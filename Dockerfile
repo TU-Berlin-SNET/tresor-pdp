@@ -1,9 +1,6 @@
-FROM dockerfile/ubuntu
+FROM maven
 
 ENV Log4jContextSelector org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
-
-RUN apt-get update &&\
-    apt-get -y install openjdk-7-jdk maven
 
 ADD . /opt/tresor-pdp
 
