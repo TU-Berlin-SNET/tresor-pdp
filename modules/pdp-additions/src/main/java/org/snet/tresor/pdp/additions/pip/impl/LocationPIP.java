@@ -125,11 +125,13 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
 
         if (subjectId != null && deviceId != null) {
                 Map<String, String> values = Request.Post(this.url)
-                        .setHeader("Authentication", this.authentication)
-                        .bodyString("{ subjectID:" + subjectId + ","
-                                    + "deviceID:" + deviceId + ","
-                                    + "attributeID:" + attributeId.toString() + "}",
-                                    ContentType.APPLICATION_JSON)
+                        .setHeader("Accept", ContentType.APPLICATION_JSON.toString())
+                        .setHeader("Accept-Charset", "UTF-8")
+                        .setHeader("Authorization", this.authentication)
+                        .bodyString("{ \"subjectID\":\"" + subjectId + "\","
+                                        + "\"deviceID\":\"" + deviceId + "\","
+                                        + "\"attributeID\":\"" + attributeId.toString() + "\"}",
+                                ContentType.APPLICATION_JSON)
                         .execute()
                         .handleResponse(this);
                 attributeMap.putAll(this.makeAttributes(values, version));

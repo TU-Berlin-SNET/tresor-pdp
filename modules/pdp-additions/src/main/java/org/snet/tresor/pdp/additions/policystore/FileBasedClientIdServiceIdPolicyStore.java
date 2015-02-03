@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread-safe file-based cliendId-serviceId policy store implementation
+ * Thread-safe file-based clientId-serviceId policy store implementation
  */
 public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServiceIdPolicyStore {
 	private static final Logger log = LoggerFactory.getLogger(FileBasedClientIdServiceIdPolicyStore.class);
@@ -66,8 +66,10 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 			if (file.isDirectory()) {
 				policies = new HashMap<String, String>();
 				File[] files = file.listFiles();
-				for (int i = 0; i < files.length; i++)
-					policies.put(files[i].getName(), this.readFile(files[i]));
+				if (files != null) {
+					for (int i = 0; i < files.length; i++)
+						policies.put(files[i].getName(), this.readFile(files[i]));
+				}
 			}
 		} finally {
 			this.lock.readLock().unlock();
@@ -89,7 +91,6 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 
 	public void put(String clientId, String serviceId, String policy) {
 		this.lock.writeLock().lock();
-		BufferedWriter writer = null;
 		try {
 			// make sure the directory exists
 			File dir = new File(this.baseDirectory.getPath() + File.separator + clientId);
@@ -102,14 +103,12 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 				throw new RuntimeException("Cannot create policy store file '" + file.getPath() + "'");
 
 			// write & close
-			writer = new BufferedWriter(new FileWriter(file));
-			writer.write(policy);
-			writer.close();
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+				writer.write(policy);
+			}
 
 		} catch (IOException e) {
 			log.error("Failed to write policy for {} and {} to policystore", clientId, serviceId, e);
-			try { writer.close(); }
-			catch (Exception i) {}
 		} finally {
 			this.lock.writeLock().unlock();
 		}
@@ -125,7 +124,9 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 		}
 	}
 
-	public void close() { }
+	public void close() {
+		log.info("Close method of FilebasedClientIdServiceIdPolicyStore does nothing");
+	}
 
 	/**
 	 * Reads given file into a string
@@ -136,10 +137,8 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 		if (f == null || !f.isFile())
 			return null;
 
-		String policy = null;
-		Scanner scanner = null;
-		try {
-			scanner = new Scanner(f).useDelimiter("\\A");
+		String policy;
+		try (Scanner scanner = new Scanner(f).useDelimiter("\\A")) {
 			policy = scanner.next();
 
 			// Scanner class hides exceptions so scan for them
@@ -149,8 +148,6 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 		} catch (IOException e) {
 			log.error("Error reading from file '{}'", f.getPath(), e);
 			policy = null;
-		} finally {
-			scanner.close();
 		}
 
 		return policy;

@@ -1,7 +1,6 @@
 package org.snet.tresor.pdp.additions.finder.impl;
 
 import org.wso2.balana.XACMLConstants;
-import org.wso2.balana.ctx.xacml2.Subject;
 
 import java.net.URI;
 

@@ -80,7 +80,7 @@ public class XACMLHelper {
 	 * @param context context in which to look
 	 * @return a string representation of the value or null
 	 */
-	public static String getAttributeAsString(URI attributeType, URI attributeId,	String issuer, URI category, EvaluationCtx context) {
+	public static String getAttributeAsString(URI attributeType, URI attributeId, String issuer, URI category, EvaluationCtx context) {
 		String value = null;
 		BagAttribute bag = (BagAttribute) context.getAttribute(attributeType, attributeId, issuer, category).getAttributeValue();
 
@@ -152,8 +152,7 @@ public class XACMLHelper {
 
 	public static AttributeValue makeValue(URI type, String value) {
 		try {
-			AttributeValue attributeValue = Balana.getInstance().getAttributeFactory().createValue(type, value);
-			return attributeValue;
+			return Balana.getInstance().getAttributeFactory().createValue(type, value);
 		} catch (UnknownIdentifierException e) {
 			log.warn("Failed to parse attributeValue. Unknown DataType {}", type, e);
 		} catch (ParsingException e) {
@@ -235,14 +234,9 @@ public class XACMLHelper {
         // create a builder based on the factory & try to load the policy
         DocumentBuilder db = factory.newDocumentBuilder();
 
-        InputStream stream = null;
-        try {
-        	stream = new ByteArrayInputStream(xml.getBytes());
-        	return db.parse(stream);
-        } finally {
-        	try { stream.close(); }
-        	catch (Exception e) { log.debug("Failed to close stream resource", e); }
-        }
+		try (InputStream stream = new ByteArrayInputStream(xml.getBytes())) {
+			return db.parse(stream);
+		}
     }
 
 }
