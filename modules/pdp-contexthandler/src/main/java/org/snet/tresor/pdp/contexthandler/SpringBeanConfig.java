@@ -24,6 +24,7 @@ import org.snet.tresor.pdp.additions.policystore.PolicyStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.wso2.balana.PDP;
 import org.wso2.balana.PDPConfig;
@@ -44,33 +45,36 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ComponentScan
 @EnableWebMvc
 public class SpringBeanConfig {
+    @Inject Environment env;
 
 	@Bean
-	AbstractClientIdServiceIdPolicyStore getClientIdServiceIdPolicyStore() throws IOException {
-		return new FileBasedClientIdServiceIdPolicyStore(new File(".").getCanonicalPath() + "/policies/",
-				new ReentrantReadWriteLock());
+	AbstractClientIdServiceIdPolicyStore policyStore() throws IOException {
+        String path = (env.containsProperty("policystore.path")) ? env.getProperty("policystore.path") :
+                new File(".").getCanonicalPath() + "/policies/";
+        return new FileBasedClientIdServiceIdPolicyStore(path, new ReentrantReadWriteLock());
 	}
 
 	@Bean
-	@Inject
-	PIPAttributeFinderModule getPIPAttributeFinderModule(ObjectMapper objectMapper) {
+	PIPAttributeFinderModule pipAttributeFinderModule() {
 		List<PIP> pips = new ArrayList<>();
 		pips.add(new WeekdayPIP());
-		pips.add(new StationPIP("http://localhost:3300", objectMapper));
-		pips.add(new LocationPIP("http://ls.snet.tu-berlin.de:8080/pe/api/v2/pdp",
-				"Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm",
-				objectMapper));
+
+        if (env.containsProperty("stationpip.url"))
+		    pips.add(new StationPIP(env.getProperty("stationpip.url"), objectMapper()));
+
+        if (env.containsProperty("locationpip.url"))
+            pips.add(new LocationPIP(env.getProperty("locationpip.url"), env.getProperty("locationpip.authentication"),
+                    objectMapper()));
 
 		return new PIPAttributeFinderModule(pips);
 	}
 
 	@Bean
-	@Inject
-	AttributeFinder getAttributeFinder(PIPAttributeFinderModule pipAttributeFinderModule) {
+	AttributeFinder attributeFinder() {
 		List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
 		attributeFinderModules.add(new CurrentEnvModule());
 		attributeFinderModules.add(new SelectorModule());
-		attributeFinderModules.add(pipAttributeFinderModule);
+		attributeFinderModules.add(pipAttributeFinderModule());
 
 		AttributeFinder attributeFinder = new AttributeFinder();
 		attributeFinder.setModules(attributeFinderModules);
@@ -79,10 +83,9 @@ public class SpringBeanConfig {
 	}
 
 	@Bean
-	@Inject
-	PolicyFinder getPolicyFinder(PolicyStore policyStore) {
+	PolicyFinder policyFinder() throws IOException {
 		Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
-		policyFinderModules.add(new PolicyStorePolicyFinderModule(policyStore));
+		policyFinderModules.add(new PolicyStorePolicyFinderModule(policyStore()));
 
 		PolicyFinder policyFinder = new PolicyFinder();
 		policyFinder.setModules(policyFinderModules);
@@ -91,7 +94,7 @@ public class SpringBeanConfig {
 	}
 
 	@Bean
-	ResourceFinder getResourceFinder() {
+	ResourceFinder resourceFinder() {
 		List<ResourceFinderModule> resourceFinderModules = new ArrayList<ResourceFinderModule>();
 
 		ResourceFinder resourceFinder = new ResourceFinder();
@@ -101,29 +104,27 @@ public class SpringBeanConfig {
 	}
 
 	@Bean
-	@Inject
-	PDPConfig getPDPConfig(AttributeFinder attributeFinder, PolicyFinder policyFinder, ResourceFinder resourceFinder) {
-		return new PDPConfig(attributeFinder, policyFinder, resourceFinder);
+	PDPConfig pdpConfig() throws IOException {
+		return new PDPConfig(attributeFinder(), policyFinder(), resourceFinder());
 	}
 
 	@Bean
-	@Inject
-	PDP getPDP(PDPConfig pdpConfig) {
-		return GeoPDP.getGeoExtendedPDP(pdpConfig);
+	PDP pdp() throws IOException {
+		return GeoPDP.getGeoExtendedPDP(pdpConfig());
 	}
 
 	@Bean
-	ObjectMapper getObjectmapper() {
+	ObjectMapper objectMapper() {
 		return new ObjectMapper();
 	}
 
 	@Bean
-	RequestCtxFactory getReqCtxFactory() {
+	RequestCtxFactory reqCtxFactory() {
 		return RequestCtxFactory.getFactory();
 	}
 
 	@Bean
-	EvaluationCtxFactory getEvalCtxFactory() {
+	EvaluationCtxFactory evalCtxFactory() {
 		return EvaluationCtxFactory.getFactory();
 	}
 

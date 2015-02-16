@@ -1,0 +1,3 @@
+locationpip:
+    url: http://ls.snet.tu-berlin.de:8080/pe/api/v2/pdp
+    authentication: Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm
