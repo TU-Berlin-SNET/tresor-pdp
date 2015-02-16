@@ -112,7 +112,6 @@ public class SpringBeanConfig {
 		return GeoPDP.getGeoExtendedPDP(pdpConfig);
 	}
 
-
 	@Bean
 	ObjectMapper getObjectmapper() {
 		return new ObjectMapper();

@@ -49,7 +49,7 @@ public class ClientIdServiceIdPolicyStoreController {
 	@RequestMapping(value="/{clientId}", method=RequestMethod.GET, produces="application/json")
 	public ResponseEntity<String> getPolicies(@PathVariable String clientId,
 			@AuthenticationPrincipal UserDetails user) throws JsonProcessingException {
-
+        MDC.clear();
 		LogHelper.putMDCs("Policy Retrieval", clientId, this.getSubjectId(user));
 		log.info("Retrieving all policies of {}", clientId);
 
@@ -64,14 +64,13 @@ public class ClientIdServiceIdPolicyStoreController {
 			result = new ResponseEntity<String>(valuesJson, HttpStatus.OK);
 		}
 
-		MDC.clear();
 		return result;
 	}
 
 	@RequestMapping(value="/{clientId}/{serviceId}", method=RequestMethod.GET, produces="application/xacml+xml")
 	public ResponseEntity<String> getPolicy(@PathVariable String clientId, @PathVariable String serviceId,
 			@AuthenticationPrincipal UserDetails user) {
-
+        MDC.clear();
 		LogHelper.putMDCs("Policy Retrieval", clientId, this.getSubjectId(user));
 		log.info("Retrieving policy of client {} for service {}", clientId, serviceId);
 
@@ -84,7 +83,6 @@ public class ClientIdServiceIdPolicyStoreController {
 			result = new ResponseEntity<String>(policy, HttpStatus.OK);
 		}
 
-		MDC.clear();
 		return result;
 	}
 
@@ -92,7 +90,7 @@ public class ClientIdServiceIdPolicyStoreController {
 	@RequestMapping(value="/{clientId}/{serviceId}", method=RequestMethod.PUT, consumes="application/xacml+xml")
 	public ResponseEntity<String> putPolicy(@PathVariable String clientId, @PathVariable String serviceId,
 			@RequestBody String policy, @AuthenticationPrincipal UserDetails user) {
-
+        MDC.clear();
 		LogHelper.putMDCs("Policy Insertion", clientId, this.getSubjectId(user));
 		log.info("Inserting policy for client {} and service {}", clientId, serviceId);
 
@@ -108,8 +106,6 @@ public class ClientIdServiceIdPolicyStoreController {
 		} catch (Exception e) {
 			log.info("Failed to insert policy for client {} and service {}", clientId, serviceId, e);
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-		} finally {
-			MDC.clear();
 		}
 	}
 
@@ -117,7 +113,7 @@ public class ClientIdServiceIdPolicyStoreController {
 	@RequestMapping(value="/{clientId}/{serviceId}", method=RequestMethod.DELETE)
 	public ResponseEntity<String> deletePolicy(@PathVariable String clientId, @PathVariable String serviceId,
 			@AuthenticationPrincipal UserDetails user) {
-
+        MDC.clear();
 		LogHelper.putMDCs("Policy Deletion", clientId, this.getSubjectId(user));
 		log.info("Deleting policy of client {} for service {}", clientId, serviceId);
 
@@ -136,7 +132,6 @@ public class ClientIdServiceIdPolicyStoreController {
 			}
 		}
 
-		MDC.clear();
 		return result;
 	}
 

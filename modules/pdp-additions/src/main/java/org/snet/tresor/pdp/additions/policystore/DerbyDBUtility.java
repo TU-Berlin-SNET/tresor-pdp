@@ -87,8 +87,8 @@ public class DerbyDBUtility implements PolicyStore{
     }
 
 	public AbstractPolicy get(EvaluationCtx ctx, PolicyFinder finder) {
-		String clientId = XACMLHelper.getClientID(ctx);
-		String serviceId = XACMLHelper.getServiceID(ctx);
+		String clientId = XACMLHelper.getClientId(ctx);
+		String serviceId = XACMLHelper.getServiceId(ctx);
 		String policy = this.get(clientId, serviceId);
 		try {
 			if (policy != null)

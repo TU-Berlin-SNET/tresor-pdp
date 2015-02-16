@@ -64,15 +64,13 @@ public class StationPIP implements PIP, ResponseHandler<String[]> {
         String url = null;
         if (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_STATION) || id.equals(FinderConstants.ATTRIBUTE_ID_PATIENT_STATION)) {
             String subject = (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_STATION)) ?
-                    "/doctor/" +  XACMLHelper.getSubjectID(context) :
-                    "/patient/" + XACMLHelper.getServiceID(context);
+                    "/doctor/" +  XACMLHelper.getSubjectId(context) : "/patient/" + XACMLHelper.getServiceId(context);
             url = this.url+subject+"?station=*&pdp=on";
         }
 
         if (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_ROLE) || id.equals(FinderConstants.ATTRIBUTE_ID_PATIENT_ROLE)) {
             String subject = (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_ROLE)) ?
-                    "/doctor/" +  XACMLHelper.getSubjectID(context) :
-                    "/patient/" + XACMLHelper.getServiceID(context);
+                    "/doctor/" +  XACMLHelper.getSubjectId(context) : "/patient/" + XACMLHelper.getServiceId(context);
             url = this.url+subject+"?role=*";
         }
 

@@ -8,11 +8,6 @@ import org.slf4j.MDC;
 public class LogHelper {
 
 	/**
-	 * MDC-key for the tresor-component
-	 */
-	public static final String TRESOR_COMPONENT = "tresor-component";
-
-	/**
 	 * MDC-key for the category
 	 */
 	public static final String CATEGORY = "category";

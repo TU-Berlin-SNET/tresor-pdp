@@ -48,6 +48,7 @@ public class PDPController {
 
 	@RequestMapping(method = RequestMethod.POST, consumes="application/xacml+xml", produces="application/xacml+xml")
 	public ResponseEntity<String> getXACMLDecision(@RequestBody String req) {
+        MDC.clear();
 		MDC.put(LogHelper.CATEGORY, "XACML");
 		log.trace("New XACML decision request");
 
@@ -56,14 +57,13 @@ public class PDPController {
 			return new ResponseEntity<String>(result, HttpStatus.OK);
 		} catch (ParsingException e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-		} finally {
-			MDC.clear();
 		}
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes="application/samlassertion+xml", produces="application/samlassertion+xml")
 	public ResponseEntity<String> getXACMLSAMLDecision(@RequestBody String req) {
-		MDC.put(LogHelper.CATEGORY, "XACMLSAML");
+        MDC.clear();
+        MDC.put(LogHelper.CATEGORY, "XACMLSAML");
 		log.trace("New XACMLSAML decision request");
 
 		try {
@@ -83,8 +83,6 @@ public class PDPController {
 		} catch (Exception e) {
 			log.error("Failed to process request. Unexpected Error", e);
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		} finally {
-			MDC.clear();
 		}
 	}
 
@@ -103,9 +101,9 @@ public class PDPController {
 	}
 
 	private String processXACMLDecisionRequest(EvaluationCtx evalCtx) {
-		String subjectId = XACMLHelper.getSubjectID(evalCtx);
-		String clientId = XACMLHelper.getClientID(evalCtx);
-		String serviceId = XACMLHelper.getServiceID(evalCtx);
+		String subjectId = XACMLHelper.getSubjectId(evalCtx);
+		String clientId = XACMLHelper.getClientId(evalCtx);
+		String serviceId = XACMLHelper.getServiceId(evalCtx);
 
 		// escape the backslash
 		subjectId = (subjectId != null) ?  subjectId.replace("\\", "\\\\") : subjectId;

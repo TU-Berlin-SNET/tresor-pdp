@@ -71,6 +71,7 @@ public class PIPAttributeFinderModule extends AttributeFinderModule {
 
                             log.debug("Successfully retrieved attribute with id {}, type {}, category {}",
                                     attributeId.toString(), attributeType.toString(), category.toString());
+
                             return new EvaluationResult(new BagAttribute(attributeType, attribute.getValues()));
                         }
                     } catch (IOException e) {
@@ -85,6 +86,13 @@ public class PIPAttributeFinderModule extends AttributeFinderModule {
         return new EvaluationResult(BagAttribute.createEmptyBag(attributeType));
     }
 
+    /**
+     * Inject attributes into a XACML2-/XACML3-EvaluationContext, effectively caching them for the duration of the request
+     * @param attributeMap mapping attributeId->attribute
+     * @param category category of the attributes to inject
+     * @param context the current evaluationContext
+     * @param version the xacml version
+     */
     private void injectAttributes(Map<String, Attribute> attributeMap, URI category, EvaluationCtx context, int version) {
         switch (version) {
             case XACMLConstants.XACML_VERSION_3_0:
@@ -94,10 +102,16 @@ public class PIPAttributeFinderModule extends AttributeFinderModule {
                 this.injectAttributesXACML2(attributeMap, category, (XACML2EvaluationCtx) context);
                 break;
 
-            default: log.warn("Failed to inject Attributes, invalid EvaluationCtx");
+            default: log.warn("Failed to inject Attributes, unsupported EvaluationCtx version {}", version);
         }
     }
 
+    /**
+     * Inject attributes into a XACML2-EvaluationContext
+     * @param attributeMap mapping attributeId->attribute
+     * @param category category of the attributes
+     * @param context the current EvaluationContext
+     */
     private void injectAttributesXACML2(Map<String, Attribute> attributeMap, URI category, XACML2EvaluationCtx context) {
         Map ctxAttributeMap;
         if (category.toString().equals(XACMLConstants.SUBJECT_CATEGORY))
@@ -112,6 +126,12 @@ public class PIPAttributeFinderModule extends AttributeFinderModule {
         }
     }
 
+    /**
+     * Inject attributes into a XACML3-EvaluationContext
+     * @param attributeMap mapping attributeId->attribute
+     * @param category category of the attributes
+     * @param context the current EvaluationContext
+     */
     private void injectAttributesXACML3(Map<String, Attribute> attributeMap, URI category, XACML3EvaluationCtx context) {
         List<Attributes> attributesList = context.getMapAttributes().get(category.toString());
         if (attributesList == null)

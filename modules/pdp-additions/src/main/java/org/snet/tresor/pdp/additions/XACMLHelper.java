@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import org.wso2.balana.*;
 import org.wso2.balana.attr.AttributeValue;
 import org.wso2.balana.attr.BagAttribute;
+import org.wso2.balana.cond.EvaluationResult;
 import org.wso2.balana.ctx.Attribute;
 import org.wso2.balana.ctx.EvaluationCtx;
 import org.wso2.balana.finder.PolicyFinder;
@@ -36,7 +37,7 @@ public class XACMLHelper {
 	 * @param ctx the EvaluationCtx
 	 * @return subjectID or null
 	 */
-	public static String getSubjectID(EvaluationCtx ctx) {
+	public static String getSubjectId(EvaluationCtx ctx) {
 		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_SUBJECT,
 				null, FinderConstants.CATEGORY_SUBJECT, ctx);
 	}
@@ -46,7 +47,7 @@ public class XACMLHelper {
 	 * @param ctx the EvaluationCtx
 	 * @return deviceID or null
 	 */
-	public static String getDeviceID(EvaluationCtx ctx) {
+	public static String getDeviceId(EvaluationCtx ctx) {
 		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_DEVICE,
 				null, FinderConstants.CATEGORY_SUBJECT, ctx);
 	}
@@ -56,7 +57,7 @@ public class XACMLHelper {
 	 * @param ctx the EvaluationCtx
 	 * @return clientID or null
 	 */
-	public static String getClientID(EvaluationCtx ctx) {
+	public static String getClientId(EvaluationCtx ctx) {
 		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_CLIENT,
 				null, FinderConstants.CATEGORY_SUBJECT, ctx);
 	}
@@ -66,25 +67,25 @@ public class XACMLHelper {
 	 * @param ctx the EvaluationCtx
 	 * @return serviceID or null
 	 */
-	public static String getServiceID(EvaluationCtx ctx) {
+	public static String getServiceId(EvaluationCtx ctx) {
 		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_SERVICE,
 				null, FinderConstants.CATEGORY_RESOURCE, ctx);
 	}
 
 	/**
-	 * Searches in given EvaluationContext for an attribute
+	 * Search in given EvaluationContext for attribute, return one value as string
 	 * @param attributeType type of attribute to look for
 	 * @param attributeId id of attribute to look for
 	 * @param issuer issuer of attribute to look for
 	 * @param category category of attribute to look for
 	 * @param context context in which to look
-	 * @return a string representation of the value or null
+	 * @return a string representation of a value or null
 	 */
 	public static String getAttributeAsString(URI attributeType, URI attributeId, String issuer, URI category, EvaluationCtx context) {
 		String value = null;
 		BagAttribute bag = (BagAttribute) context.getAttribute(attributeType, attributeId, issuer, category).getAttributeValue();
 
-		if (!bag.isEmpty()) {
+        if (bag != null && !bag.isEmpty()) {
 			AttributeValue val;
 			Iterator it = bag.iterator();
 			while (it.hasNext()) {
@@ -106,18 +107,7 @@ public class XACMLHelper {
 	 * @return BagAttribute containing attributeValue or empty BagAttribute
 	 */
 	public static BagAttribute makeBagAttribute(URI type, String value) {
-		if (value != null) {
-			AttributeValue attributeValue = XACMLHelper.makeValue(type, value);
-
-			if (attributeValue != null) {
-				List<AttributeValue> attributeValueList = new ArrayList<AttributeValue>();
-				attributeValueList.add(attributeValue);
-
-				return new BagAttribute(type, attributeValueList);
-			}
-		}
-
-		return BagAttribute.createEmptyBag(type);
+        return XACMLHelper.makeBagAttribute(type, new String[]{ value });
 	}
 
 	public static BagAttribute makeBagAttribute(URI type, String[] values) {
@@ -151,16 +141,43 @@ public class XACMLHelper {
 	}
 
 	public static AttributeValue makeValue(URI type, String value) {
-		try {
-			return Balana.getInstance().getAttributeFactory().createValue(type, value);
-		} catch (UnknownIdentifierException e) {
-			log.warn("Failed to parse attributeValue. Unknown DataType {}", type, e);
-		} catch (ParsingException e) {
-			log.warn("Failed to parse attributeValue of type {} from given String {}", type, value, e);
-		}
+        if (type != null && value != null) {
+            try {
+                return Balana.getInstance().getAttributeFactory().createValue(type, value);
+            } catch (UnknownIdentifierException e) {
+                log.warn("Failed to parse attributeValue. Unknown DataType {}", type, e);
+            } catch (ParsingException e) {
+                log.warn("Failed to parse attributeValue of type {} from given String {}", type, value, e);
+            }
+        }
 
 		return null;
 	}
+
+    /**
+     * Tries to load given string into a corresponding policy OR policySet
+     * @param policyString containing the policy or policySet as String
+     * @param finder the PolicyFinder
+     * @return a policy or policySet
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParsingException
+     */
+    public static AbstractPolicy loadPolicyOrPolicySet(String policyString, PolicyFinder finder) throws ParserConfigurationException, SAXException, IOException, ParsingException {
+        Document doc = XACMLHelper.parseXML(policyString);
+        Element root = doc.getDocumentElement();
+        String name = DOMHelper.getLocalName(root);
+
+        AbstractPolicy policy = null;
+        if (name.equals("Policy"))
+            policy = Policy.getInstance(root);
+
+        if (name.equals("PolicySet"))
+            policy = PolicySet.getInstance(root, finder);
+
+        return policy;
+    }
 
 	/**
 	 * Parses and loads given Policy
@@ -190,31 +207,6 @@ public class XACMLHelper {
 		Document doc = XACMLHelper.parseXML(policyString);
 		return PolicySet.getInstance(doc.getDocumentElement(), finder);
 	}
-
-	/**
-	 * Tries to load given string into a corresponding policy OR policySet
-	 * @param policyString containing the policy or policySet as String
-	 * @param finder the PolicyFinder
-	 * @return a policy or policySet
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws ParsingException
-	 */
-    public static AbstractPolicy loadPolicyOrPolicySet(String policyString, PolicyFinder finder) throws ParserConfigurationException, SAXException, IOException, ParsingException {
-    	Document doc = XACMLHelper.parseXML(policyString);
-        Element root = doc.getDocumentElement();
-        String name = DOMHelper.getLocalName(root);
-
-        AbstractPolicy policy = null;
-        if (name.equals("Policy"))
-        	policy = Policy.getInstance(root);
-
-        if (name.equals("PolicySet"))
-        	policy = PolicySet.getInstance(root, finder);
-
-        return policy;
-    }
 
     /**
      * Parse given xml string into a Document instance
