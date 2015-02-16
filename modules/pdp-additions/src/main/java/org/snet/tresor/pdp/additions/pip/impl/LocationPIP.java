@@ -1,8 +1,7 @@
 package org.snet.tresor.pdp.additions.pip.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -30,9 +29,6 @@ import java.util.*;
  */
 public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
     private static final Logger log = LoggerFactory.getLogger(LocationPIP.class);
-
-    // MapType for a Map<String, String> when using the ObjectMapper
-    private static final MapType MAPTYPE_STRING = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class);
 
     private static final String GEOMETRY_POINT_PRE = "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"EPSG:4326\"><gml:coordinates>";
     private static final String GEOMETRY_POINT_POST = "</gml:coordinates></gml:Point>";
@@ -120,28 +116,35 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
         log.debug("Retrieving attribute with id {}, type {}, ", attributeId.toString(), attributeType.toString());
         Map<String, Attribute> attributeMap = new HashMap<>();
 
-        String subjectId = XACMLHelper.getSubjectID(context);
-        String deviceId = XACMLHelper.getDeviceID(context);
+        String subjectId = XACMLHelper.getSubjectId(context);
+        String deviceId = XACMLHelper.getDeviceId(context);
 
         if (subjectId != null && deviceId != null) {
-                Map<String, String> values = Request.Post(this.url)
-                        .setHeader("Accept", ContentType.APPLICATION_JSON.toString())
-                        .setHeader("Accept-Charset", "UTF-8")
-                        .setHeader("Authorization", this.authentication)
-                        .bodyString("{ \"subjectID\":\"" + subjectId + "\","
-                                        + "\"deviceID\":\"" + deviceId + "\","
-                                        + "\"attributeID\":\"" + attributeId.toString() + "\"}",
-                                ContentType.APPLICATION_JSON)
-                        .execute()
-                        .handleResponse(this);
-                attributeMap.putAll(this.makeAttributes(values, version));
+            Request req = Request.Post(this.url).setHeader("Accept", ContentType.APPLICATION_JSON.toString())
+                    .setHeader("Accept-Charset", "UTF-8");
+            // set authorization if applicable
+            if (this.authentication != null)
+                req.setHeader("Authorization", this.authentication);
+
+            // do & handle the actual request
+            Map<String, String> values = req.bodyString(
+                    "{ \"subjectID\":\"" + subjectId + "\","
+                            + "\"deviceID\":\"" + deviceId + "\","
+                            + "\"attributeID\":\"" + attributeId.toString() + "\"}",
+                    ContentType.APPLICATION_JSON
+            ).execute().handleResponse(this);
+
+            Map<String, Attribute> madeAttributesMap = this.makeAttributes(values, version);
+
+            if (madeAttributesMap != null)
+                attributeMap.putAll(madeAttributesMap);
         }
 
         return attributeMap;
     }
 
     @Override
-    public Map<String, String> handleResponse(HttpResponse httpResponse) throws ClientProtocolException, IOException {
+    public Map<String, String> handleResponse(HttpResponse httpResponse) throws IOException {
         // check returned http code
         StatusLine status = httpResponse.getStatusLine();
         if (status.getStatusCode() != HttpStatus.SC_OK)
@@ -154,14 +157,23 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
 
         // check type of returned content
         ContentType type = ContentType.getOrDefault(entity);
-        if (!type.equals(ContentType.APPLICATION_JSON))
+        if (!type.toString().equals(ContentType.APPLICATION_JSON.toString()))
             throw new ClientProtocolException("Unexpected content type " + type.toString());
 
-        // parse content into a Map<String, String>
-        return this.objectMapper.readValue(entity.getContent(), MAPTYPE_STRING);
+        // retrieve values from response
+        JsonNode dataNode = this.objectMapper.readTree(entity.getContent()).path("response");
+        Iterator<Map.Entry<String, JsonNode>> fields = dataNode.fields();
+        Map<String, String> values = new HashMap<>();
+        Map.Entry<String, JsonNode> field;
+        while(fields.hasNext()) {
+            field = fields.next();
+            values.put(field.getKey(), field.getValue().asText());
+        }
+
+        return values;
     }
 
-    private Map<String, Attribute> makeAttributes(Map<String, String> values, int version) throws NullPointerException {
+    private Map<String, Attribute> makeAttributes(Map<String, String> values, int version) {
         String key, value;
         URI id, type;
         Attribute attribute;
@@ -185,10 +197,11 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
 
             attribute = XACMLHelper.makeAttribute(id, type, value, version);
 
-            if (attribute == null)
-                throw new NullPointerException("Failure in attribute creation for attribute with id "+ key + " type " + type);
+            if (attribute != null)
+                attributeMap.put(key, attribute);
+            else
+                log.info("Failure in attribute creation for attribute with id "+ key + " type " + type);
 
-            attributeMap.put(key, attribute);
         }
 
         return attributeMap;
