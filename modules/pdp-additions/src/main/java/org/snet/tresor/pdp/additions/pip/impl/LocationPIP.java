@@ -87,6 +87,11 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
 
         this.populateSupportedIds();
         this.populateSupportedIdURIs();
+
+        if (this.authentication == null)
+            log.info("Initialized LocationPIP with url {}", this.url);
+        else
+            log.info("Initialized LocationPIP with url {} and authentication", this.url);
     }
 
 

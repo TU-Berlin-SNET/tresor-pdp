@@ -48,6 +48,8 @@ public class StationPIP implements PIP, ResponseHandler<String[]> {
 
         this.url = url;
         this.objectMapper = objectMapper;
+
+        log.info("Initialized StationPIP with url {}", this.url);
     }
 
     @Override

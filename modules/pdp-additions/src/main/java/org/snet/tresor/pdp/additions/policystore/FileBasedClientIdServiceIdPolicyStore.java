@@ -43,6 +43,8 @@ public class FileBasedClientIdServiceIdPolicyStore extends AbstractClientIdServi
 			throw new RuntimeException("Cannot create policy store directory '" + directory.getPath() + "'");
 		if (lock == null)
 			throw new RuntimeException("Lock may not be null");
+
+        log.info("Initialized FileBasedClientIdServiceIdPolicyStore with path {}", this.baseDirectory.getAbsolutePath());
 	}
 
 

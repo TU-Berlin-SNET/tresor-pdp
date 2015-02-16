@@ -33,8 +33,7 @@ public class PIPAttributeFinderModule extends AttributeFinderModule {
         for (int i = 0; i < this.pips.size(); i++)
             this.supportedIds.addAll(this.pips.get(i).getSupportedIds());
 
-        if (this.pips.size() == 0)
-            log.warn("Initialized empty PIPAttributeFinderModule");
+        log.info("Initialized PIPAttributeFinderModule, number of pips: {}", this.pips.size());
     }
 
     @Override
