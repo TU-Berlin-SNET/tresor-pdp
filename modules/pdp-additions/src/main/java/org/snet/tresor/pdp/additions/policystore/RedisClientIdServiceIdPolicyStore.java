@@ -2,8 +2,11 @@ package org.snet.tresor.pdp.additions.policystore;
 
 import java.util.Map;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
  * Two-key-value policy store implementation using the redis database
@@ -11,17 +14,28 @@ import redis.clients.jedis.JedisPool;
 public class RedisClientIdServiceIdPolicyStore extends AbstractClientIdServiceIdPolicyStore {
 	JedisPool redisPool;
 
-	/**
-	 * Create RedisClientIdServiceIdPolicyStore with given parameter(s)
-	 * @param jedisPool a JedisPool connected to the redisdb
-	 */
-	public RedisClientIdServiceIdPolicyStore(JedisPool jedisPool) {
-		this.redisPool = jedisPool;
+    public RedisClientIdServiceIdPolicyStore(String host) {
+        this(host, 6379, 2000, null);
+    }
 
-		if (this.redisPool == null)
-			throw new RuntimeException("Connection to RedisDB may not be null");
-	}
+    public RedisClientIdServiceIdPolicyStore(String host, int port) {
+        this(host, port, 2000, null);
+    }
 
+    public RedisClientIdServiceIdPolicyStore(String host, int port, int timeout) {
+        this(host, port, timeout, null);
+    }
+
+    public RedisClientIdServiceIdPolicyStore(String host, int port, int timeout, String password) {
+        this.redisPool = new JedisPool(new GenericObjectPoolConfig(), host, port, timeout, password);
+
+        try {
+            Jedis j = this.redisPool.getResource();
+            this.redisPool.returnResource(j);
+        } catch (JedisConnectionException e) {
+            throw new RuntimeException("Failed to establish connection with redisDB", e);
+        }
+    }
 
 	public boolean hasPolicy(String clientId, String serviceId) {
 		Jedis redis = this.redisPool.getResource();
