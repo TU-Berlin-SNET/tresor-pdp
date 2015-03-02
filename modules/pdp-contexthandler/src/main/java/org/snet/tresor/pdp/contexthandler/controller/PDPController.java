@@ -105,18 +105,22 @@ public class PDPController {
 		String clientId = XACMLHelper.getClientId(evalCtx);
 		String serviceId = XACMLHelper.getServiceId(evalCtx);
 
-		// escape the backslash
+		// escape the backslash for logging purposes
 		subjectId = (subjectId != null) ?  subjectId.replace("\\", "\\\\") : subjectId;
 		LogHelper.putMDCs(clientId, subjectId);
 
 		ResponseCtx result = this.pdp.evaluate(evalCtx);
 
-		for (AbstractResult r : result.getResults())
-				log.info("Decision for subject {} to access service {} of client {} is {}",
-						subjectId, serviceId, clientId, AbstractResult.DECISIONS[r.getDecision()]);
+        int decisionNumber;
+		for (AbstractResult r : result.getResults()) {
+            // AbstractResult.DECISIONS array has only 4 values, r.getDecision can return higher values
+            // but everything above 3 is INDETERMINATE=2 anyway
+            decisionNumber = (r.getDecision() <= 3) ? r.getDecision() : 2;
+            log.info("Decision for subject {} to access service {} of client {} is {}",
+                    subjectId, serviceId, clientId, AbstractResult.DECISIONS[decisionNumber]);
+        }
 
 		return result.encode();
 	}
-
 
 }
