@@ -73,8 +73,7 @@ public abstract class AbstractResult {
     /**
      * string versions of the 4 Decision types used for encoding
      */
-    public static final String[] DECISIONS = { "Permit", "Deny", "Indeterminate", "NotApplicable",
-            "INDETERMINATE_DENY", "INDETERMINATE_PERMIT", "INDETERMINATE_DENY_OR_PERMIT" };
+    public static final String[] DECISIONS = { "Permit", "Deny", "Indeterminate", "NotApplicable" };
 
     /**
      * List of obligations which may be empty
