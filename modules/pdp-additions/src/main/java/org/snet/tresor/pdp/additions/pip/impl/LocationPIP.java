@@ -11,10 +11,10 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
+import org.geotools.xacml.geoxacml.attr.GeometryAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.additions.XACMLHelper;
-import org.snet.tresor.pdp.additions.finder.impl.FinderConstants;
 import org.snet.tresor.pdp.additions.pip.PIP;
 import org.wso2.balana.ctx.Attribute;
 import org.wso2.balana.ctx.EvaluationCtx;
@@ -33,47 +33,37 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
     private static final String GEOMETRY_POINT_PRE = "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"EPSG:4326\"><gml:coordinates>";
     private static final String GEOMETRY_POINT_POST = "</gml:coordinates></gml:Point>";
 
-    // supported attributes with type urn:ogc:def:dataType:geoxacml:1.0:geometry
-    private static final Set<String> supportedGeoAttributes;
-    static {
-        Set<String> set = new HashSet<>();
-        set.add(FinderConstants.ATTRIBUTE_ID_GEOLOCATION);
-        set.add(FinderConstants.ATTRIBUTE_ID_WIFILOCATION);
+    private static final URI DATATYPE_GEO = URI.create(GeometryAttribute.identifier);
 
-        supportedGeoAttributes = Collections.unmodifiableSet(set);
+    private static final Map<String, URI> supportedIdTypeMap;
+    static {
+        Map<String, URI> typeMap = new HashMap<>();
+        typeMap.put("org:snet:tresor:attribute:current-geolocation", DATATYPE_GEO);
+        typeMap.put("org:snet:tresor:attribute:current-wifi", DATATYPE_GEO);
+        typeMap.put("org:snet:tresor:attribute:current-wifi-ssid", XACMLHelper.DATATYPE_STRING);
+        typeMap.put("org:snet:tresor:attribute:current-bluetooth-location", XACMLHelper.DATATYPE_STRING);
+        typeMap.put("org:snet:tresor:attribute:current-cell-id", XACMLHelper.DATATYPE_STRING);
+        typeMap.put("org:snet:tresor:attribute:timestamp-geolocation", XACMLHelper.DATATYPE_INT);
+        typeMap.put("org:snet:tresor:attribute:timestamp-wifi", XACMLHelper.DATATYPE_INT);
+        typeMap.put("org:snet:tresor:attribute:timestamp-wifi-ssid", XACMLHelper.DATATYPE_INT);
+        typeMap.put("org:snet:tresor:attribute:timestamp-bluetooth-location", XACMLHelper.DATATYPE_INT);
+        typeMap.put("org:snet:tresor:attribute:timestamp-cell-id", XACMLHelper.DATATYPE_INT);
+
+        supportedIdTypeMap = Collections.unmodifiableMap(typeMap);
     }
 
-    // supported attributes with type http://www.w3.org/2001/XMLSchema#string
-    private static final Set<String> supportedStringAttributes;
+    private static final Map<String, URI> supportedIdUriMap;
     static {
-        Set<String> set = new HashSet<>();
-        set.add(FinderConstants.ATTRIBUTE_ID_WIFISSID);
-        set.add(FinderConstants.ATTRIBUTE_ID_BTLOCATION);
-        set.add(FinderConstants.ATTRIBUTE_ID_CELLID);
+        Map<String, URI> uriMap = new HashMap<>();
+        for (String key : supportedIdTypeMap.keySet())
+            uriMap.put(key, URI.create(key));
 
-        supportedStringAttributes = Collections.unmodifiableSet(set);
-    }
-
-    // supported attributes with type http://www.w3.org/2001/XMLSchema#integer
-    private static final Set<String> supportedIntegerAttributes;
-    static {
-        Set<String> set = new HashSet<>();
-        set.add(FinderConstants.ATTRIBUTE_ID_GEOLOCATION_TIMESTAMP);
-        set.add(FinderConstants.ATTRIBUTE_ID_WIFILOCATION_TIMESTAMP);
-        set.add(FinderConstants.ATTRIBUTE_ID_WIFISSID_TIMESTAMP);
-        set.add(FinderConstants.ATTRIBUTE_ID_BTLOCATION_TIMESTAMP);
-        set.add(FinderConstants.ATTRIBUTE_ID_CELLID_TIMESTAMP);
-
-        supportedIntegerAttributes = Collections.unmodifiableSet(set);
+        supportedIdUriMap = Collections.unmodifiableMap(uriMap);
     }
 
     private String url;
     private String authentication;
-    private Set<String> supportedIds;
     private ObjectMapper objectMapper;
-
-    // map containing the URIs for attributeIds
-    private Map<String, URI> supportedIdURIMap;
 
     public LocationPIP(String url, String authentication, ObjectMapper objectMapper) {
         if (url == null)
@@ -85,34 +75,15 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
         this.authentication = authentication;
         this.objectMapper = objectMapper;
 
-        this.populateSupportedIds();
-        this.populateSupportedIdURIs();
-
         if (this.authentication == null)
             log.info("Initialized LocationPIP with url {}", this.url);
         else
             log.info("Initialized LocationPIP with url {} and authentication", this.url);
     }
 
-
-    private void populateSupportedIds() {
-        Set<String> supportedIdSet = new HashSet<>();
-        supportedIdSet.addAll(supportedGeoAttributes);
-        supportedIdSet.addAll(supportedStringAttributes);
-        supportedIdSet.addAll(supportedIntegerAttributes);
-        this.supportedIds = Collections.unmodifiableSet(supportedIdSet);
-    }
-
-    private void populateSupportedIdURIs() {
-        Map<String, URI> map = new HashMap<>();
-        for (String attributeId : this.supportedIds)
-            map.put(attributeId, URI.create(attributeId));
-        this.supportedIdURIMap = Collections.unmodifiableMap(map);
-    }
-
     @Override
     public Set<String> getSupportedIds() {
-        return this.supportedIds;
+        return supportedIdUriMap.keySet();
     }
 
     @Override
@@ -140,9 +111,7 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
             ).execute().handleResponse(this);
 
             Map<String, Attribute> madeAttributesMap = this.makeAttributes(values, version);
-
-            if (madeAttributesMap != null)
-                attributeMap.putAll(madeAttributesMap);
+            attributeMap.putAll(madeAttributesMap);
         }
 
         return attributeMap;
@@ -179,34 +148,28 @@ public class LocationPIP implements PIP, ResponseHandler<Map<String, String>> {
     }
 
     private Map<String, Attribute> makeAttributes(Map<String, String> values, int version) {
-        String key, value;
-        URI id, type;
-        Attribute attribute;
         Map<String, Attribute> attributeMap = new HashMap<>();
 
-        for (Map.Entry<String, String> entry : values.entrySet()) {
-            key = entry.getKey();
-            value = entry.getValue();
-            id = this.supportedIdURIMap.get(key);
-            type = null;
+        String value;
+        URI idUri, typeUri;
+        Attribute attribute;
+        for (String id : values.keySet()) {
+            idUri = supportedIdUriMap.get(id);
+            typeUri = supportedIdTypeMap.get(id);
             attribute = null;
 
-            if (supportedGeoAttributes.contains(key)) {
-                value = GEOMETRY_POINT_PRE + value + GEOMETRY_POINT_POST;
-                type = FinderConstants.DATATYPE_GEO;
-            }
-            if (supportedIntegerAttributes.contains(key))
-                type = FinderConstants.DATATYPE_INTEGER;
-            if (supportedStringAttributes.contains(key))
-                type = FinderConstants.DATATYPE_STRING;
+            if (idUri != null && typeUri != null) {
+                value = values.get(id);
+                if (typeUri.toString().equals(GeometryAttribute.identifier))
+                    value = GEOMETRY_POINT_PRE + value + GEOMETRY_POINT_POST;
 
-            attribute = XACMLHelper.makeAttribute(id, type, value, version);
+                attribute = XACMLHelper.makeAttribute(idUri, typeUri, value, version);
+            }
 
             if (attribute != null)
-                attributeMap.put(key, attribute);
+                attributeMap.put(id, attribute);
             else
-                log.info("Failure in attribute creation for attribute with id "+ key + " type " + type);
-
+                log.info("Failure in attribute creation for attribute with id "+ id + " type " + typeUri.toString());
         }
 
         return attributeMap;

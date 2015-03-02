@@ -1,5 +1,22 @@
 package org.snet.tresor.pdp.additions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.wso2.balana.*;
+import org.wso2.balana.attr.AttributeValue;
+import org.wso2.balana.attr.BagAttribute;
+import org.wso2.balana.attr.IntegerAttribute;
+import org.wso2.balana.attr.StringAttribute;
+import org.wso2.balana.ctx.Attribute;
+import org.wso2.balana.ctx.EvaluationCtx;
+import org.wso2.balana.finder.PolicyFinder;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,29 +25,23 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.snet.tresor.pdp.additions.finder.impl.FinderConstants;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.wso2.balana.*;
-import org.wso2.balana.attr.AttributeValue;
-import org.wso2.balana.attr.BagAttribute;
-import org.wso2.balana.cond.EvaluationResult;
-import org.wso2.balana.ctx.Attribute;
-import org.wso2.balana.ctx.EvaluationCtx;
-import org.wso2.balana.finder.PolicyFinder;
-import org.xml.sax.SAXException;
-
 /**
  * XACMLHelper class containing miscellaneous helper methods
  */
 public class XACMLHelper {
 	private static final Logger log = LoggerFactory.getLogger(XACMLHelper.class);
+
+    public static final URI ATTRIBUTE_ID_SUBJECT = URI.create("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+    public static final URI ATTRIBUTE_ID_DEVICE = URI.create("org:snet:tresor:attribute:device-id");
+    public static final URI ATTRIBUTE_ID_CLIENT = URI.create("http://schemas.cloud-tresor.com/request/2014/09/tresor-organization-uuid");
+    public static final URI ATTRIBUTE_ID_SERVICE = URI.create("http://schemas.cloud-tresor.com/request/2014/04/service-uuid");
+
+    public static final URI CATEGORY_SUBJECT = URI.create(XACMLConstants.SUBJECT_CATEGORY);
+    public static final URI CATEGORY_RESOURCE = URI.create(XACMLConstants.RESOURCE_CATEGORY);
+    public static final URI CATEGORY_ENVIRONMENT = URI.create(XACMLConstants.ENT_CATEGORY);
+
+    public static final URI DATATYPE_STRING = URI.create(StringAttribute.identifier);
+    public static final URI DATATYPE_INT = URI.create(IntegerAttribute.identifier);
 
 	/**
 	 * Retrieve subjectID from given context
@@ -38,8 +49,8 @@ public class XACMLHelper {
 	 * @return subjectID or null
 	 */
 	public static String getSubjectId(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_SUBJECT,
-				null, FinderConstants.CATEGORY_SUBJECT, ctx);
+		return getAttributeAsString(DATATYPE_STRING, ATTRIBUTE_ID_SUBJECT,
+				null, CATEGORY_SUBJECT, ctx);
 	}
 
 	/**
@@ -48,8 +59,8 @@ public class XACMLHelper {
 	 * @return deviceID or null
 	 */
 	public static String getDeviceId(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_DEVICE,
-				null, FinderConstants.CATEGORY_SUBJECT, ctx);
+		return getAttributeAsString(DATATYPE_STRING, ATTRIBUTE_ID_DEVICE,
+				null, CATEGORY_SUBJECT, ctx);
 	}
 
 	/**
@@ -58,8 +69,8 @@ public class XACMLHelper {
 	 * @return clientID or null
 	 */
 	public static String getClientId(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_CLIENT,
-				null, FinderConstants.CATEGORY_SUBJECT, ctx);
+		return getAttributeAsString(DATATYPE_STRING, ATTRIBUTE_ID_CLIENT,
+				null, CATEGORY_SUBJECT, ctx);
 	}
 
 	/**
@@ -68,8 +79,8 @@ public class XACMLHelper {
 	 * @return serviceID or null
 	 */
 	public static String getServiceId(EvaluationCtx ctx) {
-		return getAttributeAsString(FinderConstants.DATATYPE_STRING, FinderConstants.ATTRIBUTE_ID_SERVICE,
-				null, FinderConstants.CATEGORY_RESOURCE, ctx);
+		return getAttributeAsString(DATATYPE_STRING, ATTRIBUTE_ID_SERVICE,
+				null, CATEGORY_RESOURCE, ctx);
 	}
 
 	/**

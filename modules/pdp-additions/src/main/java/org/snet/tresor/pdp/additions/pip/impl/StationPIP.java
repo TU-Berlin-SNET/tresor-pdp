@@ -13,7 +13,6 @@ import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snet.tresor.pdp.additions.XACMLHelper;
-import org.snet.tresor.pdp.additions.finder.impl.FinderConstants;
 import org.snet.tresor.pdp.additions.pip.PIP;
 import org.wso2.balana.attr.BagAttribute;
 import org.wso2.balana.ctx.Attribute;
@@ -26,13 +25,19 @@ import java.util.*;
 public class StationPIP implements PIP, ResponseHandler<String[]> {
     private static final Logger log = LoggerFactory.getLogger(StationPIP.class);
 
+    private static final String ATTRIBUTE_ID_DOCTOR_STATION = "org:snet:tresor:attribute:doctor-station";
+    private static final String ATTRIBUTE_ID_DOCTOR_ROLE = "org:snet:tresor:attribute:doctor-role";
+
+    private static final String ATTRIBUTE_ID_PATIENT_STATION = "org:snet:tresor:attribute:patient-station";
+    private static final String ATTRIBUTE_ID_PATIENT_ROLE = "org:snet:tresor:attribute:patient-role";
+
     private static final Set<String> supportedIds;
     static {
         Set<String> set = new HashSet<String>();
-        set.add(FinderConstants.ATTRIBUTE_ID_DOCTOR_STATION);
-        set.add(FinderConstants.ATTRIBUTE_ID_DOCTOR_ROLE);
-        set.add(FinderConstants.ATTRIBUTE_ID_PATIENT_STATION);
-        set.add(FinderConstants.ATTRIBUTE_ID_PATIENT_ROLE);
+        set.add(ATTRIBUTE_ID_DOCTOR_STATION);
+        set.add(ATTRIBUTE_ID_DOCTOR_ROLE);
+        set.add(ATTRIBUTE_ID_PATIENT_STATION);
+        set.add(ATTRIBUTE_ID_PATIENT_ROLE);
 
         supportedIds = Collections.unmodifiableSet(set);
     }
@@ -64,14 +69,14 @@ public class StationPIP implements PIP, ResponseHandler<String[]> {
         log.debug("Retrieving attribute with id {}, type {}, ", id, attributeType.toString());
 
         String url = null;
-        if (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_STATION) || id.equals(FinderConstants.ATTRIBUTE_ID_PATIENT_STATION)) {
-            String subject = (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_STATION)) ?
+        if (id.equals(ATTRIBUTE_ID_DOCTOR_STATION) || id.equals(ATTRIBUTE_ID_PATIENT_STATION)) {
+            String subject = (id.equals(ATTRIBUTE_ID_DOCTOR_STATION)) ?
                     "/doctor/" +  XACMLHelper.getSubjectId(context) : "/patient/" + XACMLHelper.getServiceId(context);
             url = this.url+subject+"?station=*&pdp=on";
         }
 
-        if (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_ROLE) || id.equals(FinderConstants.ATTRIBUTE_ID_PATIENT_ROLE)) {
-            String subject = (id.equals(FinderConstants.ATTRIBUTE_ID_DOCTOR_ROLE)) ?
+        if (id.equals(ATTRIBUTE_ID_DOCTOR_ROLE) || id.equals(ATTRIBUTE_ID_PATIENT_ROLE)) {
+            String subject = (id.equals(ATTRIBUTE_ID_DOCTOR_ROLE)) ?
                     "/doctor/" +  XACMLHelper.getSubjectId(context) : "/patient/" + XACMLHelper.getServiceId(context);
             url = this.url+subject+"?role=*";
         }

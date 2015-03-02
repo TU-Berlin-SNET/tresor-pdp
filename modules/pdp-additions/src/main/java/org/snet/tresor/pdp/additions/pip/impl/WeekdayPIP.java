@@ -23,7 +23,9 @@ public class WeekdayPIP implements PIP {
         supportedIds = Collections.unmodifiableSet(set);
     }
 
-    public WeekdayPIP() {}
+    public WeekdayPIP() {
+        log.info("Initialized WeekdayPIP");
+    }
 
     @Override
     public Set<String> getSupportedIds() {
