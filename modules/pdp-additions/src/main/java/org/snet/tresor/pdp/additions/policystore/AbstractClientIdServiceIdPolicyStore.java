@@ -25,7 +25,7 @@ public abstract class AbstractClientIdServiceIdPolicyStore implements TwoKeyValu
 			if (policy != null)
 				return XACMLHelper.loadPolicyOrPolicySet(policy, finder);
 		} catch (Exception e) {
-			log.error("Found corresponding policy for client {} and service {} but failed to load it", clientId, serviceId);
+			log.error("Found corresponding policy for client {} and service {} but failed to load it", clientId, serviceId, e);
 		}
 		return null;
 	}
