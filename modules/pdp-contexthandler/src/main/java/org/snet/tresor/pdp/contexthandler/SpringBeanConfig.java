@@ -1,26 +1,16 @@
 package org.snet.tresor.pdp.contexthandler;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.inject.Inject;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.snet.tresor.pdp.additions.GeoPDP;
-import org.snet.tresor.pdp.additions.finder.impl.*;
+import org.snet.tresor.pdp.additions.finder.impl.PIPAttributeFinderModule;
+import org.snet.tresor.pdp.additions.finder.impl.PolicyStorePolicyFinderModule;
 import org.snet.tresor.pdp.additions.pip.PIP;
 import org.snet.tresor.pdp.additions.pip.impl.LocationPIP;
 import org.snet.tresor.pdp.additions.pip.impl.StationPIP;
 import org.snet.tresor.pdp.additions.pip.impl.WeekdayPIP;
 import org.snet.tresor.pdp.additions.policystore.AbstractClientIdServiceIdPolicyStore;
 import org.snet.tresor.pdp.additions.policystore.FileBasedClientIdServiceIdPolicyStore;
-import org.snet.tresor.pdp.additions.policystore.PolicyStore;
+import org.snet.tresor.pdp.additions.policystore.RedisClientIdServiceIdPolicyStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -30,87 +20,108 @@ import org.wso2.balana.PDP;
 import org.wso2.balana.PDPConfig;
 import org.wso2.balana.ctx.EvaluationCtxFactory;
 import org.wso2.balana.ctx.RequestCtxFactory;
-import org.wso2.balana.finder.AttributeFinder;
-import org.wso2.balana.finder.AttributeFinderModule;
-import org.wso2.balana.finder.PolicyFinder;
-import org.wso2.balana.finder.PolicyFinderModule;
-import org.wso2.balana.finder.ResourceFinder;
-import org.wso2.balana.finder.ResourceFinderModule;
+import org.wso2.balana.finder.*;
 import org.wso2.balana.finder.impl.CurrentEnvModule;
 import org.wso2.balana.finder.impl.SelectorModule;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Configuration
 @ComponentScan
 @EnableWebMvc
 public class SpringBeanConfig {
     @Inject Environment env;
+    @Inject YamlConfig yamlConfig;
+
+    @Bean
+    PDP pdp() throws IOException {
+        return GeoPDP.getGeoExtendedPDP(pdpConfig());
+    }
+
+    @Bean
+    PDPConfig pdpConfig() throws IOException {
+        return new PDPConfig(attributeFinder(), policyFinder(), resourceFinder());
+    }
+
+    @Bean
+    AttributeFinder attributeFinder() {
+        List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
+        attributeFinderModules.add(new CurrentEnvModule());
+        attributeFinderModules.add(new SelectorModule());
+        attributeFinderModules.add(pipAttributeFinderModule());
+
+        AttributeFinder attributeFinder = new AttributeFinder();
+        attributeFinder.setModules(attributeFinderModules);
+
+        return attributeFinder;
+    }
+
+    @Bean
+    PolicyFinder policyFinder() throws IOException {
+        Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
+        policyFinderModules.add(new PolicyStorePolicyFinderModule(policyStore()));
+
+        PolicyFinder policyFinder = new PolicyFinder();
+        policyFinder.setModules(policyFinderModules);
+
+        return policyFinder;
+    }
+
+    @Bean
+    ResourceFinder resourceFinder() {
+        List<ResourceFinderModule> resourceFinderModules = new ArrayList<ResourceFinderModule>();
+
+        ResourceFinder resourceFinder = new ResourceFinder();
+        resourceFinder.setModules(resourceFinderModules);
+
+        return resourceFinder;
+    }
+
+    @Bean
+    PIPAttributeFinderModule pipAttributeFinderModule() {
+        List<PIP> pips = new ArrayList<>();
+        pips.add(new WeekdayPIP());
+
+        ObjectMapper objectmapper = objectMapper();
+
+        for (Map<String, String> locationpip : yamlConfig.getLocationpips())
+            pips.add(new LocationPIP(locationpip.get("url"), locationpip.get("authentication"), objectmapper));
+
+        for (Map<String, String> stationpip : yamlConfig.getStationpips())
+            pips.add(new StationPIP(stationpip.get("url"), objectmapper));
+
+        return new PIPAttributeFinderModule(pips);
+    }
 
 	@Bean
 	AbstractClientIdServiceIdPolicyStore policyStore() throws IOException {
-        String path = (env.containsProperty("policystore.path")) ? env.getProperty("policystore.path") :
-                new File(".").getCanonicalPath() + "/policies/";
-        return new FileBasedClientIdServiceIdPolicyStore(path, new ReentrantReadWriteLock());
-	}
+        AbstractClientIdServiceIdPolicyStore policyStore = null;
+        Map<String, String> config = yamlConfig.getPolicystore();
 
-	@Bean
-	PIPAttributeFinderModule pipAttributeFinderModule() {
-		List<PIP> pips = new ArrayList<>();
-		pips.add(new WeekdayPIP());
+        String type = (config.containsKey("type")) ? config.get("type") : "file";
 
-        if (env.containsProperty("stationpip.url"))
-		    pips.add(new StationPIP(env.getProperty("stationpip.url"), objectMapper()));
+        if (type.equals("file")) {
+            String path = (env.containsProperty("policystore.path")) ? env.getProperty("policystore.path") :
+                    (config.containsKey("path")) ? config.get("path") :
+                            new File(".").getCanonicalPath() + "/policies/";
 
-        if (env.containsProperty("locationpip.url"))
-            pips.add(new LocationPIP(env.getProperty("locationpip.url"), env.getProperty("locationpip.authentication"),
-                    objectMapper()));
+            policyStore = new FileBasedClientIdServiceIdPolicyStore(path, new ReentrantReadWriteLock());
+        }
 
-		return new PIPAttributeFinderModule(pips);
-	}
+        if (type.equals("redis")) {
+            String host = (config.containsKey("host")) ? config.get("host") : "localhost";
+            int port = (config.containsKey("port")) ? Integer.parseInt(config.get("port")) : 6379;
+            int timeout = (config.containsKey("timeout")) ? Integer.parseInt(config.get("timeout")) : 2000;
+            String password = config.get("password");
 
-	@Bean
-	AttributeFinder attributeFinder() {
-		List<AttributeFinderModule> attributeFinderModules = new ArrayList<AttributeFinderModule>();
-		attributeFinderModules.add(new CurrentEnvModule());
-		attributeFinderModules.add(new SelectorModule());
-		attributeFinderModules.add(pipAttributeFinderModule());
+            policyStore = new RedisClientIdServiceIdPolicyStore(host, port, timeout, password);
+        }
 
-		AttributeFinder attributeFinder = new AttributeFinder();
-		attributeFinder.setModules(attributeFinderModules);
-
-		return attributeFinder;
-	}
-
-	@Bean
-	PolicyFinder policyFinder() throws IOException {
-		Set<PolicyFinderModule> policyFinderModules = new HashSet<PolicyFinderModule>();
-		policyFinderModules.add(new PolicyStorePolicyFinderModule(policyStore()));
-
-		PolicyFinder policyFinder = new PolicyFinder();
-		policyFinder.setModules(policyFinderModules);
-
-		return policyFinder;
-	}
-
-	@Bean
-	ResourceFinder resourceFinder() {
-		List<ResourceFinderModule> resourceFinderModules = new ArrayList<ResourceFinderModule>();
-
-		ResourceFinder resourceFinder = new ResourceFinder();
-		resourceFinder.setModules(resourceFinderModules);
-
-		return resourceFinder;
-	}
-
-	@Bean
-	PDPConfig pdpConfig() throws IOException {
-		return new PDPConfig(attributeFinder(), policyFinder(), resourceFinder());
-	}
-
-	@Bean
-	PDP pdp() throws IOException {
-		return GeoPDP.getGeoExtendedPDP(pdpConfig());
+        return policyStore;
 	}
 
 	@Bean

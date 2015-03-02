@@ -1,0 +1,24 @@
+##
+## How to use:
+## pdp:                 # prefix for all pdp/contexthandler configuration
+##   locationpips:      # optional configuration of locationpips to use (in yaml list form)
+##     -
+##       url: <url>                         # url of location pip, must be present
+##       authentication: <authentication>   # how to authenticate, currently http-basic authentication header, optional
+##   stationpips:       # optional configuration of stationpips to use (in yaml list form)
+##     -
+##       ur: <url>      # url of station pip, must be present
+##   policystore:       # optional configuration of policyStore
+##     type: <type                          # type of policystore, valid values: redis, file; default: file
+##     path: <path_to_directory>            # path to policies directory, only valid for type file, default: same as .jar
+##     host: <host>                         # host of redisDB, only valid for type redis
+##     port: <port>                         # port of redisDB, only valid for type redis
+##     timeout: <timeout>                   # timeout value for queries to redisDB, only valid for type redis
+##     password: <password>                 # password for redisDB, only valid for type redis
+
+
+pdp:
+  locationpips:
+    -
+      url: http://ls.snet.tu-berlin.de:8080/pe/api/v2/pdp
+      authentication: Basic cGVfdXNlcjo5NTViMDYzMzY0ZDkxNTdjMDgzOTI1M2U4NDcwMjI2ODliNWVlMWRm
