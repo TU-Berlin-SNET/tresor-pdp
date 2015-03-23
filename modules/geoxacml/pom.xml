@@ -18,17 +18,13 @@
  */
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.wso2.balana</groupId>
-        <artifactId>balana</artifactId>
-        <version>1.0.0.wso2v8-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
 
+    <modelVersion>4.0.0</modelVersion>
     <groupId>org.geotools</groupId>
     <artifactId>geoXACML</artifactId>
     <name>org.geotools.geoxacml</name>
+    <version>1.0</version>
+    
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -52,6 +48,7 @@
             <version>10.2</version>
         </dependency>
     </dependencies>
+    
     <repositories>
         <repository>
             <id>osgeo</id>
@@ -59,4 +56,5 @@
             <url>http://download.osgeo.org/webdav/geotools/</url>
         </repository>
     </repositories>
+
 </project>

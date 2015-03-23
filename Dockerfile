@@ -7,11 +7,11 @@ ADD . /opt/tresor-pdp
 WORKDIR /opt/tresor-pdp
 
 RUN mvn clean package &&\
-    cp /opt/tresor-pdp/modules/pdp-contexthandler/target/pdp-contexthandler.jar /opt/pdp-contexthandler.jar
+    cp /opt/tresor-pdp/modules/contexthandler/target/tresor-pdp.jar /opt/tresor-pdp.jar
 
 WORKDIR /opt
 
-ENTRYPOINT ["/usr/bin/java", "-jar", "pdp-contexthandler.jar"]
+ENTRYPOINT ["/usr/bin/java", "-jar", "tresor-pdp.jar"]
 
 EXPOSE 8080
 
