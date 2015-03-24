@@ -1,7 +1,5 @@
 FROM maven
 
-ENV Log4jContextSelector org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
-
 ADD . /opt/tresor-pdp
 
 WORKDIR /opt/tresor-pdp
@@ -11,7 +9,7 @@ RUN mvn clean package &&\
 
 WORKDIR /opt
 
-ENTRYPOINT ["/usr/bin/java", "-jar", "tresor-pdp.jar"]
+ENTRYPOINT ["/usr/bin/java", "-jar", "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector", "tresor-pdp.jar"]
 
 EXPOSE 8080
 
